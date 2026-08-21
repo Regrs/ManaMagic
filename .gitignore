@@ -15,5 +15,8 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
 ManaMagic/ManaMagic.Core/Documentation/Disassembly/
 ManaMagic/SoMBossAIPatcher/
