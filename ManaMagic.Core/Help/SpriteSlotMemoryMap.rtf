@@ -1,0 +1,180 @@
+﻿{\rtf1\ansi\fs20
+
+{\b $E000}: [MASTER_ACTIVATOR] - 0x00: Slot Is Inactive.\par
+\tab\tab\tab         - 0x01: Slot Is Active.\par
+\par
+{\b $E002}: [X_COORDINATE] - 16-Bit.\par
+{\b $E004}: [Y_COORDINATE] - 16-Bit.\par
+{\b $E006}: [X_SPEED]\par
+{\b $E007}: [Y_SPEED]\par
+{\b $E008}: [Z_HEIGHT]\par
+\par
+{\b $E00E}: [SPRITE_FLAGS] - 0x00: Default.\par
+\tab\tab           - 0x01: Horizontal Shake.\par
+\tab\tab           - 0x02: Vertical Shake.\par
+\tab\tab           - 0x04: Unknown.\par
+\tab\tab           - 0x08: Unknown.\par
+\tab\tab           - 0x10: Unknown.\par
+\tab\tab           - 0x20: Unknown.\par
+\tab\tab           - 0x40: Ghost Flicker.\par
+\tab\tab           - 0x80: Invisible.\par
+\par
+{\b $E010}: [CURRENT_DIRECTION] - 0x00: Up.\par
+\tab\tab\tab           - 0x01: Down.\par
+\tab\tab\tab           - 0x02: Right.\par
+\tab\tab\tab           - 0x82: Left.\par
+\par
+{\b $E04F}: Active Spell/Item Palette Index.\par
+\par
+{\b $E050}: [X_DISTANCE_FROM_TARGET_01] - Enemies: Randi, Allies: Enemy #1.\par
+{\b $E051}: [Y_DISTANCE_FROM_TARGET_01] - Enemies: Randi, Allies: Enemy #1.\par
+\par
+{\b $E053}: [X_DISTANCE_FROM_TARGET_02] - Enemies: Purim, Allies: Enemy #2.\par
+{\b $E054}: [Y_DISTANCE_FROM_TARGET_02] - Enemies: Purim, Allies: Enemy #2.\par
+\par
+{\b $E056}: [X_DISTANCE_FROM_TARGET_03] - Enemies: Popoie, Allies: Enemy #3.\par
+{\b $E057}: [Y_DISTANCE_FROM_TARGET_03] - Enemies: Popoie, Allies: Enemy #3.\par
+\par
+{\b $E069}: [WEAPON_PALETTE_ID]. - Index into the weapon/item palette table located at D1/F600.\par
+\par
+{\b $E072}: [EVENT] - 16-Bit. For NPCs, this is ran when interacted with, for enemies it is ran when they die.\par
+\par
+{\b $E0FC}: Active Spell/Item Animation Script Pointer.\par
+\par
+{\b $E180}: [SPRITE_ID]\par
+{\b $E181}: [CURRENT_LEVEL]\par
+{\b $E182}: [CURRENT_HIT_POINTS] - 16-Bit.\par
+{\b $E184}: [MAX_HIT_POINTS] - 16-Bit.\par
+{\b $E186}: [CURRENT_MANA_POINTS]\par
+{\b $E187}: [MAX_MANA_POINTS]\par
+{\b $E188}: [STRENGTH]\par
+{\b $E189}: [AGILITY]\par
+{\b $E18A}: [CONSTITUTION]\par
+{\b $E18B}: [INTELLIGENCE]\par
+{\b $E18C}: [WISDOM]\par
+{\b $E18D}: [CURRENT_EXPERENCE] - 24-Bit.\par
+\par
+{\b $E190}: [STATUS_EFFECTS] - 16-Bit.\par
+{\b $E192}: [MONSTER_TYPE]\par
+{\b $E193}: [ELEMENT]\par
+{\b $E194}: [WEAPON_EFFECTIVE_AGAINST] - Never actually loaded, so always zero.\par
+{\b $E195}: [ACTIVE_WEAPON_ELEMENT] - Set by Saber spells. Mostly useless as this is only checked to determine if Moon Saber is active.\par
+{\b $E196}: [ACTIVE_WEAPON_CRITICAL_RATE]\par
+{\b $E197}: [ACTIVE_WEAPON_HIT_PERCENTAGE]\par
+{\b $E198}: [ACTIVE_WEAPON_ATTACK_POWER]\par
+{\b $E199}: [ACTIVE_WEAPON_STATUS_EFFECTS] - 16-Bit.\par
+{\b $E19B}: [CURRENT_CHARGE_LEVEL]\par
+{\b $E19C}: [ACTIVE_WEAPON_LEVEL]\par
+{\b $E19D}: [SABLE_SPELL_USES]\par
+\par
+{\b $E1A0}: [WEAK_TYPE] - Dummied Out, Always Zero.\par
+{\b $E1A1}: [WEAK_ELEMENT]\par
+{\b $E1A2}: [STRONG_TYPE] - Dummied Out, Always Zero.\par
+{\b $E1A3}: [STRONG_ELEMENT]\par
+{\b $E1A4}: [EVASION]\par
+{\b $E1A5}: [DEFENSE] - 16-Bit.\par
+{\b $E1A7}: [MAGIC_EVASION]\par
+{\b $E1A8}: [MAGIC_DEFENSE] - 16-Bit.\par
+{\b $E1AA}: [STATUS_IMMUNITY] - 16-Bit. Players always immune to Transform. Enemies are always immune to Moogle & Pygmy.\par
+{\b $E1AC}: [AI_PHYSICAL_TARGET] - Id of the target for AI physical attacks.\par
+{\b $E1AD}: [AI_MAGIC_TARGET] - Id of the target for AI magical attacks. (Unused for PCs)\par
+{\b $E1AE}: [WEAPON_BUFFS] - High Nibble: Moon Energy Counter, Low Nibble: Elemental Saber Level.\par
+{\b $E1AF}: [DAMAGE_SOUND_EFFECT] - Id of the sound effect to use when taking damage.\par
+\par
+{\b $E1B0}: [BUFF_EFFECTS] - 0x01: Defense Up.\par
+\tab\tab           - 0x02: Defense Down.\par
+\tab\tab           - 0x04: Evade Up.\par
+\tab\tab           - 0x08: Evade Down.\par
+\tab\tab           - 0x10: Hit Up.\par
+\tab\tab           - 0x20: Hit Down.\par
+\tab\tab           - 0x40: Attack Up.\par
+\tab\tab           - 0x80: Attack Down.\par
+{\b $E1B1}: [MISC_FLAGS] - 0x01: Knocked Out (Plays Animation 0F on players/shadow clones and 0A on enemies.\par
+\tab\tab         - 0x02: ????? (Checked at C1/E453. Set by a bit in the enemy death style byte)\par
+\tab\tab         - 0x04: Partial Remedy Spell (Triggers the 'Recovery Failed!' message).\par
+\tab\tab         - 0x08: Dead (Plays the Healing Cheer (2B) animation if not dead or the Stand & Flicker (2F) animation if they are dead.\par
+\tab\tab         - 0x10: Lucid Barrier (Lucid Barrier Defense will be subtracted from attack damage).\par
+\tab\tab         - 0x20: Prepared For Whip Jump.\par
+\tab\tab         - 0x40: Wall (Spells Will Be Reflected).\par
+\tab\tab         - 0x80: Dropped Treasure Chest (This one seems to do nothing...?).\par
+{\b $E1B2}: [TIMER_STATUS_DURATION_01] - Decremented every 20 frames. Controls Duration For: Stun, Tangle, Paralyze (Dummied Out), Knocked Out, Frosty, Petrify.\par
+{\b $E1B3}: [TIMER_STATUS_DURATION_02] - Decremented every 20 frames. Controls Duration For: Confusion, Balloon.\par
+{\b $E1B4}: [TIMER_STATUS_DURATION_03] - Decremented every 20 frames. Controls Duration For: Stun, Injured.\par
+{\b $E1B5}: [TIMER_STATUS_DURATION_04] - Decremented every 20 frames. Controls Duration For: Moogle, Transform.\par
+{\b $E1B6}: [TIMER_STATUS_DURATION_05] - Decremented every 20 frames. Controls Duration For: Poison, Engulf.\par
+{\b $E1B7}: [TIMER_ATTACK_BUFF_DURATION] - Decremented every 20 frames. Controls Duration For: Attack Up, Attack Down.\par
+{\b $E1B8}: [WALL_USE_COUNTER] - ([{ElementalLevel / NumTargets} + 1] * 4) + 2\par
+{\b $E1B9}: [MAIN_TIMER] - Decremented every 5 frames.\par
+{\b $E1BA}: [TIMER_HIT_BUFF_DURATION] - Decremented every 20 frames. Controls Duration For: Hit Up, Hit Down.\par
+{\b $E1BB}: [TIMER_EVADE_BUFF_DURATION] - Decremented every 20 frames. Controls Duration For: Evade Up, Evade Down.\par
+{\b $E1BC}: [TIMER_DEFENSE_BUFF_DURATION] - Decremented every 20 frames. Controls Duration For: Defense Up, Defense Down.\par
+{\b $E1BD}: [LUCID_BARRIER_HIT_POINTS] - 16-bit, Hit Points = SpellPower or Maximum HP, whichever is less.\par
+{\b $E1BF}: [LUCID_BARRIER_DEFENSE] - Defense = ({DEFENSE / 2} / NumTargets).\par
+\par
+{\b $E1C0}: [SKILL_LEVEL_GLOVE_SWORD] - High Nibble: Glove, Low Nibble: Sword\par
+{\b $E1C1}: [SKILL_LEVEL_AXE_SPEAR] - High Nibble: Axe, Low Nibble: Spear\par
+{\b $E1C2}: [SKILL_LEVEL_WHIP_BOW] - High Nibble: Whip, Low Nibble: Bow\par
+{\b $E1C3}: [SKILL_LEVEL_BOOMERANG_JAVELIN] - High Nibble: Boomerang, Low Nibble: Javelin\par
+{\b $E1C4}: [SKILL_LEVEL_GNOME_UNDINE] - High Nibble: Gnome, Low Nibble: Undine\par
+{\b $E1C5}: [SKILL_LEVEL_SALAMANDO_SYLPHID] - High Nibble: Salamando, Low Nibble: Sylphid\par
+{\b $E1C6}: [SKILL_LEVEL_LUNA_DRYAD] - High Nibble: Luna, Low Nibble: Dryad\par
+{\b $E1C7}: [SKILL_LEVEL_SHADE_LUMINA] - High Nibble: Shade, Low Nibble: Lumina\par
+{\b $E1C8}: [SPELLS_KNOWN_GNOME]     -Purim:   08: Spell 01, 18: Spell 01 & Spell 02, 38: All Spells.\par
+{\b $E1C9}: [SPELLS_KNOWN_UNDINE]     -Popoie: 01: Spell 01, 03: Spell 01 & Spell 02, 07: All Spells.\par
+{\b $E1CA}: [SPELLS_KNOWN_SALAMANDO]\par
+{\b $E1CB}: [SPELLS_KNOWN_SYLPHID]\par
+{\b $E1CC}: [SPELLS_KNOWN_LUNA]\par
+{\b $E1CD}: [SPELLS_KNOWN_DRYAD]\par
+{\b $E1CE}: [SPELLS_KNOWN_SHADE]\par
+{\b $E1CF}: [SPELLS_KNOWN_LUMINA]\par
+\par
+{\b $E1D0}: [CURRENT_EXPERIENCE_GLOVE]\par
+{\b $E1D1}: [CURRENT_EXPERIENCE_SWORD]\par
+{\b $E1D2}: [CURRENT_EXPERIENCE_AXE]\par
+{\b $E1D3}: [CURRENT_EXPERIENCE_SPEAR]\par
+{\b $E1D4}: [CURRENT_EXPERIENCE_WHIP]\par
+{\b $E1D5}: [CURRENT_EXPERIENCE_BOW]\par
+{\b $E1D6}: [CURRENT_EXPERIENCE_BOOMERANG]\par
+{\b $E1D7}: [CURRENT_EXPERIENCE_JAVELIN]\par
+{\b $E1D8}: [CURRENT_EXPERIENCE_GNOME]\par
+{\b $E1D9}: [CURRENT_EXPERIENCE_UNDINE]\par
+{\b $E1DA}: [CURRENT_EXPERIENCE_SALAMANDO]\par
+{\b $E1DB}: [CURRENT_EXPERIENCE_SYLPHID]\par
+{\b $E1DC}: [CURRENT_EXPERIENCE_LUNA]\par
+{\b $E1DD}: [CURRENT_EXPERIENCE_DRYAD]\par
+{\b $E1DE}: [CURRENT_EXPERIENCE_SHADE]\par
+{\b $E1DF}: [CURRENT_EXPERIENCE_LUMINA]\par
+\par
+{\b $E1E0}: [EQUIPPED_HELMET_ID].\par
+{\b $E1E1}: [EQUIPPED_ARMOR_ID].\par
+{\b $E1E2}: [EQUIPPED_ACCESSORY_ID].\par
+{\b $E1E3}: [EQUIPPED_WEAPON_ID] - This can be different from what the ring menu thinks your equipped with. This is how status effects and the Mana Sword work.\par
+{\b $E1E4}: [WEAPON_TYPE_ID]\par
+{\b $E1E5}: [ACTIVE_ANIMATION]\par
+{\b $E1E6}: [MANA_POWER] - After sealing a seed you will need to zone for this field to update.\par
+{\b $E1E7}: [CHARACTER_ID]\par
+{\b $E1E8}: [MELEE_WEAPON] - Same as 01E3 for players.\par
+{\b $E1E9}: [RANGED_WEAPON] - Only used by enemies.\par
+\par
+{\b $E1EC}: [LAST_ATTACKER_ID] - Id of the character that last attacked this character.\par
+{\b $E1ED}: [WEAPON_RECOVERY_TIMER] - TODO: Find Tick Rate.\par
+\par
+{\b $E1F0}: [ATTACKER_ID] - 0xFF: Not being attacked.\par
+{\b $E1F1}: [DAMAGE_HIT_POINTS] - 16-Bit. Values greater than 999 get reduced to 999.\par
+{\b $E1F3}: [RESTORE_HIT_POINTS] - 16-Bit. Values greater than 999 get reduced to 999.\par
+{\b $E1F5}: [DAMAGE_MANA_POINTS] - Values greater than 99 get reduced to 99.\par
+{\b $E1F6}: [RESTORE_MANA_POINTS] - Values greater than 99 get reduced to 99.\par
+{\b $E1F7}: [ACTIVE_WEAPON_STATUS_INFLICTION_RATE]\par
+\par
+{\b $E1FB}: [CHARACTER_TYPE] - 0x01: Shadow Clone.\par
+\tab\tab\tab     - 0x02: Don't Act (Balloon, Barrel, Engulf, Frosty & Petrify).\par
+\tab\tab\tab     - 0x04: Character Opening A Chest.\par
+\tab\tab\tab     - 0x08: Unknown.\par
+\tab\tab\tab     - 0x10: Crystal Orb.\par
+\tab\tab\tab     - 0x20: Treasure Chest.\par
+\tab\tab\tab     - 0x40: Boss.\par
+\tab\tab\tab     - 0x80: Player Character.\par
+\par
+{\b $E1FD}: [ENEMY_BLACK_MAGIC_POWER] - Enemies use this value instead of the defined spell power.\par
+{\b $E1FE}: [ENEMY_WHITE_MAGIC_POWER] - Enemies use this value instead of the defined spell power.\par
+}
