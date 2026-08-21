@@ -1,0 +1,193 @@
+﻿http://www.westerndesigncenter.com/wdc/documentation/Programmanual.pdf
+
+7E005C 	System 	FLAG_BOSS_ENCOUNTER
+7E00ED 	System 	CURRENT_MAP_STYLE
+
+$0000 - TempVar:TilesetLoaderRegister, TempVar:SpritePaletteLoopCounterL
+$0001 - TempVar:TilesetWorkRegister, TempVar:SpritePaletteLoopCounterH
+$0002 - TempVar:ModifiedJoyPadStateH, TempVar:TilesetWorkRegisterH
+$0003 - TempVar:ModifiedJoyPadWorkRegister, TempVar:TilesetWorkRegisterL
+$0004 - TempVar:CurrentTilesetData (16-Bit), TempVar:GraphicAddress (16-Bit)
+$0008 - TempVar:EncodedSizeL
+$0009 - TempVar:EncodedSizeH
+$0010 - TempVar:Layer1CollisionOffset (16-Bit), {TempVar:MapTilesetPointerL} (16-Bit), TempVar:8x8TileInstructions (16-Bit)
+$0012 - TempVar:Layer2CollisionOffset (16-Bit), {TempVar:MapTilesetPointerBank} (16-Bit), TempVar:8x8TileInstructionsBank
+$0014 - TempVar:MapCollisionPointer (16-Bit), TempVar:16x16TilesetConstructionLayer1 (16-Bit), TempVar:TileLoaderInstructionSize (16-Bit)
+$0016 - TempVar:16x16TilesetConstructionLayer2 (16-Bit)
+$0018 - TempVar:TilesetLoadCounter (16-Bit)
+$001B - TempVar:MapPaletteRegister
+$001C - TempVar:MapHeaderRegister (16-Bit)
+$0021 - TM
+$0029 - BGMODE
+$002A - ???
+$002C - HDMAEN
+$0042 - [JOYPAD1_BUTTON_STATE] (16-Bit)
+$0044 - [JOYPAD2_BUTTON_STATE] (16-Bit)
+$0046 - [JOYPAD3_BUTTON_STATE] (16-Bit)
+$0052 - ???
+$0056 - [CURRENT_FRAME_INDEX]
+$0058 - ??? Map Related
+$005C - [FLAG_BOSS_ENCOUNTER]
+$005D - [CURRENT_MAP_STYLE]
+$00BA - Character Offset
+$00C0       ;Compare [BOSS_X_COORDINATE, X] against [CURRENT_MAP_WIDTH].
+$00C2       ;[CURRENT_MAP_HEIGHT]
+$00D9 - [PLAYER_1_CONTROLLED_CHARACTER]
+$00DA - [PLAYER_2_CONTROLLED_CHARACTER]
+$00DB - [PLAYER_3_CONTROLLED_CHARACTER]
+$00DC - [CURRENT_MAP_ID] (16-Bit)
+$00DE - [MAP_ENTRANCE_X_COORDINATE]
+$00DF - [MAP_ENTRANCE_Y_COORDINATE]
+$00E0 - [MAP_ENTRANCE_FADE_STYLE]
+$00E6 - INIDISP
+$00E8 - Related to Flammie
+      - 0x04: Set when taking off after using the flammie drum.
+$00EC - Some kinda NMI waiter flag
+      - 0x01: The "Frame Complete" flag?
+      - 0x02:
+      - 0x08:
+      --0x01 + 0x08 == NMI Skips DMI Transfer
+$00ED - CURRENT_MAP_STYLE
+$00F4 - Seems to be a 16-bit frame counter.
+$0100 - NMIVector (4 bytes)
+$0104 - IRQVector (4 bytes)
+$0108 - ??? Map Related
+$010E - [LAST_DOOR_INDEX] (16-Bit)
+$011E - ??? Map Related
+$011F - [FLAG_SPECIAL_ITEMS_ALLOWED]
+$0383 - TempVat:AttackerOffset
+$0385 - TempVar:DefenderOffset
+$0389 - TempVar:AttackDamage}
+$03A4 - TempVar:CritRate
+$03A6 - TempVar:GainedWeaponExperience
+$03B0 - TempVar:MaxWeaponLevel
+$03CC - TempVar:CharacterOffset
+$03D0 - TempVar:NewWeaponExperience}
+$03D4         ;Store Register Y(Character Offset) into {TempVar:D4}.
+$03D4 - TempVar:WeaponIndex
+$03D8 - TempVar:ExpForNextWeaponLevel
+$03CC - TempVar:RandomNumber
+
+$0FA2 - TempVar:BossId
+
+$1D01 - [EVENT_POINTER]
+$1D03 - [EVENT_BANK]
+$1D04  - ????
+$1D05 - Background Mode?
+$1D14 - [MODE7_MESSAGEBOX_BOSS_SPRITE_OBJECT_OFFSET]
+$1D16 - [MODE7_MESSAGEBOX_BOSS_FRAME_OFFSET]
+
+$E062 - Some timer
+
+$FE00 - [FIELD_MESSAGE_RANGE]
+
+; 7F/B800-7F/BB00 - Layer 1 Collision Information
+; 7F/BC00-7F/BF00 - Layer 2 Collision Information
+; 7F/C000-7F/C600 - Layer 1 16x16 Tileset Construction
+; 7F/C800-7F/CE00 - Layer 2 16x16 Tileset Construction
+
+
+E0: 11100000
+-80: DF/6000, Fill Byte: 00
+-A0: DF/6000, Fill Byte: FF
+
+[Table_GraphicTileBaseAddresses]
+CC/E270:	E0E71F [00: ]
+CC/E273:	00601F [01: ]
+CC/E276:	00001C [02: ]
+CC/E279:	00001D [03: ]
+
+
+0CE891: 66 85 1F [00: Load 20 Tile(s), Begin At Location: DF/6990, Fill Byte: 00]
+66: 011-00110
+85: 100-00101
+
+1000010101100110 : 8566
+0000010101100110 : 0566
+0010101100110000 : 2B30
+0101011001100000 : 5660
+1000000110010000 : 8190
+
+DF:E190
+
+[Boss Addresses]
+LDA $46         ;Load {TempVar:Multiplicand} into Accumulator.
+LDA $4E         ;Load {TempVar:Multplier} into Accumulator.
+STA $56         ;Store [ProductL] into {TempVar:ProductL}.
+STA $57         ;Store [ProductH] into {TempVar:ProductH}.
+---
+; $0018 - [BOSS_PALETTE_OFFSET_01]
+; $0019 - [BOSS_PALETTE_OFFSET_02] 
+; $001A - [BOSS_PALETTE_OFFSET_03]
+; $0029 - [BOSS_X_SUBPIXEL_COORDINATE]
+; $002B - [BOSS_X_COORDINATE]
+; $002D - [BOSS_ATTACK_WAIT_TIME]
+; $0030 - [BOSS_Y_SUBPIXEL_COORDINATE]
+; $0032 - [BOSS_Y_COORDINATE]
+; $003A - [BOSS_SUB_PIXEL_X_SPEED]
+; $003C - [BOSS_X_SPEED]
+; $003E - [BOSS_SUB_PIXEL_Y_SPEED]
+; $0040 - [BOSS_Y_SPEED]
+; $0042 - [BOSS_ATTACK_PATTERN]
+; $0048 - [BOSS_GENERIC_ROUTINE_POINTER]
+; $004A - [BOSS_COMMAND_LOCK_ROUTINE_POINTER]
+; $004C - [BOSS_SPECIAL_DEATH_HANDLER_POINTER]
+
+; $00AD - [BOSS_ATTACK_TIMER]
+; $0064 - [BOSS_Z_SUBPIXEL_COORDINATE]
+; $0066 - [BOSS_Z_COORDINATE]
+; $0070 - [BOSS_SPRITE_FLAGS]
+; $0078 - [BOSS_POST_DEATH_ACTION_POINTER]
+; $007A - [BOSS_ACTIVE_COMMAND_ID]
+; $007C - [BOSS_COMBAT_LOCK] - State Machine bosses will skip their attack routines when set.
+; $007E - [BOSS_STATE_FLAGS]
+
+; $0082 - [BOSS_ATTACKING_FLAG]
+; $0088 - [BOSS_ANIMATION_SYNC_VALUE]
+; $008E - [BOSS_AI_POINTER]
+; $0090 - [BOSS_OBJECT_COORDINATE_ROUTINE_POINTER]
+; $0094 - [BOSS_AI_ACTIVE_STATE]
+; $0096 - [BOSS_AI_CALL_TIMER] - Incremented everytime the boss AI routine is called (5 frames), reset whenever the boss wants
+; $0098 - [BOSS_CONTROL_FLAGS]
+; BossControlFlag #$0100: These two bits combine to form a value 
+; BossControlFlag #$0200: indicating what frame the bosses AI runs on.
+; BossControlFlag #$0400 seems to disable collision all together.
+; BossControlFlag #$0800: Boss Enabled.
+; BossControlFlag #$1000: Player Character Collision Disabled.
+; BossControlFlag #$2000 seems to indicate a boss child object. 
+; BossControlFlag #$0001: Vampire sets this 
+; BossControlFlag #$0002 seems to make the boss collide with Layer 2. (Hydra Sets This)
+; BossControlFlag #$0008 seems to indicate a background sprite.
+; BossControlFlag #$0010 Something about shadows.
+; BossControlFlag #$0040: Horizontal Flip.
+; BossControlFlag #$0080: Vertical Flip.
+; $009A - [BOSS_ANIMATION_ID]
+; $009E - [BOSS_FRAME_DELAY]
+; $00A0 - [BOSS_FRAME_CONSTRUCTION_POINTER]
+; $00A2 - [BOSS_FRAME_CONSTRUCTION_BANK]
+; $00A5 - [BOSS_SHADOW_Y_OFFSET]
+; $00A7 - [BOSS_SHADOW_TYPE]
+; $00A9 - [BOSS_CURRENT_TARGET]
+; $00AB - [BOSS_DIRECTION]
+; $00AD - [BOSS_ATTACK_TIMER]
+; $00B0 - [BOSS_ACTIVE_COMMAND_SCRIPT_POINTER]
+; $00B0 - [BOSS_OBJECT_MASTER_OFFSET]
+; $00BA - [BOSS_DAMAGE_ANIMATION_POINTER]
+; $00BC - [BOSS_DEFAULT_ANIMATION_POINTER]
+; $00BE - [BOSS_DEATH_ANIMATION_POINTER]
+; $00C4 - [BOSS_SUB_PIXEL_Z_SPEED]
+; $00C6 - [BOSS_Z_SPEED]
+
+
+02352B: A687            LDX $87         ;Load {TempVar:BossOffset} into Register X.
+02352D: BDBC00          LDA $00BC,X     ;Load [BOSS_DEFAULT_COMMAND_POINTER, X] into Accumulator.
+023530: 9DB000          STA $00B0,X     ;Store [BOSS_DEFAULT_COMMAND_POINTER, X] into [BOSS_ACTIVE_COMMAND_SCRIPT_POINTER, X].
+023533: 9EB200          STZ $00B2,X     ;Store Zero into [BOSS_AI_SCRIPT_LOCATION, X].
+023536: A90200          LDA #$0002      ;Load 0x0002 into Accumulator.
+023539: 9D9400          STA $0094,X     ;Store 0x0002 into [BOSS_AI_ACTIVE_STATE, X]. (Process AI Script)
+02353C: 9E8000          STZ $0080,X     ;Store Zero into [BOSS_SPELL_CAST_FLAG, X].
+02353F: 9E1400          STZ $0014,X     ;Store Zero into [BOSS_ANIMATION_FREEZE_TIMER, X].
+023542: 9E4800          STZ $0048,X     ;Store Zero into [BOSS_GENERIC_ROUTINE_POINTER, X].
+023545: 9E4A00          STZ $004A,X     ;Store Zero into [BOSS_COMMAND_LOCK_ROUTINE_POINTER, X].
+023548: A90100          LDA #$0001      ;Load 0x0001 into Accumulator.
+02354B: 9D8200          STA $0082,X     ;Store 0x0001 into [BOSS_ATTACKING_FLAG, X]. (Boss Not Attacking)

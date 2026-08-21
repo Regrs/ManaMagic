@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ManaMagic version="1">
+  <RomPath path="D:\Software Development\ManaMagic\ManaMagic\bin\Debug\net5.0-windows\Data\Secret of Mana (USA).sfc" />
+  <Events />
+  <StringTables>
+    <WeaponNames />
+    <EquipmentNames />
+    <ItemNames />
+    <EnemyNames />
+    <WeaponDescriptions />
+    <TownNames />
+    <ItemErrors />
+    <ShopText />
+    <StatusEffectMessages />
+    <ElementalFearMessages />
+    <TrapMessagesMessages />
+    <WeaponNameMessages />
+    <BossSkillNameMessages />
+    <LunarMagicMessages />
+    <TreasureChestMessages />
+    <CombatMessages />
+    <AnalyzerMessages />
+    <LevelUpMessages />
+  </StringTables>
+  <CharacterData>
+    <RandiStatsByLevel />
+    <PurimStatsByLevel />
+    <PopoieStatsByLevel />
+    <ExperiencePerLevels />
+  </CharacterData>
+  <Sprites>
+    <EnemyStatistics />
+    <LootTable />
+    <Palettes />
+  </Sprites>
+  <Bosses>
+    <BossPalettes />
+    <BossWeapons />
+    <BossHeaders />
+  </Bosses>
+  <Items>
+    <Weapons />
+    <Equipments />
+    <Consumables />
+    <Shops>
+      <PriceTables />
+      <ShopInventories />
+    </Shops>
+  </Items>
+  <Maps>
+    <DisplaySettings />
+    <MapPaletteSets />
+    <FlammieFlightCoordinates />
+  </Maps>
+  <WorldMap>
+    <LandingLocations />
+    <CannonTravelCoordinateSets />
+  </WorldMap>
+</ManaMagic>

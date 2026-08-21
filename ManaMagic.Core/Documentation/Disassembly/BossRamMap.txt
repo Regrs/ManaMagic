@@ -1,0 +1,120 @@
+﻿--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+$2116 - [VMADD]
+$2118 - [VMDATAWRITEL]
+$2119 - [VMDATAWRITEH]
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+$2C5   ;{TempVar:ConstantZero}
+$2C7   ;{Tempvar:ConstantFFFF}
+$287 - [DP_BOSS_OFFSET]
+$289 - [DP_BOSS_FRAME_OFFSET]
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+$001D14 - [MODE7_MESSAGEBOX_BOSS_SPRITE_OBJECT_OFFSET]
+$001D16 - [MODE7_MESSAGEBOX_BOSS_FRAME_OFFSET]
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+$0000 ;[MASTER_ACTIVATOR]
+$0002 ;[X_COORDINATE]
+$0004 ;[Y_COORDINATE]
+$0014 ;[BOSS_ANIMATION_FREEZE_TIMER]
+$0018 ;[BOSS_PALETTE_OFFSET, X] : 4 Slot Array
+$002B ;[BOSS_X_COORDINATE]
+$002D ;[BOSS_ATTACK_WAIT_TIME]
+$0032 ;[BOSS_Y_COORDINATE]
+$003A ;[BOSS_X_SUBPIXEL_SPEED]
+$003C ;[BOSS_X_SPEED]
+$003E ;[BOSS_Y_SUBPIXEL_SPEED]
+$0040 ;[BOSS_Y_SPEED]
+$0042 ;[BOSS_ATTACK_PATTERN]
+$0045 ;[Z_COORDINATE]
+$0048 ;[BOSS_GENERIC_ROUTINE_POINTER]
+$004A ;[BOSS_COMMAND_LOCK_ROUTINE_POINTER]
+$004C ;[BOSS_SPECIAL_DEATH_HANDLER_POINTER]
+$0059 ;[ATTACKER_ID]
+$005A ;[DEFENDER_ID]
+--------------------------------------------------------------------------------------------------------------------------------------------
+$0060 ;Load [7E/E060, X] into Accumulator. |-CMP #$0040      ;Test for 'Taking Damage'. 0x20: Boss Dying
+$0062 ;From Boss Header, Gets added to Y-Coordinate in certain conditions.
+--------------------------------------------------------------------------------------------------------------------------------------------
+$0064 ;[BOSS_Z_SUBPIXEL_COORDINATE]
+$0066 ;[BOSS_Z_COORDINATE]
+$0070 ;[BOSS_SPRITE_FLAGS]
+      ;--0x4000: Flicker
+$0076 ;[BOSS_COMMAND_POINTER]
+$0078 ;[BOSS_POST_DEATH_HANDLER]
+$007A ;[BOSS_ACTIVE_COMMAND_ID]
+$007E ;[BOSS_STATE_FLAGS]
+$0080 ;[BOSS_SPELL_CAST_FLAG]
+      ;--0x00: Boss Not Casting Spell
+      ;--0x01: Boss Casting Spell
+$0082 ;[BOSS_ATTACKING_FLAG]
+      ;--0x00: Boss Attacking
+      ;--0x01: Boss Not Attacking
+      ;--0x02: Boss Under Attack
+$0088 ;[BOSS_ANIMATION_SYNC_VALUE]
+$008E ;[BOSS_AI_POINTER]
+$0090 ;[BOSS_OBJECT_COORDINATE_ROUTINE_POINTER]
+$0094 ;[STRUCTURED_BOSS_AI_LOCATION]
+$0098 ;[BOSS_CONTROL_FLAGS]
+      ;--0x0800: ??? (Causes anim scripts to be called?)
+      ;--0x2000: ??? (If Not Set Boss Enabled Flag Check Is Skipped?)
+      ;--0x4000: ???
+      ;--0x0008: ??? (Causes X/Y/Z to get stored in temp variables before maybe calling an anim script)
+      ;--0x0010: ???
+      ;--0x0040: Horizontal Flip
+      ;--0x0080: Vertical Flip
+$009A ;[BOSS_ANIMATION_ID]
+$009C ;[BOSS_ANIMATION_SCRIPT_POSITION]
+$009E ;[BOSS_FRAME_DELAY]
+$00A0 ;[BOSS_FRAME_CONSTRUCTION_POINTER]
+$00A2 ;[BOSS_FRAME_CONSTRUCTION_BANK]
+$00A7 ;[BOSS_SHADOW_TYPE]
+$00A9 ;[BOSS_CURRENT_TARGET]
+$00AB ;[BOSS_DIRECTION]
+$00AD ;[BOSS_ATTACK_TIMER]
+$00B0 ;[BOSS_ACTIVE_COMMAND_SCRIPT_POINTER]
+$00B0 ;[BOSS_OBJECT_MASTER_OFFSET] : Child Boss Objects Only. Contains the $E000 offset of the parent object.
+$00B2 ;[BOSS_AI_SCRIPT_LOCATION]
+$00B4 ;[BOSS_INIT_POINTER]
+$00B6 ;[BOSS_MOVEMENT_ALGORITHM_POINTER]
+$00B8 ;[BOSS_ATTACK_ALGORITHM_POINTER]
+$00BA ;[BOSS_DAMAGE_ANIMATION_POINTER]
+$00BC ;[BOSS_DEFAULT_COMMAND_POINTER]
+$00BE ;[BOSS_DEATH_ANIMATION_POINTER]
+$00C4 ;[BOSS_Z_SUBPIXEL_SPEED]
+$00C6 ;[BOSS_Z_SPEED]
+$0175 ;[SPLASH_NUMBERS_ACTIVATOR]
+$0176 ;[CAST_SPELL_TARGET_COUNT]
+$0182 ;[CURRENT_HIT_POINTS]
+$0184 ;[MAX_HIT_POINTS]
+$0180 ;[SPRITE_ID]
+$0190 ;[STATUS_EFFECTS]
+$019B ;[CURRENT_CHARGE_LEVEL]
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+$033D ;Increment [BOSS_RANDOM_SEED].
+$033F ;[BOSS_PALETTE_ID_ARRAY]
+$0E60 ;[BOSS_OBJECT_ARRAY]
+
+BIT $5C		;Test [FLAG_BOSS_ENCOUNTER].
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+018 Palette offsets x 4
+01E Size
+029 X subpixel position
+030 Y subpixel position
+04E Crash flags
+064 Z subpixel position
+070 State (4 = Flicker, 8=Invisible)
+072 Death script (Mantis Ant = 0112
+08E Main procedure
+098 Flags (1=Follow screen, 8=BG graphics, 10=PC Collison Enable, 80=H flip, 40=V flip)
+099 Flags2 (8 = Animated)
+0A5 Y delta
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------

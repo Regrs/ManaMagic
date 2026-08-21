@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ManaMagic version="1">
+  <RomPath path="Data\Secret of Mana (USA).sfc" />
+  <Events>
+    <Event index="80">
+      <OperationCode value="AddItem" parameter1="70" />
+      <OperationCode value="AddItem" parameter1="71" />
+      <OperationCode value="AddItem" parameter1="146" />
+      <OperationCode value="AddItem" parameter1="164" />
+      <OperationCode value="AddItem" parameter1="129" />
+      <OperationCode value="AddToParty" parameter1="1" />
+      <OperationCode value="AddToParty" parameter1="2" />
+      <OperationCode value="Restore" parameter1="4" />
+      <OperationCode value="Restore" parameter1="132" />
+      <OperationCode value="RefreshPartyStatusBars" />
+      <OperationCode value="SetCharacterSlotAddress" parameter1="2" parameter2="200" parameter3="56" />
+      <OperationCode value="SetCharacterSlotAddress" parameter1="3" parameter2="200" parameter3="7" />
+      <OperationCode value="SetCharacterSlotAddress" parameter1="2" parameter2="203" parameter3="56" />
+      <OperationCode value="SetCharacterSlotAddress" parameter1="3" parameter2="200" parameter3="7" />
+      <OperationCode value="OpenTextWindow" />
+      <OperationCode value="TextStart" parameter1="128,173,129,150,133,128,153,143,149,146,128,135,129,141,133,202,127" />
+      <OperationCode value="PadLeft" parameter1="2" />
+      <OperationCode value="TextStart" parameter1="203" />
+      <OperationCode value="BeginOptionDialogSetup" />
+      <OperationCode value="SetOptionDialogOption" parameter1="5" />
+      <OperationCode value="TextStart" parameter1="179,133,147" />
+      <OperationCode value="SetOptionDialogOption" parameter1="11" />
+      <OperationCode value="TextStart" parameter1="168,143,128,128,204" />
+      <OperationCode value="EndOptionDialogSetup" parameter1="1" />
+      <OperationCode value="JumpToEvent1" parameter1="0" />
+      <OperationCode value="Utility" parameter1="6" />
+      <OperationCode value="JumpToEvent1" parameter1="0" />
+      <OperationCode value="End" />
+    </Event>
+  </Events>
+  <StringTables>
+    <WeaponNames>
+      <Event index="1">
+        <OperationCode value="TextStart" parameter1="170,169,177,159,172,128,161,166,169,176,159,183" />
+        <OperationCode value="End" />
+      </Event>
+    </WeaponNames>
+    <EquipmentNames>
+      <Event index="22">
+        <OperationCode value="TextStart" parameter1="158,133,130,149,135,128,169,150,133,146,129,140,140,147" />
+        <OperationCode value="End" />
+      </Event>
+    </EquipmentNames>
+    <ItemNames>
+      <Event index="0">
+        <OperationCode value="TextStart" parameter1="156,140,149,133,128,173,139,153" />
+        <OperationCode value="End" />
+      </Event>
+    </ItemNames>
+    <EnemyNames>
+      <Event index="0">
+        <OperationCode value="TextStart" parameter1="179,133,140,140,143,151,128,156,149,142,142,153" />
+        <OperationCode value="End" />
+      </Event>
+      <Event index="87">
+        <OperationCode value="TextStart" parameter1="168,143,143,130,128,155,142,148" />
+        <OperationCode value="End" />
+      </Event>
+    </EnemyNames>
+    <WeaponDescriptions>
+      <Event index="1">
+        <OperationCode value="TextStart" parameter1="182,127,183,127,184,127,185" />
+        <OperationCode value="End" />
+      </Event>
+    </WeaponDescriptions>
+    <TownNames>
+      <Event index="0">
+        <OperationCode value="TextStart" parameter1="179,169,166,169,128,176,163,166,166,155,161,159" />
+        <OperationCode value="End" />
+      </Event>
+    </TownNames>
+    <ItemErrors>
+      <Event index="5">
+        <OperationCode value="TextStart" parameter1="179,143,149,128,132,143,142,133,128,134,149,131,139,133,132,128,149,144,191" />
+        <OperationCode value="End" />
+      </Event>
+    </ItemErrors>
+    <ShopText>
+      <Event index="1">
+        <OperationCode value="TextStart" parameter1="127" />
+        <OperationCode value="ClearTextWindow" />
+        <OperationCode value="TextStart" parameter1="170,137,147,147,128,143,134,134,200" />
+        <OperationCode value="End" />
+      </Event>
+    </ShopText>
+    <StatusEffectMessages />
+    <ElementalFearMessages />
+    <TrapMessagesMessages />
+    <WeaponNameMessages />
+    <BossSkillNameMessages />
+    <LunarMagicMessages />
+    <TreasureChestMessages />
+    <CombatMessages />
+    <AnalyzerMessages>
+      <Event index="0">
+        <OperationCode value="TextStart" parameter1="160,149,131,139,128" />
+        <OperationCode value="End" />
+      </Event>
+    </AnalyzerMessages>
+    <LevelUpMessages />
+  </StringTables>
+  <CharacterData>
+    <RandiStatsByLevel>
+      <StatByLevel index="1" hitPoints="998" manaPoints="98" strength="98" agility="98" constitution="98" intelligence="98" wisdom="98" />
+      <StatByLevel index="2" hitPoints="999" manaPoints="99" strength="99" agility="99" constitution="99" intelligence="99" wisdom="99" />
+    </RandiStatsByLevel>
+    <PurimStatsByLevel />
+    <PopoieStatsByLevel />
+    <ExperiencePerLevels>
+      <ExperiencePerLevel index="1" experience="17" />
+    </ExperiencePerLevels>
+    <DefaultPartyData index="0" gold="1000" sealedManaSeeds="0" saveLocation="0" randiAGQ="2" purimAGQ="3" popoieAGQ="3" randiAGL="10" purimAGL="15" popoieAGL="15" randiHelmet="12" randiArmor="37" randiAccessory="46" randiWeapon="10" purimHelmet="0" purimArmor="23" purimAccessory="0" purimWeapon="0" popoieHelmet="0" popoieArmor="24" popoieAccessory="0" popoieWeapon="54" />
+  </CharacterData>
+  <Sprites>
+    <EnemyStatistics>
+      <EnemyStatEntry index="0" level="73" hitPoints="20" manaPoints="0" strength="3" agility="1" intelligence="1" wisdom="1" evasion="0" defense="0" magicEvasion="0" magicDefense="0" monsterType="8" element="2" experienceAward="1" blackMagicPower="10" whiteMagicPower="10" immunities="5632" meleeWeapon="72" rangedWeapon="72" deathStyle="10" weaponMagicLevel="0" goldAward="2" />
+      <EnemyStatEntry index="87" level="3" hitPoints="15" manaPoints="20" strength="8" agility="5" intelligence="7" wisdom="7" evasion="0" defense="0" magicEvasion="0" magicDefense="0" monsterType="4" element="1" experienceAward="10" blackMagicPower="17" whiteMagicPower="17" immunities="32764" meleeWeapon="0" rangedWeapon="0" deathStyle="1" weaponMagicLevel="0" goldAward="100" />
+    </EnemyStatistics>
+    <LootTable>
+      <LootEntry index="0" dropRate="61" trapInfo="16" rareDropChance="248" commonDrop="40" rareDrop="4" />
+    </LootTable>
+    <Palettes>
+      <Palette index="0" palette0="32767" palette1="0" palette2="13665" palette3="21825" palette4="29120" palette5="32320" palette6="25904" palette7="32245" palette8="30175" palette9="31359" palette10="32543" palette11="23041" palette12="7518" palette13="22204" palette14="28605" palette15="32767" />
+    </Palettes>
+  </Sprites>
+  <Bosses>
+    <BossPalettes>
+      <Palette index="12" address="192988" palette0="22197" palette1="7297" palette2="31744" palette3="7778" palette4="8473" palette5="11263" palette6="22395" palette7="24992" palette8="30400" palette9="28576" palette10="28532" palette11="14762" palette12="20015" palette13="26355" palette14="29591" palette15="32767" />
+      <Palette index="70" address="194588" palette0="19026" palette1="4228" palette2="32736" palette3="30438" palette4="29228" palette5="28049" palette6="16384" palette7="11856" palette8="12065" palette9="29757" palette10="32324" palette11="24041" palette12="14737" palette13="22038" palette14="26324" palette15="31673" />
+    </BossPalettes>
+    <BossWeapons>
+      <BossWeapon index="0" affinity="2" element="8" accuracy="99" power="36" statusEffects="16512" inflictionRate="99" />
+    </BossWeapons>
+    <BossHeaders />
+  </Bosses>
+  <Items>
+    <Weapons>
+      <Weapon index="9" weaponClass="1" statModifiers="49664" projectileType="0" paletteIndex="25" affinity="0" criticalChance="0" accuracy="75" power="149" statusEffects="32" inflictionRate="80" />
+    </Weapons>
+    <Equipments>
+      <Equipment index="22" statModifiers="95" defense="99" evasion="99" magicDefense="99" magicEvasion="99" equippableBy="224" element="2" resistances="32756" unknown="0" />
+    </Equipments>
+    <Consumables>
+      <Consumable index="0" amountHealed="6" paletteIndex="151" />
+    </Consumables>
+    <Shops>
+      <PriceTables>
+        <PriceTable index="0">
+          <Item index="0" price="65535" />
+          <Item index="1" price="5" />
+        </PriceTable>
+      </PriceTables>
+      <ShopInventories>
+        <ShopInventory index="0">
+          <Item index="0" shopItem="186" />
+          <Item index="1" shopItem="190" />
+          <Item index="2" shopItem="191" />
+          <Item index="3" shopItem="124" />
+          <Item index="4" shopItem="145" />
+          <Item index="5" shopItem="188" />
+          <Item index="6" shopItem="151" />
+          <Item index="7" shopItem="136" />
+        </ShopInventory>
+      </ShopInventories>
+    </Shops>
+  </Items>
+  <Maps>
+    <DisplaySettings />
+    <MapPaletteSets />
+    <FlammieFlightCoordinates>
+      <FlammieFlightCoordinate index="0" xCoordinate="9" yCoordinate="7" />
+    </FlammieFlightCoordinates>
+  </Maps>
+  <WorldMap>
+    <LandingLocations>
+      <LandingLocation index="0" mapIndex="9" xCoordinate="16" yCoordinate="14" />
+    </LandingLocations>
+    <CannonTravelCoordinateSets>
+      <CannonTravelCoordinateSet index="0" startXCoordinate="124" startYCoordinate="124" endXCoordinate="4" endYCoordinate="5" />
+    </CannonTravelCoordinateSets>
+  </WorldMap>
+</ManaMagic>
