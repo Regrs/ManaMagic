@@ -1,0 +1,384 @@
+﻿<RAMLayout>
+  <Address name="MASTER_ACTIVATOR" offset="E000" size="8" type="CharacterData">
+    <Description value="0x00: Slot Is Inactive,0x01: Slot Is Active" />
+  </Address>
+  <!-- SKIP -->
+  <Address name="X_COORDINATE" offset="E002" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="Y_COORDINATE" offset="E004" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="X_SPEED" offset="E006" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="Y_SPEED" offset="E007" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="Z_HEIGHT" offset="E008" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <!-- SKIP -->
+  <Address name="SPRITE_FLAGS" offset="E00E" size="8" type="CharacterData">
+    <Description value="0x01: Horizontal Shake,0x02: Vertical Shake,0x04: Unknown,0x08: Unknown,0x10: Unknown,0x20: Unknown,0x40: Ghost Flicker,0x80: Invisible" />
+  </Address>
+  <!-- SKIP -->
+  <Address name="CURRENT_DIRECTION" offset="E010" size="8" type="CharacterData">
+    <Description value="0x00: Up,0x01: Down,0x02: Right,0x82: Left" />
+  </Address>
+  <!-- SKIP -->
+  <!-- $E04F: Active Spell/Item Palette Index -->
+  <!-- SKIP -->
+  <Address name="X_DISTANCE_FROM_TARGET_01" offset="E050" size="8" type="CharacterData">
+    <Description value="Enemies: Randi; Allies: Enemy #1." />
+  </Address>
+  <Address name="Y_DISTANCE_FROM_TARGET_01" offset="E051" size="8" type="CharacterData">
+    <Description value="Enemies: Randi; Allies: Enemy #1." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="X_DISTANCE_FROM_TARGET_02" offset="E053" size="8" type="CharacterData">
+    <Description value="Enemies: Purim; Allies: Enemy #2." />
+  </Address>
+  <Address name="Y_DISTANCE_FROM_TARGET_02" offset="E054" size="8" type="CharacterData">
+    <Description value="Enemies: Purim; Allies: Enemy #2." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="X_DISTANCE_FROM_TARGET_03" offset="E053" size="8" type="CharacterData">
+    <Description value="Enemies: Popoie; Allies: Enemy #3." />
+  </Address>
+  <Address name="Y_DISTANCE_FROM_TARGET_03" offset="E054" size="8" type="CharacterData">
+    <Description value="Enemies: Popoie; Allies: Enemy #3." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="WEAPON_PALETTE_ID" offset="E069" size="8" type="CharacterData">
+    <Description value="Index into the weapon/item palette table located at D1/F600." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="EVENT" offset="E072" size="16" type="CharacterData">
+    <Description value="For NPCs: this is ran when interacted with.,For Enemies: it is ran when they die." />
+  </Address>
+  <!-- SKIP -->
+  <!-- $E0FC: Active Spell/Item Animation Script Pointer -->
+  <!-- SKIP -->
+  <Address name="SPRITE_ID" offset="E180" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_LEVEL" offset="E181" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_HIT_POINTS" offset="E182" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="MAX_HIT_POINTS" offset="E184" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_MANA_POINTS" offset="E186" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="MAX_MANA_POINTS" offset="E187" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="STRENGTH" offset="E188" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="AGILITY" offset="E189" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CONSTITUTION" offset="E18A" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="INTELLIGENCE" offset="E18B" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="WISDOM" offset="E18C" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERENCE" offset="E18D" size="24" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="STATUS_EFFECTS" offset="E190" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="MONSTER_TYPE" offset="E192" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="ELEMENT" offset="E193" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="WEAPON_EFFECTIVE_AGAINST" offset="E194" size="8" type="CharacterData">
+    <Description value="Never actually loaded so always zero." />
+  </Address>
+  <Address name="ACTIVE_WEAPON_ELEMENT" offset="E195" size="8" type="CharacterData">
+    <Description value="Set by Saber spells. Mostly useless as this is only checked to determine if Moon Saber is active." />
+  </Address>
+  <Address name="ACTIVE_WEAPON_CRITICAL_RATE" offset="E196" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="ACTIVE_WEAPON_HIT_PERCENTAGE" offset="E197" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="ACTIVE_WEAPON_ATTACK_POWER" offset="E198" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="ACTIVE_WEAPON_STATUS_EFFECTS" offset="E199" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_CHARGE_LEVEL" offset="E19B" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="ACTIVE_WEAPON_LEVEL" offset="E19C" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="SABLE_SPELL_USES" offset="E19D" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <!-- $E19E: 16-bit - Another status effect tracker field. -->
+  <Address name="WEAK_TYPE" offset="E1A0" size="8" type="CharacterData">
+    <Description value="Dummied Out. Always Zero." />
+  </Address>
+  <Address name="WEAK_ELEMENT" offset="E1A1" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="STRONG_TYPE" offset="E1A2" size="8" type="CharacterData">
+    <Description value="Dummied Out. Always Zero." />
+  </Address>
+  <Address name="STRONG_ELEMENT" offset="E1A3" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="EVASION" offset="E1A4" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="DEFENSE" offset="E1A5" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="MAGIC_EVASION" offset="E1A7" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="MAGIC_DEFENSE" offset="E1A8" size="16" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="STATUS_IMMUNITY" offset="E1AA" size="16" type="CharacterData">
+    <Description value="Players always immune to Transform. Enemies are always immune to Moogle and Pygmy." />
+  </Address>
+  <Address name="AI_PHYSICAL_TARGET" offset="E1AC" size="8" type="CharacterData">
+    <Description value="ID of the target for AI physical attacks." />
+  </Address>
+  <Address name="AI_MAGIC_TARGET" offset="E1AD" size="8" type="CharacterData">
+    <Description value="ID of the target for AI magical attacks. (Unused for PCs)" />
+  </Address>
+  <Address name="WEAPON_BUFFS" offset="E1AE" size="8" type="CharacterData">
+    <Description value="High Nibble: Moon Energy Counter,Low Nibble: Elemental Saber Level." />
+  </Address>
+  <Address name="DAMAGE_SOUND_EFFECT" offset="E1AF" size="8" type="CharacterData">
+    <Description value="ID of the sound effect to use when taking damage." />
+  </Address>
+  <Address name="BUFF_EFFECTS" offset="E1B0" size="8" type="CharacterData">
+    <Description value="0x01: Defense Up,0x02: Defense Down,0x04: Evade Up,0x08: Evade Down,0x10: Hit Up,0x20: Hit Down,0x40: Attack Up,0x80: Attack Down" />
+  </Address>
+  <Address name="MISC_FLAGS" offset="E1B1" size="8" type="CharacterData">
+    <Description value="0x01: Knocked Out (Plays Animation 0F on players/shadow clones and 0A on enemies),0x02: ????? (Checked at C1/E453. Set by a bit in the enemy death style byte),0x04: Partial Remedy Spell (Triggers the 'Recovery Failed!' message),0x08: Dead (Plays the Healing Cheer (2B) animation if not dead or the Stand and Flicker (2F) animation if they are dead),0x10: Lucid Barrier (Lucid Barrier Defense will be subtracted from attack damage),0x20: Prepared For Whip Jump,0x40: Wall (Spells Will Be Reflected),0x80: Dropped Treasure Chest (This one seems to do nothing...?)" />
+  </Address>
+  <Address name="TIMER_STATUS_DURATION_01" offset="E1B2" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Stun; Tangle; Paralyze (Dummied Out); Knocked Out; Frosty; Petrify." />
+  </Address>
+  <Address name="TIMER_STATUS_DURATION_02" offset="E1B3" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Confusion; Balloon." />
+  </Address>
+  <Address name="TIMER_STATUS_DURATION_03" offset="E1B4" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Stun; Injured." />
+  </Address>
+  <Address name="TIMER_STATUS_DURATION_04" offset="E1B5" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Moogle; Transform." />
+  </Address>
+  <Address name="TIMER_STATUS_DURATION_05" offset="E1B6" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Poison; Engulf." />
+  </Address>
+  <Address name="TIMER_ATTACK_BUFF_DURATION" offset="E1B7" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Attack Up; Attack Down." />
+  </Address>
+  <Address name="WALL_USE_COUNTER" offset="E1B8" size="8" type="CharacterData">
+    <Description value="([{ElementalLevel / NumTargets} + 1] * 4) + 2" />
+  </Address>
+  <Address name="MAIN_TIMER" offset="E1B9" size="8" type="CharacterData">
+    <Description value="Decremented every 5 frames." />
+  </Address>
+  <Address name="TIMER_HIT_BUFF_DURATION" offset="E1BA" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Hit Up; Hit Down." />
+  </Address>
+  <Address name="TIMER_EVADE_BUFF_DURATION" offset="E1BB" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Evade Up; Evade Down." />
+  </Address>
+  <Address name="TIMER_DEFENSE_BUFF_DURATION" offset="E1BC" size="8" type="CharacterData">
+    <Description value="Decremented every 20 frames. Controls Duration For: Defense Up; Defense Down." />
+  </Address>
+  <Address name="LUCID_BARRIER_HIT_POINTS" offset="E1BD" size="16" type="CharacterData">
+    <Description value="Hit Points = SpellPower or Maximum HP; whichever is less." />
+  </Address>
+  <Address name="LUCID_BARRIER_DEFENSE" offset="E1BF" size="8" type="CharacterData">
+    <Description value="Defense = ({DEFENSE / 2} / NumTargets)." />
+  </Address>
+  <Address name="SKILL_LEVEL_GLOVE_SWORD" offset="E1C0" size="8" type="CharacterData">
+    <Description value="High Nibble: Glove; Low Nibble: Sword" />
+  </Address>
+  <Address name="SKILL_LEVEL_AXE_SPEAR" offset="E1C1" size="8" type="CharacterData">
+    <Description value="High Nibble: Axe; Low Nibble: Spear" />
+  </Address>
+  <Address name="SKILL_LEVEL_WHIP_BOW" offset="E1C2" size="8" type="CharacterData">
+    <Description value="High Nibble: Whip; Low Nibble: Bow" />
+  </Address>
+  <Address name="SKILL_LEVEL_BOOMERANG_JAVELIN" offset="E1C3" size="8" type="CharacterData">
+    <Description value="High Nibble: Boomerang; Low Nibble: Javelin" />
+  </Address>
+  <Address name="SKILL_LEVEL_GNOME_UNDINE" offset="E1C4" size="8" type="CharacterData">
+    <Description value="High Nibble: Gnome; Low Nibble: Undine" />
+  </Address>
+  <Address name="SKILL_LEVEL_SALAMANDO_SYLPHID" offset="E1C5" size="8" type="CharacterData">
+    <Description value="High Nibble: Salamando; Low Nibble: Sylphid" />
+  </Address>
+  <Address name="SKILL_LEVEL_LUNA_DRYAD" offset="E1C6" size="8" type="CharacterData">
+    <Description value="High Nibble: Luna; Low Nibble: Dryad" />
+  </Address>
+  <Address name="SKILL_LEVEL_SHADE_LUMINA" offset="E1C7" size="8" type="CharacterData">
+    <Description value="High Nibble: Shade; Low Nibble: Lumina" />
+  </Address>
+  <Address name="SPELLS_KNOWN_GNOME" offset="E1C8" size="8" type="CharacterData">
+    <Description value="Purim: 08: Spell 01; 18: Spells 01 and 02; 38: All Spells.,Popoie: 01: Spell 01; 03: Spells 01 and 02; 07: All Spells." />
+  </Address>
+  <Address name="SPELLS_KNOWN_UNDINE" offset="E1C9" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="SPELLS_KNOWN_SALAMANDO" offset="E1CA" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="SPELLS_KNOWN_SYLPHID" offset="E1CB" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="SPELLS_KNOWN_LUNA" offset="E1CC" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="SPELLS_KNOWN_DRYAD" offset="E1CD" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="SPELLS_KNOWN_SHADE" offset="E1CE" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="SPELLS_KNOWN_LUMINA" offset="E1CF" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_GLOVE" offset="E1D0" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_SWORD" offset="E1D1" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_AXE" offset="E1D2" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_SPEAR" offset="E1D3" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_WHIP" offset="E1D4" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_BOW" offset="E1D5" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_BOOMERANG" offset="E1D6" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_JAVELIN" offset="E1D7" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_GNOME" offset="E1D8" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_UNDINE" offset="E1D9" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_SALAMANDO" offset="E1DA" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_SYLPHID" offset="E1DB" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_LUNA" offset="E1DC" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_DRYAD" offset="E1DD" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_SHADE" offset="E1DE" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="CURRENT_EXPERIENCE_LUMINA" offset="E1DF" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="EQUIPPED_HELMET_ID" offset="E1E0" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="EQUIPPED_ARMOR_ID" offset="E1E1" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="EQUIPPED_ACCESSORY_ID" offset="E1E2" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="EQUIPPED_WEAPON_ID" offset="E1E3" size="8" type="CharacterData">
+    <Description value="This can be different from what the ring menu thinks your equipped with. This is how status effects and the Mana Sword work." />
+  </Address>
+  <Address name="WEAPON_TYPE_ID" offset="E1E4" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="ACTIVE_ANIMATION" offset="E1E5" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="MANA_POWER" offset="E1E6" size="8" type="CharacterData">
+    <Description value="After sealing a seed you will need to zone for this field to update." />
+  </Address>
+  <Address name="CHARACTER_ID" offset="E1E7" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="MELEE_WEAPON" offset="E1E8" size="8" type="CharacterData">
+    <Description value="Same as $01E3 for players." />
+  </Address>
+  <Address name="RANGED_WEAPON" offset="E1E9" size="8" type="CharacterData">
+    <Description value="Only used by enemies." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="LAST_ATTACKER_ID" offset="E1EC" size="8" type="CharacterData">
+    <Description value="ID of the character that last attacked this character." />
+  </Address>
+  <Address name="WEAPON_RECOVERY_TIMER" offset="E1ED" size="8" type="CharacterData">
+    <Description value="TODO: Find Tick Rate." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="ATTACKER_ID" offset="E1F0" size="8" type="CharacterData">
+    <Description value="0xFF: Not being attacked." />
+  </Address>
+  <Address name="DAMAGE_HIT_POINTS" offset="E1F1" size="16" type="CharacterData">
+    <Description value="Values greater than 999 get reduced to 999." />
+  </Address>
+  <Address name="RESTORE_HIT_POINTS" offset="E1F3" size="16" type="CharacterData">
+    <Description value="Values greater than 999 get reduced to 999." />
+  </Address>
+  <Address name="DAMAGE_MANA_POINTS" offset="E1F5" size="8" type="CharacterData">
+    <Description value="Values greater than 99 get reduced to 99." />
+  </Address>
+  <Address name="RESTORE_MANA_POINTS" offset="E1F6" size="8" type="CharacterData">
+    <Description value="Values greater than 99 get reduced to 99." />
+  </Address>
+  <Address name="ACTIVE_WEAPON_STATUS_INFLICTION_RATE" offset="E1F7" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <!-- SKIP -->
+  <Address name="CHARACTER_TYPE" offset="E1FB" size="8" type="CharacterData">
+    <Description value="0x01: Shadow Clone,0x02: Don't Act (Balloon; Barrel; Engulf; Frosty; Petrify),0x04: Character Opening A Chest,0x08: Unknown,0x10: Crystal Orb,0x20: Treasure Chest,0x40: Boss,0x80: Player Character" />
+  </Address>
+  <!-- SKIP -->
+  <Address name="ENEMY_BLACK_MAGIC_POWER" offset="E1FD" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <Address name="ENEMY_WHITE_MAGIC_POWER" offset="E1FE" size="8" type="CharacterData">
+    <Description value="" />
+  </Address>
+  <!-- SKIP -->
+</RAMLayout>

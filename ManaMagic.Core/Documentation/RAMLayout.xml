@@ -1,0 +1,52 @@
+﻿<RAMLayout>
+  <Address name="EVENT_CONTROL_CODE" offset="0004" size="8" type="EventSubSystem">
+    <Description value="The control code for the currently executing op-code." />
+  </Address>
+  <Address name="EVENT_OPERAND_01" offset="0005" size="16" type="EventSubSystem">
+    <Description value="The first operand for the currently executing op-code." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="NASIR_FLAG" offset="002B" size="8" type="EasterEgg">
+    <Description value="Counter for number of button presses before displaying the NAS easter egg." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="ARMOR_MOD_NEGATIVE" offset="0040" size="8" type="DummiedOut">
+    <Description value="If set then armor stat modifications become negative. This setting is unused." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="CURRENT_EVENT_POINTER" offset="00D1" size="16" type="EventSubSystem">
+    <Description value="Pointer to the location of the currently executing op-code." />
+  </Address>
+  <Address name="CURRENT_EVENT_POINTER_BANK" offset="00D3" size="8" type="EventSubSystem">
+    <Description value="Bank of the currently executing op-code." />
+  </Address>
+  <Address name="EVENT_ACTIVATOR_OFFSET" offset="00D4" size="16" type="EventSubSystem">
+    <Description value="Offset of the PC that activated the current event." />
+  </Address>
+  <Address name="PREVIOUS_EVENT_POINTER" offset="00D6" size="16" type="EventSubSystem">
+    <Description value="Pointer to the location of the previously executed event. Used to return after calling another event." />
+  </Address>
+  <Address name="PREVIOUS_EVENT_POINTER_BANK" offset="00D8" size="8" type="EventSubSystem">
+    <Description value="Bank of the previously executed event." />
+  </Address>
+  <Address name="PLAYER_1_CONTROLLED_CHARACTER" offset="00D9" size="8" type="System">
+    <Description value="Flag determining which character Player 1 controls.,0x00: Not Playing,0x01: Randi,0x02: Purim,0x04: Popoie,,Setting 0x80 will cause controller input to be ignored." />
+  </Address>
+  <Address name="PLAYER_2_CONTROLLED_CHARACTER" offset="00DA" size="8" type="System">
+    <Description value="Flag determining which character Player 2 controls.,0x00: Not Playing,0x01: Randi,0x02: Purim,0x04: Popoie,,Setting 0x80 will cause controller input to be ignored." />
+  </Address>
+  <Address name="PLAYER_3_CONTROLLED_CHARACTER" offset="00DB" size="8" type="System">
+    <Description value="Flag determining which character Player 3 controls.,0x00: Not Playing,0x01: Randi,0x02: Purim,0x04: Popoie,,Setting 0x80 will cause controller input to be ignored." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="CURRENT_MAP_STYLE" offset="00ED" size="8" type="System">
+    <Description value="0x00: Non-Combat Map.,0x80: Combat Map." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="ADD_INVENTORY_ITEM_ID" offset="1820" size="8" type="RingMenu">
+    <Description value="The ID of the item to be added to the players inventory." />
+  </Address>
+  <Address name="EQUIP_ITEM_TARGET" offset="1821" size="16" type="RingMenu">
+    <Description value="ID of the character to equip with an item.,0x01: Randi,0x02: Purim,0x03: Popoie." />
+  </Address>
+</RAMLayout>
