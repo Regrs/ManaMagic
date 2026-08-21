@@ -1,0 +1,55 @@
+﻿{\rtf1\ansi\fs20
+
+{\fs40\ulw Cut Content}\par
+\par
+{\b\ulw Leftover Debugging Functions}\par
+{\b 1)} {\ulw The Debug Room - Tileset Viewer (Map ID: 0E)}\par
+   One of two dev rooms remaining in the game.\par
+   This map simply lays out all 16x16 tiles in the maps tileset in a 16x12 grid pattern.\par
+   The layer 2 tiles will be laid out in the same grid pattern and 50% transparent. It also slowly scrolls southward.\par
+   The map is set to display the Town Exterior (Index 00) tileset, however if you edit the header others can be viewed.\par
+   Navigation is difficult to impossible without disabling collision.\par
+   Additionally this map doesn't have any triggers defined, so walking on a trigger tile will end up using a map trigger from Potos Village Outskirts (Map ID: 10) instead.\par
+   No doors exist that lead to this map, a door must be hacked to gain access.\par
+\par
+{\b 2)} {\ulw The Debug Room - Developer Room (Map ID: 0F)}\par
+   One of two dev rooms remaining in the game and the most well known of the two.\par
+   The map is of maximum size, is solid black, and contains 9 NPCs, 8 near the entry point and one off-screen to the right.\par
+   The 8 nearby NPCs are assigned Debug Events 400-405 and Debug Events 8E-8F. The off-screen Snowman NPC is assigned default Event 0.\par
+   The functions of all debug events have been removed and are now just stubs, except for Debug Event 400 (assigned to the King NPC).\par
+   In Seiken Densetsu 2 Debug Event 400 is a stub just like the rest of them, however during localization the intro sequence was moved to Bank 0A and assigned the ID of 400.\par
+   As a result, the only remaining function of this room is to replay the intro sequence, and only because of a side effect of localization.\par
+   The Purim & Popoie NPCs are set to not appear if they are in your party and they use Debug Events 8E-8F instead of in the 400 range.\par
+   The likely function of these NPCs was to add them to your party. The function of the rest is impossible to know.\par
+   One door (Index 10) leads to this map. This door is actually assigned to a map trigger on Map ID: 81 (Potos Fields 2).\par
+   The trigger is located out of bounds on the west side of the map between the bushes on the other side of the exit leading to the Potos Waterfall Base.\par
+===========TODO===========\par
+\par
+{\b\ulw Weapons}\par
+{\b 1)} There are a total of 51 placeholder weapons (BE-F0). 45 are coded as player gloves and 6 are enemy Shapeshifter weapons. None have any stats.\par
+{\b 2)} Weapon Index 72 is an unused version of Marmablue's weapon with only 32 attack power instead of 80.\par
+{\b 3)} Weapon Index A1 is an unused enemy weapon that throws a fireball and inflicts Frosty.\par
+{\b 4)} Weapon Index F5 is the weapon used by enemies when inflicted with Barrel status, however all enemies are immune to Barrel.\par
+{\b 5)} Weapon Class 12 is the barrel used by Weapon Index F5, it is not used by any other weapon.\par
+{\b 6)} Weapon Classes 16 and 17 are unused enemy boomerang class types. (TODO: Possible these are the class for the "return" of the boomerang)\par
+{\b 7)} Weapon Class 1F is the fireball used by Weapon Index A1, it is not used by any other weapon.\par
+\par
+{\b\ulw Equipment}\par
+\par
+{\b 1)} TODO: Unused Equipment Stat Mod Negative Flag\par
+{\b 2)} TODO: "Max Candy" Definition: Yes, Name: Yes, Icon: No\par
+{\b 3)} TODO: Ruby Armlet\par
+\par
+{\b\ulw Items}\par
+{\b 1)} The Cup Of Wishes is set to restore 250 HP, this is ignored and it restores full HP instead.\par
+{\b 2)} The "?" item (Index: 0B) is an unused item. It is consumable, plays the same animation as Candy and does nothing else.\par
+\par
+{\b\ulw Ring Icons}\par
+\par
+{\b 1)} There is a formatted icon after Acid Storm, indicating it once cycled icons rather then palettes.\par
+{\b 2)} There is a formatted icon after Lava Wave, indicating it once cycled icons rather then palettes.\par
+{\b 3)} The Mana Sword has an icon, even though it can normally never be seen.\par
+{\b 4)} Boomerangs contain 3 formatted icons between the icons for Chakram types and Frizbar types (Indexes 75, 76, 77).\par
+{\b 5)} The unused Ruby Armlet has an equally unused icon.\par
+{\b 6)} The unused "?" item has an unused ball graphic.\par
+}
