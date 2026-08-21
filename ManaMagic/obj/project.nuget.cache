@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "yGXVBXY/PngFPf4JlwrPw/+wsIBaUOGVgs0Lb7E5LNtenifi7pUhCwiC+vU17/sNHjGzVx/owJAL1R70SZyeUg==",
+  "success": true,
+  "projectFilePath": "D:\\Software Development\\ManaMagic\\ManaMagic\\ManaMagic.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Daniel\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
+    "C:\\Users\\Daniel\\.nuget\\packages\\microsoft.win32.systemevents\\5.0.0\\microsoft.win32.systemevents.5.0.0.nupkg.sha512",
+    "C:\\Users\\Daniel\\.nuget\\packages\\system.drawing.common\\5.0.0\\system.drawing.common.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

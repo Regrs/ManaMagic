@@ -1,0 +1,3923 @@
+﻿; This is the SPC700 code from Bank 03, from the perspective of the SPC700.
+; Code and offsets are in the locations they will be loaded into the SPC700.
+; Grouped into sections based off how SoM loads them into the SPC700.
+
+; Link Clearance For Figuring This Stuff Out
+; https://www.romhacking.net/documents/197 (Anomie's SPC700 Doc)
+; http://www.gamepilgrimage.com/sites/default/files/SystemSpecs/SNES/anomie/apudsp.txt
+; https://www.crazysmart.net.au/kindred/files/spc700_inst_op.pdf
+; https://sneslab.net/wiki/SPC700/IPL_ROM
+; https://problemkaputt.de/fullsnes.htm
+; https://github.com/vgmtrans/vgmtrans/blob/master/src/main/formats/AkaoSnesSeq.cpp
+; https://github.com/mogue/FF6-SoundEngine/blob/master/spc_program.asm
+; https://github.com/gilligan/snesdev/blob/master/docs/spc700.txt
+; http://pikensoft.com/old/docs/Super_Famicomm_sound_manual_%28Ledi%29.txt
+https://emudev.de/q00-snes/spc700-the-audio-processor/
+------------------------------------
+--------------Memory Map------------
+------------------------------------
+$0004 - [CURRENT_SOUND_SEQ_READ]
+
+$000C - [SOUND_SEQ_POINTER0 (Low)]
+$000D - [SOUND_SEQ_POINTER0 (High)]
+$000E - [SOUND_SEQ_POINTER1 (Low)]
+$000F - [SOUND_SEQ_POINTER1 (High)]
+$0010 - [SOUND_SEQ_POINTER2 (Low)]
+$0011 - [SOUND_SEQ_POINTER2 (High)]
+$0012 - [SOUND_SEQ_POINTER3 (Low)]
+$0013 - [SOUND_SEQ_POINTER3 (High)]
+$0014 - [SOUND_SEQ_POINTER4 (Low)]
+$0015 - [SOUND_SEQ_POINTER4 (High)]
+$0016 - [SOUND_SEQ_POINTER5 (Low)]
+$0017 - [SOUND_SEQ_POINTER5 (High)]
+$0018 - [SOUND_SEQ_POINTER6 (Low)]
+$0019 - [SOUND_SEQ_POINTER6 (High)]
+$001A - [SOUND_SEQ_POINTER7 (Low)]
+$001B - [SOUND_SEQ_POINTER7 (High)]
+
+$002C - [GENERAL_MEMORY_POINTER (Low)]
+$002D - [GENERAL_MEMORY_POINTER (High)]
+$002E - [MEMMOVE_DESTINATION_ADDRESS (Low)] - The MemoryMove command stores the address of where it is moving memory to here.
+$002F - [MEMMOVE_DESTINATION_ADDRESS (High)]
+
+$005D = [V0SRCN_REGISTER_VALUE]
+$005E = [V1SRCN_REGISTER_VALUE]
+$005F = [V2SRCN_REGISTER_VALUE]
+$0060 = [V3SRCN_REGISTER_VALUE]
+$0061 = [V4SRCN_REGISTER_VALUE]
+$0062 = [V5SRCN_REGISTER_VALUE]
+$0063 = [V6SRCN_REGISTER_VALUE]
+$0064 = [V7SRCN_REGISTER_VALUE]
+
+$00A7 - [EVOL_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [EVOLL] & [EVOLR] DSP Registers.
+
+$00AF - [KON_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [KON] DSP Register.
+$00B0 - [KOF_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [KOF] DSP Register.
+
+$00B4 - [CURRENT_CPUI0_READ] - The last value read out of the [CPUI0] Register.
+$00B5 - [CURRENT_CPUI1_READ] - The last value read out of the [CPUI1] Register.
+$00B6 - [CURRENT_CPUI2_READ] - The last value read out of the [CPUI2] Register.
+$00B7 - [CURRENT_CPUI3_READ] - The last value read out of the [CPUI3] Register.
+$00B8 - [EON_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [EON] DSP Register.
+$00B9 - [NON_REGISTER_VALUE] - Set by (($AE ^ 0xFF) & $BE) | $BF
+$00BA - [PMON_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [PMON] DSP Register.
+$00BB - [FLG_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [FLG] DSP Register.
+
+$00C7 - [FILTER_COEF_INDEX]
+$00C8 - [EFB_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [EFB] DSP Register.
+
+$00DD - Seems to be a timer. Calls a routine every 7 ticks.
+
+$00DF - [EDL_REGISTER_VALUE] - The value the AkaoSpcEngine will place in the [EDL] DSP Register.
+$00E0 - [PREVIOUS_EDL_VALUE]
+$00E1 - [ECHO_WRITE_BUFFER_ADDRESS (Low)] - The address of the active echo buffer.
+$00E2 - [ECHO_WRITE_BUFFER_ADDRESS (High)]
+$00E3 - Unused?
+$00E4 - Unused?
+$00E5 - Unused?
+$00E6 - Unused?
+$00E7 - Unused?
+$00E8 - Unused?
+$00E9 - Unused?
+$00EA - Unused?
+$00EB - Unused?
+$00EC - Unused?
+$00ED - Unused?
+$00EE - Unused?
+$00EF - Unused?
+$00F0 - [TEST]          - Testing Functions Register
+$00F1 - [CONTROL]       - I/O and Timer Control Register
+$00F2 - [DSPADDR]       - DSP Communication Address Register
+$00F3 - [DSPDATA]       - DSP Connunication Data Register
+$00F4 - [CPUI0]/[CPUO0] - CPU Input/Output 0 Register
+$00F5 - [CPUI1]/[CPUO1] - CPU Input/Output 1 Register
+$00F6 - [CPUI2]/[CPUO2] - CPU Input/Output 2 Register
+$00F7 - [CPUI3]/[CPUO3] - CPU Input/Output 3 Register
+$00F8 - [AUXIO4]        - External I/O Port P4 Register (Disconnected/Unused)
+$00F9 - [AUXIO5]        - External I/O Port P5 Register (Disconnected/Unused)
+$00FA - [T0TARGET]      - Timer 0 Scaling Target Register
+$00FB - [T1TARGET]      - Timer 1 Scaling Target Register
+$00FC - [T2TARGET]      - Timer 2 Scaling Target Register
+$00FD - [T0OUT]         - Timer 0 Output Register
+$00FE - [T1OUT]         - Timer 1 Output Register
+$00FF - [T2OUT]         - Timer 2 Output Register
+$0100-$01FF             - Program Stack
+$0200-$1417             - Program Code
+$1418-$1597             - Pointer Tables & DSP Data
+$1598-$17FF - Unused?
+$1800-$1817 - SFX related array
+$1818-$187F - ????
+$1880-$1897 - SFX related array
+$1898-$18FF - ????
+$1900-$192B - Sample Source Directory
+
+$2C00-$47FF - SFX Data?
+$4800-$4F00 - BRR Sample Data
+
+$FE80-$FF8F-[VxADSR_REGISTER_VALUES] - Two bytes per voice. Byte 1 is VxADSR1 and Byte 2 is VxADSR2.
+
+$FFC0-FFFF - IPL ROM
+------------------------
+
+
+----------------------------------------
+[00: AkaoSPCEngineAssemblyCode]
+----------------------------------------
+[InitializeAkaoSpcEngine]
+00/0200: 20              CLRP                ;Clear Direct Page Flag.
+00/0201: C0              DI                  ;Disable Interrupts. (But why tho, there aren't any to disable)
+00/0202: CDFF            MOV X, #$FF         ;Move 0xFF into Register X.
+00/0204: BD              MOV SP, X           ;Move Register X to the Stack Pointer.
+00/0205: E800            MOV A, #$00         ;Move 0x00 into the Accumulator.
+00/0207: 5D              MOV X, A            ;Move 0x00 into Register X.
+
+[ClearPageZeroMemory]
+00/0208: AF              MOV (X)+, A         ;Move 0x00 into [$0000, X] and increment Register X.
+00/0209: C8F0            CMP X, #$F0         ;Compare Register X against 0xF0.
+00/020B: D0FB            BNE $0208           ;Branch to ClearPageZeroMemory and keep clearing $0000-$00F0.
+00/020D: E800            MOV A, #$00         ;Move 0x00 into the Accumulator. (Preparing to zero out a bunch of DSP Registers)
+00/020F: 8D0C            MOV Y, #$0C         ;Load [MVOLL] into Register Y.
+00/0211: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0214: 8D1C            MOV Y, #$1C         ;Load [MVOLR] into Register Y.
+00/0216: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0219: 8D2C            MOV Y, #$2C         ;Load [EVOLL] into Register Y.
+00/021B: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/021E: 8D3C            MOV Y, #$3C         ;Load [EVOLR] into Register Y.
+00/0220: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0223: 8D2D            MOV Y, #$2D         ;Load [PMON] into Register Y.
+00/0225: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0228: 8D3D            MOV Y, #$3D         ;Load [NON] into Register Y.
+00/022A: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/022D: 8D4D            MOV Y, #$4D         ;Load [EON] into Register Y.
+00/022F: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0232: 8D5D            MOV Y, #$5D         ;Load [DIR] into Register Y.
+00/0234: E819            MOV A, #$19         ;Load 0x19 into the Accumulator. (Set the start address for the samples pointer table at 00/1900)
+00/0236: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0239: 8D07            MOV Y, #$07         ;Load [GAIN0] into Register Y.
+00/023B: CDA0            MOV X, #$A0         ;Load 0xA0 into Register X.  (Decrease Exponential: INFINITE)
+
+[InitializeVoiceGain]
+00/023D: CBF2            MOV $F2, Y          ;Move [VxGAIN] into [DSPADDR].
+00/023F: D8F3            MOV $F3, X          ;Move 0xA0 to [DSPDATA].
+00/0241: DD              MOV A, Y            ;Move [VxGAIN] from Register Y to the Accumulator.
+00/0242: 60              CLRC                ;Clear Carry Flag.
+00/0243: 8810            ADC A, #$10         ;Add 0x10 to the value of [VxGAIN] to move to the next voice.
+00/0245: FD              MOV Y, A            ;Move the [VxGAIN] register Id back to Register Y.
+00/0246: 10F5            BPL $023D           ;Branch to InitializeVoiceGain if the Register Value is <0x87.
+00/0248: 8FF0F1          MOV $F1, #$F0       ;Move 0xF0 into [CONTROL]. (Read IPL ROM and set Input Ports to zero)
+00/024B: 8F24FA          MOV $FA, #$24       ;Move 0x24 to [T0TARGET]. (Timer1 increments every 0x24 ticks)
+00/024E: 8F01F1          MOV $F1, #$01       ;Move 0x01 into [CONTROL]. (Enable Timer1).
+00/0251: 8F02DF          MOV $DF, #$02       ;Move 0x02 into [EDL_REGISTER_VALUE].
+00/0254: 3FDE12          CALL $12DE          ;Call InitializeDSPEchoRegisters.
+00/0257: 3F2F13          CALL $132F          ;Call InitializeEchoBuffers.
+00/025A: E87F            MOV A, #$7F         ;Load 0x7F into the Accumulator. (Max sound volume)
+00/025C: 8D0C            MOV Y, #$0C         ;Load [MVOLL] into Register Y.
+00/025E: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0261: 8D1C            MOV Y, #$1C         ;Load [MVOLR] into Register Y.
+00/0263: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0266: 8FFFB0          MOV $B0, #$FF       ;Move 0xFF into [KOF_REGISTER_VALUE]. (Fade out all voices)
+00/0269: 8F07DD          MOV $DD, #$07
+00/026C: E290            SET7 $90
+00/026E: E29C            SET7 $9C
+00/0270: 8D08            MOV Y, #$08
+00/0272: E8FF            MOV A, #$FF
+00/0274: D67FFF          MOV $FF7F+Y, A
+00/0277: FEFB            DBNZ Y, $0274       ;When done initializing, fall into the main program loop.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+[MainProgramLoop]
+00/0279: 3FAF0C          CALL $0CAF          ;Call ProcessAPUCommand.
+00/027C: EBFD            MOV Y, $FD          ;Move [T0OUT] into Register Y.
+00/027E: F0F9            BEQ $0279           ;Wait for the timer to tick.
+00/0280: 8D06            MOV Y, #$06         ;Move 0x06 into Register Y. Table is loaded in reverse order to leverge the DBNZ instruction.
+
+[UpdateDSPRegisters]
+00/0282: F68B15          MOV A, $158B+Y      ;Move a value from DSPRegistersTable. (Contains KON, KOF, PMON, NON, EON, and FLG)
+00/0285: C4F2            MOV $F2, A          ;Store the value into [DSPADDR].
+00/0287: F69115          MOV A, $1591+Y      ;Move an offset from the DSPRegistersMemoryOffsetTable. (For above Registers. Values will be written here and sent to the register)
+00/028A: 5D              MOV X, A            ;Move the offset to Register X.
+00/028B: E6              MOV A, (X)          ;Move the value at the given offset into the Accumulator.
+00/028C: C4F3            MOV $F3, A          ;Store the value into [DSPDATA].
+00/028E: FEF2            DBNZ Y, $0282       ;Branch to UpdateDSPRegisters as long as Y > 0.
+00/0290: CBB0            MOV $B0, Y          ;Store 0x00 into [KOF_REGISTER_VALUE].
+00/0292: CBAF            MOV $AF, Y          ;Store 0x00 into [KON_REGISTER_VALUE].
+00/0294: E3B115          BBS7 $B1, $02AC
+00/0297: BAAD            MOVW YA, $AD
+00/0299: DAF6            MOVW $F6, YA        ;$AD & $AE sent to SNES
+00/029B: A3B104          BBS5 $B1, $02A2
+00/029E: E800            MOV A, #$00
+00/02A0: 2F06            BRA $02A8
+
+00/02A2: E48B            MOV A, $8B
+00/02A4: D002            BNE $02A8
+00/02A6: B2B1            CLR5 $B1
+00/02A8: C4F5            MOV $F5, A
+00/02AA: 2F03            BRA $02AF
+
+00/02AC: 3F8E13          CALL $138E
+00/02AF: BACB            MOVW YA, $CB
+00/02B1: D00A            BNE $02BD
+00/02B3: 8BDD            DEC $DD
+00/02B5: D006            BNE $02BD
+00/02B7: 8F07DD          MOV $DD, #$07
+00/02BA: 3FE513          CALL $13E5
+00/02BD: 3FF702          CALL $02F7
+00/02C0: CD00            MOV X, #$00
+00/02C2: 8F01B2          MOV $B2, #$01
+00/02C5: E4AE            MOV A, $AE
+00/02C7: 48FF            EOR A, #$FF
+00/02C9: 24AD            AND A, $AD
+00/02CB: C402            MOV $02, A
+00/02CD: 4B02            LSR $02
+00/02CF: 9005            BCC $02D6
+00/02D1: D805            MOV $05, X
+00/02D3: 3FC00A          CALL $0AC0
+00/02D6: 3D              INC X
+00/02D7: 3D              INC X
+00/02D8: 0BB2            ASL $B2
+00/02DA: D0F1            BNE $02CD
+00/02DC: CD10            MOV X, #$10
+00/02DE: 8F01B2          MOV $B2, #$01
+00/02E1: E4AE            MOV A, $AE
+00/02E3: C402            MOV $02, A
+00/02E5: 4B02            LSR $02
+00/02E7: 9005            BCC $02EE
+00/02E9: D805            MOV $05, X
+00/02EB: 3FC00A          CALL $0AC0
+00/02EE: 3D              INC X
+00/02EF: 3D              INC X
+00/02F0: 0BB2            ASL $B2
+00/02F2: D0F1            BNE $02E5
+00/02F4: 5F7902          JMP $0279       ;Jump to MainProgramLoop.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+[]
+00/02F7: E490            MOV A, $90
+00/02F9: 4880            EOR A, #$80
+00/02FB: EB7D            MOV Y, $7D
+00/02FD: CF              MUL YA
+00/02FE: DD              MOV A, Y
+00/02FF: F3900A          BBC7 $90, $030C
+00/0302: 1C              ASL A
+00/0303: 60              CLRC 
+00/0304: 847D            ADC A, $7D
+00/0306: 9007            BCC $030F
+00/0308: E8FF            MOV A, #$FF
+00/030A: 2F03            BRA $030F
+
+[]
+00/030C: D001            BNE $030F
+00/030E: BC              INC A
+00/030F: 60              CLRC 
+00/0310: 847E            ADC A, $7E
+00/0312: C47E            MOV $7E, A
+00/0314: 23B102          BBS1 $B1, $0319
+00/0317: 904E            BCC $0367
+00/0319: CD00            MOV X, #$00          ;Move 0x00 into Register X.
+00/031B: 8F01B2          MOV $B2, #$01
+00/031E: FAAD02          MOV $02, $AD
+
+[]
+00/0321: 4B02            LSR $02
+00/0323: 9030            BCC $0355
+00/0325: D805            MOV $05, X
+00/0327: 9B3C            DEC $3C+X
+00/0329: D005            BNE $0330
+00/032B: 3FB103          CALL $03B1          ;Script Processing Loop
+00/032E: 2F21            BRA $0351
+
+[]
+00/0330: E4AE            MOV A, $AE
+00/0332: 24B2            AND A, $B2
+00/0334: D01F            BNE $0355
+00/0336: E802            MOV A, #$02
+00/0338: DE3C09          CBNE $3C+X, $0344
+00/033B: E4C2            MOV A, $C2
+00/033D: 24B2            AND A, $B2
+00/033F: D003            BNE $0344
+00/0341: 09B2B0          OR $B0, $B2         ;OR with [KOF_REGISTER_VALUE].
+00/0344: 40              SETP                ;Set Direct Page Flag.
+00/0345: F400            MOV A, $0100+X
+00/0347: F002            BEQ $034B
+00/0349: 9B00            DEC $0100+X
+00/034B: F401            MOV A, $0101+X
+00/034D: F002            BEQ $0351
+00/034F: 9B01            DEC $0101+X
+00/0351: 20              CLRP                ;Clear Direct Page Flag.
+00/0352: 3FDF09          CALL $09DF
+
+[]
+00/0355: 3D              INC X
+00/0356: 3D              INC X
+00/0357: 0BB2            ASL $B2
+00/0359: D0C6            BNE $0321
+00/035B: E480            MOV A, $80
+00/035D: F008            BEQ $0367
+00/035F: 8B80            DEC $80
+00/0361: BA81            MOVW YA, $81
+00/0363: 7A7C            ADDW YA, $7C
+00/0365: DA7C            MOVW $7C, YA
+
+[]
+00/0367: E878            MOV A, #$78
+00/0369: 60              CLRC 
+00/036A: 847F            ADC A, $7F
+00/036C: C47F            MOV $7F, A
+00/036E: 23B102          BBS1 $B1, $0373
+00/0371: 903D            BCC $03B0
+00/0373: CD10            MOV X, #$10         ;Move 0x10 into Register X.
+00/0375: 8F01B2          MOV $B2, #$01
+00/0378: E4AE            MOV A, $AE
+00/037A: C402            MOV $02, A
+00/037C: 4B02            LSR $02
+00/037E: 902A            BCC $03AA
+00/0380: D805            MOV $05, X
+00/0382: 9B3C            DEC $3C+X
+00/0384: D005            BNE $038B
+00/0386: 3FB103          CALL $03B1          ;Script Processing Loop
+00/0389: 2F1B            BRA $03A6
+
+[]
+00/038B: E802            MOV A, #$02
+00/038D: DE3C09          CBNE $3C+X, $0399
+00/0390: E4C3            MOV A, $C3
+00/0392: 24B2            AND A, $B2
+00/0394: D003            BNE $0399
+00/0396: 09B2B0          OR $B0, $B2         ;OR with [KOF_REGISTER_VALUE]
+00/0399: 40              SETP                ;Set Direct Page Flag.
+00/039A: F400            MOV A, $0100+X
+00/039C: F002            BEQ $03A0
+00/039E: 9B00            DEC $0100+X
+00/03A0: F401            MOV A, $0101+X
+00/03A2: F002            BEQ $03A6
+00/03A4: 9B01            DEC $0101+X
+00/03A6: 20              CLRP                ;Clear Direct Page Flag.
+00/03A7: 3FDF09          CALL $09DF
+00/03AA: 3D              INC X
+00/03AB: 3D              INC X
+00/03AC: 0BB2            ASL $B2
+00/03AE: D0CC            BNE $037C
+00/03B0: 6F              RET                 ;Return.
+
+[Script Processing Loop]
+; $05 (Register X) is set to either 0x00 or 0x10 before this routine is called.
+; I assume its left/right channels.
+00/03B1: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/03B4: 68D2            CMP A, #$D2
+00/03B6: 9005            BCC $03BD
+00/03B8: 3F4E05          CALL $054E          ;Call ExecuteSoundScriptCommand.
+00/03BB: 2FF4            BRA $03B1
+
+[A < $D2]
+00/03BD: 8D00            MOV Y, #$00         ;Move 0x00 into Register Y.
+00/03BF: CD0F            MOV X, #$0F         ;Move 0x0F into Register X.
+00/03C1: 9E              DIV YA, X           ;Divide the opcode by 0x0F;
+00/03C2: F805            MOV X, $05
+00/03C4: F62C15          MOV A, $152C+Y      ;Table of values, 0x0E entries
+00/03C7: D43C            MOV $3C+X, A
+00/03C9: 3F6D05          CALL $056D
+00/03CC: 78B404          CMP $04, #$B4
+00/03CF: 9009            BCC $03DA
+00/03D1: 78C304          CMP $04, #$C3
+00/03D4: B003            BCS $03D9           ;Current read byte >=0xC3 then just exit.
+00/03D6: 5F8504          JMP $0485
+00/03D9: 6F              RET                 ;Return.
+
+[Current Read Byte < 0xB4]
+00/03DA: C810            CMP X, #$10
+00/03DC: B006            BCS $03E4
+00/03DE: E4AE            MOV A, $AE
+00/03E0: 24B2            AND A, $B2
+00/03E2: D0F5            BNE $03D9
+00/03E4: E404            MOV A, $04
+00/03E6: 8D00            MOV Y, #$00
+00/03E8: CD0F            MOV X, #$0F
+00/03EA: 9E              DIV YA, X
+00/03EB: C404            MOV $04, A
+00/03ED: F805            MOV X, $05
+00/03EF: F43D            MOV A, $3D+X
+00/03F1: 8D0C            MOV Y, #$0C
+00/03F3: CF              MUL YA
+00/03F4: 60              CLRC 
+00/03F5: 8404            ADC A, $04
+00/03F7: 60              CLRC 
+00/03F8: 9561FD          ADC A, $FD61+X
+00/03FB: 80              SETC 
+00/03FC: A80A            SBC A, #$0A
+00/03FE: D541FD          MOV $FD41+X, A
+00/0401: 3FED04          CALL $04ED
+00/0404: E408            MOV A, $08
+00/0406: D560FE          MOV $FE60+X, A
+00/0409: E409            MOV A, $09
+00/040B: D561FE          MOV $FE61+X, A
+00/040E: 8D07            MOV Y, #$07
+00/0410: F52101          MOV A, $0121+X      ;Stack
+00/0413: F022            BEQ $0437
+00/0415: 68C0            CMP A, #$C0
+00/0417: B004            BCS $041D
+00/0419: E800            MOV A, #$00
+00/041B: 2F02            BRA $041F
+00/041D: E880            MOV A, #$80
+00/041F: D5C0FD          MOV $FDC0+X, A
+00/0422: E801            MOV A, #$01
+00/0424: D5E0FC          MOV $FCE0+X, A
+00/0427: F56001          MOV A, $0160+X
+00/042A: D50001          MOV $0100+X, A
+00/042D: F003            BEQ $0432
+00/042F: DD              MOV A, Y
+00/0430: 2F02            BRA $0434
+00/0432: E800            MOV A, #$00
+00/0434: D500FE          MOV $FE00+X, A
+00/0437: F54001          MOV A, $0140+X
+00/043A: F024            BEQ $0460
+00/043C: 68C0            CMP A, #$C0
+00/043E: B004            BCS $0444
+00/0440: E800            MOV A, #$00
+00/0442: 2F02            BRA $0446
+00/0444: E880            MOV A, #$80
+00/0446: D5C1FD          MOV $FDC1+X, A
+00/0449: E801            MOV A, #$01
+00/044B: D5E1FC          MOV $FCE1+X, A
+00/044E: F56101          MOV A, $0161+X
+00/0451: D50101          MOV $0101+X, A
+00/0454: F003            BEQ $0459
+00/0456: DD              MOV A, Y
+00/0457: 2F02            BRA $045B
+
+00/0459: E800            MOV A, #$00
+00/045B: D501FE          MOV $FE01+X, A
+00/045E: E800            MOV A, #$00
+00/0460: D540FE          MOV $FE40+X, A
+00/0463: D541FE          MOV $FE41+X, A
+00/0466: D501FD          MOV $FD01+X, A
+00/0469: D580FD          MOV $FD80+X, A
+00/046C: D581FD          MOV $FD81+X, A
+00/046F: C810            CMP X, #$10
+00/0471: B006            BCS $0479
+00/0473: E4AE            MOV A, $AE
+00/0475: 24B2            AND A, $B2
+00/0477: D00C            BNE $0485
+00/0479: 09B2C9          OR $C9, $B2
+00/047C: 09B2CA          OR $CA, $B2
+00/047F: 09B2AF          OR $AF, $B2         //  KON Register Values
+00/0482: 3F8308          CALL $0883
+
+[Current Read Byte >= 0xB4 & < 0xC3]
+00/0485: F52001          MOV A, $0120+X
+00/0488: F062            BEQ $04EC
+00/048A: 60              CLRC 
+00/048B: 9541FD          ADC A, $FD41+X
+00/048E: D541FD          MOV $FD41+X, A
+00/0491: 3FED04          CALL $04ED
+00/0494: F560FE          MOV A, $FE60+X
+00/0497: C434            MOV $34, A
+00/0499: F561FE          MOV A, $FE61+X
+00/049C: C435            MOV $35, A
+00/049E: BA08            MOVW YA, $08
+00/04A0: 80              SETC 
+00/04A1: 9A34            SUBW YA, $34
+00/04A3: DA34            MOVW $34, YA
+00/04A5: 0D              PUSH PSW
+00/04A6: B008            BCS $04B0
+00/04A8: 58FF34          EOR $34, #$FF
+00/04AB: 58FF35          EOR $35, #$FF
+00/04AE: 3A34            INCW $34
+00/04B0: F5C1FC          MOV A, $FCC1+X
+00/04B3: D008            BNE $04BD
+00/04B5: FA3534          MOV $34, $35
+00/04B8: 8F0035          MOV $35, #$00
+00/04BB: 2F0D            BRA $04CA
+00/04BD: 5D              MOV X, A
+00/04BE: E435            MOV A, $35
+00/04C0: 8D00            MOV Y, #$00
+00/04C2: 9E              DIV YA, X
+00/04C3: C435            MOV $35, A
+00/04C5: E434            MOV A, $34
+00/04C7: 9E              DIV YA, X
+00/04C8: C434            MOV $34, A
+00/04CA: BA34            MOVW YA, $34
+00/04CC: D002            BNE $04D0
+00/04CE: AB34            INC $34
+00/04D0: 8E              POP PSW
+00/04D1: B008            BCS $04DB
+00/04D3: 58FF34          EOR $34, #$FF
+00/04D6: 58FF35          EOR $35, #$FF
+00/04D9: 3A34            INCW $34
+00/04DB: F805            MOV X, $05
+00/04DD: E434            MOV A, $34
+00/04DF: D580FD          MOV $FD80+X, A
+00/04E2: E435            MOV A, $35
+00/04E4: D581FD          MOV $FD81+X, A
+00/04E7: E800            MOV A, #$00
+00/04E9: D52001          MOV $0120+X, A
+00/04EC: 6F              RET 
+
+[]
+00/04ED: CD0C            MOV X, #$0C
+00/04EF: 8D00            MOV Y, #$00
+00/04F1: 9E              DIV YA, X
+00/04F2: F805            MOV X, $05
+00/04F4: C403            MOV $03, A
+00/04F6: DD              MOV A, Y
+00/04F7: 1C              ASL A
+00/04F8: FD              MOV Y, A
+00/04F9: F6F214          MOV A, $14F2+Y
+00/04FC: C40A            MOV $0A, A
+00/04FE: F6F314          MOV A, $14F3+Y
+00/0501: C40B            MOV $0B, A
+00/0503: FD              MOV Y, A
+00/0504: F520FD          MOV A, $FD20+X
+00/0507: 60              CLRC 
+00/0508: 9540FD          ADC A, $FD40+X
+00/050B: 0D              PUSH PSW
+00/050C: 2D              PUSH A
+00/050D: CF              MUL YA
+00/050E: DA08            MOVW $08, YA
+00/0510: EB0A            MOV Y, $0A
+00/0512: AE              POP A
+00/0513: CF              MUL YA
+00/0514: DD              MOV A, Y
+00/0515: 8D00            MOV Y, #$00
+00/0517: 7A08            ADDW YA, $08
+00/0519: DA08            MOVW $08, YA
+00/051B: F521FD          MOV A, $FD21+X
+00/051E: F008            BEQ $0528
+00/0520: CF              MUL YA
+00/0521: DD              MOV A, Y
+00/0522: 8D00            MOV Y, #$00
+00/0524: 7A08            ADDW YA, $08
+00/0526: 2F02            BRA $052A
+
+00/0528: E408            MOV A, $08
+00/052A: 8E              POP PSW
+00/052B: 3002            BMI $052F
+00/052D: 7A0A            ADDW YA, $0A
+00/052F: DA08            MOVW $08, YA
+00/0531: E804            MOV A, #$04
+00/0533: EB03            MOV Y, $03
+00/0535: 300E            BMI $0545
+00/0537: 6403            CMP A, $03
+00/0539: B00F            BCS $054A
+00/053B: 0B08            ASL $08
+00/053D: 2B09            ROL $09
+00/053F: BC              INC A
+00/0540: 2E03F8          CBNE $03, $053B
+00/0543: 2F08            BRA $054D
+
+[]
+00/0545: 4B09            LSR $09
+00/0547: 6B08            ROR $08
+00/0549: 9C              DEC A
+00/054A: 2E03F8          CBNE $03, $0545
+00/054D: 6F              RET 
+
+[ExecuteSoundScriptCommand]
+; Oh, so we're screwing with the stack now.
+; This will load a function pointer from the table at $1428 and push it on the stack.
+; Which causes the RET at the end of this routine to go to the routine we pushed instead of our caller.
+00/054E: A8D2            SBC A, #$D2         ;Subtract 0xD2 from the command byte to create a function pointer index.
+00/0550: 1C              ASL A               ;Multiply the index by two to create an offset into the pointer table.
+00/0551: FD              MOV Y, A            ;Move the offset into Register Y.
+00/0552: F62914          MOV A, $1429+Y
+00/0555: 2D              PUSH A
+00/0556: F62814          MOV A, $1428+Y
+00/0559: 2D              PUSH A
+00/055A: DD              MOV A, Y
+00/055B: 5C              LSR A
+00/055C: FD              MOV Y, A
+00/055D: F68414          MOV A, $1484+Y
+00/0560: F00A            BEQ $056C
+
+[ReadNextSoundScriptByte]
+00/0562: E70C            MOV A, [$0C+X]      ;Load the next byte of the sound effect script.
+00/0564: C404            MOV $04, A          ;Move the value into [CURRENT_SOUND_SEQ_READ].
+00/0566: BB0C            INC $0C+X           ;Increment [SOUND_SEQ_POINTER (Low)].
+00/0568: D002            BNE $056C           ;If the increment didn't rollover then exit.
+00/056A: BB0D            INC $0D+X           ;Increment [SOUND_SEQ_POINTER (High)].
+00/056C: 6F              RET                 ;Return.
+
+; 210
+00/3000: 
+D2 [Call Routine:00]
+F0 [Call Routine:1E]
+EA [Call Routine:18]
+06 [TCLR1 $00C2]
+E4 [Call Routine:12]
+08 D7 00 18 C1 E9 25 EE 15 50 F2
+[]
+00/056D: F40C            MOV A, $0C+X
+00/056F: FB0D            MOV Y, $0D+X
+00/0571: DA2C            MOVW $2C, YA
+00/0573: F45C            MOV A, $5C+X
+00/0575: C4DE            MOV $DE, A
+00/0577: 8D00            MOV Y, #$00
+00/0579: F72C            MOV A, [$2C]+Y
+00/057B: 68D2            CMP A, #$D2
+00/057D: 9076            BCC $05F5
+00/057F: 3A2C            INCW $2C
+00/0581: 68F2            CMP A, #$F2
+00/0583: F070            BEQ $05F5
+00/0585: 68FA            CMP A, #$FA
+00/0587: D00E            BNE $0597
+00/0589: F72C            MOV A, [$2C]+Y
+00/058B: 2D              PUSH A
+00/058C: FC              INC Y
+00/058D: F72C            MOV A, [$2C]+Y
+00/058F: FD              MOV Y, A
+00/0590: AE              POP A
+00/0591: 7A06            ADDW YA, $06
+00/0593: DA2C            MOVW $2C, YA
+00/0595: 2FE0            BRA $0577
+
+[!= 0xFA]
+00/0597: 68F1            CMP A, #$F1
+00/0599: D027            BNE $05C2
+00/059B: EBDE            MOV Y, $DE
+00/059D: F6C0FE          MOV A, $FEC0+Y
+00/05A0: F011            BEQ $05B3
+00/05A2: 9C              DEC A
+00/05A3: D00E            BNE $05B3
+00/05A5: 8BDE            DEC $DE
+00/05A7: 7D              MOV A, X
+00/05A8: 1C              ASL A
+00/05A9: 9C              DEC A
+00/05AA: 2EDECA          CBNE $DE, $0577
+00/05AD: 60              CLRC 
+00/05AE: 9804DE          ADC $DE, #$04
+00/05B1: 2FC4            BRA $0577
+
+00/05B3: DD              MOV A, Y
+00/05B4: 1C              ASL A
+00/05B5: FD              MOV Y, A
+00/05B6: F600FF          MOV A, $FF00+Y
+00/05B9: C42C            MOV $2C, A
+00/05BB: F601FF          MOV A, $FF01+Y
+00/05BE: C42D            MOV $2D, A
+00/05C0: 2FB5            BRA $0577
+
+[!= 0xF1]
+; F9 == Skip 1 or 3 
+00/05C2: 68F9            CMP A, #$F9
+00/05C4: D011            BNE $05D7
+00/05C6: EBDE            MOV Y, $DE
+00/05C8: F6A0FE          MOV A, $FEA0+Y
+00/05CB: BC              INC A
+00/05CC: 772C            CMP A, [$2C]+Y
+00/05CE: D003            BNE $05D3
+00/05D0: FC              INC Y
+00/05D1: 2FB6            BRA $0589
+00/05D3: 8D03            MOV Y, #$03
+00/05D5: 2F18            BRA $05EF
+
+[!= 0xF9]
+; FB == Skip 2 Bytes?
+00/05D7: 68FB            CMP A, #$FB
+00/05D9: D00A            BNE $05E5
+00/05DB: E4B2            MOV A, $B2
+00/05DD: 24C4            AND A, $C4
+00/05DF: D0A8            BNE $0589
+00/05E1: 8D02            MOV Y, #$02
+00/05E3: 2F0A            BRA $05EF
+
+[!= 0xFB]
+00/05E5: 80              SETC 
+00/05E6: A8D2            SBC A, #$D2
+00/05E8: FD              MOV Y, A
+00/05E9: F68414          MOV A, $1484+Y
+00/05EC: F089            BEQ $0577          ;If zero keep reading
+00/05EE: FD              MOV Y, A
+00/05EF: 3A2C            INCW $2C
+00/05F1: FEFC            DBNZ Y, $05EF
+00/05F3: 2F84            BRA $0579
+
+[<=0xD2 || == 0xF2]
+00/05F5: FD              MOV Y, A
+00/05F6: E4B2            MOV A, $B2
+00/05F8: ADC3            CMP Y, #$C3
+00/05FA: B012            BCS $060E
+00/05FC: ADB4            CMP Y, #$B4
+00/05FE: 900E            BCC $060E
+00/0600: C810            CMP X, #$10
+00/0602: B005            BCS $0609
+00/0604: 0EC200          TSET1 $00C2
+00/0607: 2F11            BRA $061A
+
+00/0609: 0EC300          TSET1 $00C3
+00/060C: 2F0C            BRA $061A
+
+[>=0xC3 || <0xB4]
+00/060E: C810            CMP X, #$10
+00/0610: B005            BCS $0617
+00/0612: 4EC200          TCLR1 $00C2
+00/0615: 2F03            BRA $061A
+00/0617: 4EC300          TCLR1 $00C3
+00/061A: 6F              RET 
+
+[SetDSPRegisterValue (Y = Register, A = Data)]
+00/061B: CBF2            MOV $F2, Y          ;Move the register to be set into [DSPADDR].
+00/061D: C4F3            MOV $F3, A          ;Move the value to set to [DSPDATA].
+00/061F: 6F              RET                 ;Return.
+
+[21: ]
+00/0620: C810            CMP X, #$10
+00/0622: B008            BCS $062C
+00/0624: C47D            MOV $7D, A
+00/0626: E800            MOV A, #$00
+00/0628: C47C            MOV $7C, A
+00/062A: C480            MOV $80, A
+00/062C: 6F              RET 
+
+[22: ]
+00/062D: C480            MOV $80, A
+00/062F: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0632: C810            CMP X, #$10
+00/0634: B02E            BCS $0664
+00/0636: EB80            MOV Y, $80
+00/0638: F0E6            BEQ $0620
+00/063A: 80              SETC 
+00/063B: A47D            SBC A, $7D
+00/063D: F0EB            BEQ $062A
+00/063F: 0D              PUSH PSW
+00/0640: B003            BCS $0645
+00/0642: 48FF            EOR A, #$FF
+00/0644: BC              INC A
+00/0645: F880            MOV X, $80
+00/0647: 8D00            MOV Y, #$00
+00/0649: 9E              DIV YA, X
+00/064A: C435            MOV $35, A
+00/064C: E800            MOV A, #$00
+00/064E: 9E              DIV YA, X
+00/064F: C434            MOV $34, A
+00/0651: F805            MOV X, $05
+00/0653: 8E              POP PSW
+00/0654: B008            BCS $065E
+00/0656: 58FF34          EOR $34, #$FF
+00/0659: 58FF35          EOR $35, #$FF
+00/065C: 3A34            INCW $34
+00/065E: BA34            MOVW YA, $34
+00/0660: C481            MOV $81, A
+00/0662: CB82            MOV $82, Y
+00/0664: 6F              RET 
+
+[26: ]
+00/0665: C4AC            MOV $AC, A
+00/0667: 6F              RET 
+
+[00: ]
+00/0668: D501FC          MOV $FC01+X, A
+00/066B: E800            MOV A, #$00
+00/066D: D500FC          MOV $FC00+X, A
+00/0670: D580FC          MOV $FC80+X, A
+00/0673: 6F              RET
+
+[01: ]
+00/0674: C434            MOV $34, A
+00/0676: D580FC          MOV $FC80+X, A
+00/0679: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/067C: EB34            MOV Y, $34
+00/067E: F0E8            BEQ $0668
+00/0680: 80              SETC                ;Set Carry Flag.
+00/0681: B501            SBC A, $01+X
+00/0683: FC              INC Y
+00/0684: F0EA            BEQ $0670
+00/0686: 0D              PUSH PSW
+00/0687: B003            BCS $068C
+00/0689: 48FF            EOR A, #$FF
+00/068B: BC              INC A
+00/068C: F834            MOV X, $34
+00/068E: 8D00            MOV Y, #$00
+00/0690: 9E              DIV YA, X
+00/0691: C435            MOV $35, A
+00/0693: E800            MOV A, #$00
+00/0695: 9E              DIV YA, X
+00/0696: C434            MOV $34, A
+00/0698: F805            MOV X, $05
+00/069A: 8E              POP PSW
+00/069B: B008            BCS $06A5
+00/069D: 58FF34          EOR $34, #$FF
+00/06A0: 58FF35          EOR $35, #$FF
+00/06A3: 3A34            INCW $34
+00/06A5: E434            MOV A, $34
+00/06A7: D520FC          MOV $FC20+X, A
+00/06AA: E435            MOV A, $35
+00/06AC: D521FC          MOV $FC21+X, A
+00/06AF: 6F              RET 
+
+[24: ]
+00/06B0: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+
+[23: DummiedOut]
+00/06B3: 6F              RET 
+
+[02: ]
+00/06B4: C810            CMP X, #$10
+00/06B6: B00C            BCS $06C4
+00/06B8: D541FC          MOV $FC41+X, A
+00/06BB: E800            MOV A, #$00
+00/06BD: D540FC          MOV $FC40+X, A
+00/06C0: D581FC          MOV $FC81+X, A
+00/06C3: 6F              RET 
+
+00/06C4: FD              MOV Y, A
+00/06C5: 0D              PUSH PSW
+00/06C6: 4880            EOR A, #$80
+00/06C8: 8E              POP PSW
+00/06C9: 100A            BPL $06D5
+00/06CB: 60              CLRC 
+00/06CC: 9541FC          ADC A, $FC41+X
+00/06CF: 900F            BCC $06E0
+00/06D1: E8FF            MOV A, #$FF
+00/06D3: 2F0B            BRA $06E0
+00/06D5: 48FF            EOR A, #$FF
+00/06D7: BC              INC A
+00/06D8: 60              CLRC 
+00/06D9: 9541FC          ADC A, $FC41+X
+00/06DC: B002            BCS $06E0
+00/06DE: E800            MOV A, #$00
+00/06E0: D541FC          MOV $FC41+X, A
+00/06E3: 6F              RET 
+
+[03: ]
+00/06E4: C434            MOV $34, A
+00/06E6: D581FC          MOV $FC81+X, A
+00/06E9: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/06EC: EB34            MOV Y, $34
+00/06EE: F0C8            BEQ $06B8
+00/06F0: 80              SETC 
+00/06F1: B541            SBC A, $41+X
+00/06F3: FC              INC Y
+00/06F4: F0CA            BEQ $06C0
+00/06F6: 0D              PUSH PSW
+00/06F7: B003            BCS $06FC
+00/06F9: 48FF            EOR A, #$FF
+00/06FB: BC              INC A
+00/06FC: F834            MOV X, $34
+00/06FE: 8D00            MOV Y, #$00
+00/0700: 9E              DIV YA, X
+00/0701: C435            MOV $35, A
+00/0703: E800            MOV A, #$00
+00/0705: 9E              DIV YA, X
+00/0706: C434            MOV $34, A
+00/0708: F805            MOV X, $05
+00/070A: 8E              POP PSW
+00/070B: B008            BCS $0715
+00/070D: 58FF34          EOR $34, #$FF
+00/0710: 58FF35          EOR $35, #$FF
+00/0713: 3A34            INCW $34
+00/0715: E434            MOV A, $34
+00/0717: D560FC          MOV $FC60+X, A
+00/071A: E435            MOV A, $35
+00/071C: D561FC          MOV $FC61+X, A
+00/071F: 6F              RET 
+
+[04: ]
+00/0720: BC              INC A
+00/0721: D5C1FC          MOV $FCC1+X, A
+00/0724: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0727: D52001          MOV $0120+X, A
+00/072A: 6F              RET 
+
+[16: ]
+00/072B: 60              CLRC 
+00/072C: 9561FD          ADC A, $FD61+X
+
+[15: ]
+00/072F: D561FD          MOV $FD61+X, A
+00/0732: 6F              RET 
+
+[25: ]
+00/0733: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0736: 6F              RET 
+
+[05: ]
+00/0737: D56001          MOV $0160+X, A
+00/073A: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/073D: BC              INC A
+00/073E: D5A0FC          MOV $FCA0+X, A
+00/0741: E801            MOV A, #$01
+00/0743: D5E0FC          MOV $FCE0+X, A
+00/0746: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+
+[06: ]
+00/0749: D52101          MOV $0121+X, A
+00/074C: 6F              RET 
+
+[07: ]
+00/074D: D56101          MOV $0161+X, A
+00/0750: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0753: BC              INC A
+00/0754: D5A1FC          MOV $FCA1+X, A
+00/0757: E801            MOV A, #$01
+00/0759: D5E1FC          MOV $FCE1+X, A
+00/075C: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+
+[08: ]
+00/075F: D54001          MOV $0140+X, A
+00/0762: 6F              RET 
+
+[09: ]
+00/0763: 60              CLRC 
+00/0764: BC              INC A
+00/0765: D5C0FC          MOV $FCC0+X, A
+00/0768: D001            BNE $076B
+00/076A: 80              SETC 
+00/076B: 7C              ROR A
+00/076C: D001            BNE $076F
+00/076E: BC              INC A
+00/076F: D500FD          MOV $FD00+X, A
+00/0772: FD              MOV Y, A
+00/0773: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0776: 1C              ASL A
+00/0777: E404            MOV A, $04
+00/0779: 287F            AND A, #$7F
+00/077B: 9002            BCC $077F
+00/077D: 487F            EOR A, #$7F
+00/077F: C434            MOV $34, A
+00/0781: DD              MOV A, Y
+00/0782: 1005            BPL $0789
+00/0784: 8F0035          MOV $35, #$00
+00/0787: 2F13            BRA $079C
+00/0789: 5D              MOV X, A
+00/078A: 8D00            MOV Y, #$00
+00/078C: E434            MOV A, $34
+00/078E: 9E              DIV YA, X
+00/078F: C435            MOV $35, A
+00/0791: E800            MOV A, #$00
+00/0793: 9E              DIV YA, X
+00/0794: C434            MOV $34, A
+00/0796: BA34            MOVW YA, $34
+00/0798: D002            BNE $079C
+00/079A: AB34            INC $34
+00/079C: 9008            BCC $07A6
+00/079E: 58FF34          EOR $34, #$FF
+00/07A1: 58FF35          EOR $35, #$FF
+00/07A4: 3A34            INCW $34
+00/07A6: F805            MOV X, $05
+00/07A8: E434            MOV A, $34
+00/07AA: D5A0FD          MOV $FDA0+X, A
+00/07AD: E435            MOV A, $35
+00/07AF: D5A1FD          MOV $FDA1+X, A
+00/07B2: E404            MOV A, $04
+
+[0A: ]
+00/07B4: D54101          MOV $0141+X, A
+00/07B7: E800            MOV A, #$00
+00/07B9: D5E0FD          MOV $FDE0+X, A
+00/07BC: D5E1FD          MOV $FDE1+X, A
+00/07BF: 6F              RET 
+
+[13: ]
+00/07C0: F53D00          MOV A, $003D+X
+00/07C3: BC              INC A
+00/07C4: 2F04            BRA $07CA
+
+[14: ]
+00/07C6: F53D00          MOV A, $003D+X
+00/07C9: 9C              DEC A
+
+[12: ]
+00/07CA: D53D00          MOV $003D+X, A
+00/07CD: 6F              RET 
+
+[10: ]
+00/07CE: C810            CMP X, #$10
+00/07D0: B005            BCS $07D7
+00/07D2: 09B2BC          OR $BC, $B2
+00/07D5: 2F03            BRA $07DA
+00/07D7: 09B2BD          OR $BD, $B2
+00/07DA: E4AE            MOV A, $AE
+00/07DC: 48FF            EOR A, #$FF
+00/07DE: 24BC            AND A, $BC
+00/07E0: 04BD            OR A, $BD
+00/07E2: C4B8            MOV $B8, A
+00/07E4: 6F              RET 
+
+[11: ]
+00/07E5: E4B2            MOV A, $B2
+00/07E7: C810            CMP X, #$10
+00/07E9: B005            BCS $07F0
+00/07EB: 4EBC00          TCLR1 $00BC
+00/07EE: 2FEA            BRA $07DA
+00/07F0: 4EBD00          TCLR1 $00BD
+00/07F3: 2FE5            BRA $07DA
+
+[0C: ]
+00/07F5: C810            CMP X, #$10
+00/07F7: B005            BCS $07FE
+00/07F9: 09B2BE          OR $BE, $B2
+00/07FC: 2F05            BRA $0803
+
+00/07FE: 09B2BF          OR $BF, $B2
+00/0801: 82B1            SET4 $B1
+00/0803: E4BB            MOV A, $BB
+00/0805: 28E0            AND A, #$E0
+00/0807: 83B104          BBS4 $B1, $080E
+00/080A: 04C5            OR A, $C5
+00/080C: 2F02            BRA $0810
+
+00/080E: 04C6            OR A, $C6
+00/0810: C4BB            MOV $BB, A
+00/0812: E4AE            MOV A, $AE
+00/0814: 48FF            EOR A, #$FF
+00/0816: 24BE            AND A, $BE
+00/0818: 04BF            OR A, $BF
+00/081A: C4B9            MOV $B9, A
+00/081C: 6F              RET 
+
+[0D: ]
+00/081D: E4B2            MOV A, $B2
+00/081F: C810            CMP X, #$10
+00/0821: B005            BCS $0828
+00/0823: 4EBE00          TCLR1 $00BE
+00/0826: 2FDB            BRA $0803
+00/0828: 4EBF00          TCLR1 $00BF
+00/082B: D0D6            BNE $0803
+00/082D: 92B1            CLR4 $B1
+00/082F: 2FD2            BRA $0803
+
+[0B: ]
+00/0831: 281F            AND A, #$1F
+00/0833: C810            CMP X, #$10
+00/0835: B004            BCS $083B
+00/0837: C4C5            MOV $C5, A
+00/0839: 2FC8            BRA $0803
+00/083B: C4C6            MOV $C6, A
+00/083D: 2FC4            BRA $0803
+
+[0E: ]
+00/083F: C810            CMP X, #$10
+00/0841: B005            BCS $0848
+00/0843: 09B2C0          OR $C0, $B2
+00/0846: 2F03            BRA $084B
+00/0848: 09B2C1          OR $C1, $B2
+00/084B: E4AE            MOV A, $AE
+00/084D: 48FF            EOR A, #$FF
+00/084F: 24C0            AND A, $C0
+00/0851: 04C1            OR A, $C1
+00/0853: C4BA            MOV $BA, A
+00/0855: 6F              RET 
+
+[0F: ]
+00/0856: E4B2            MOV A, $B2
+00/0858: C810            CMP X, #$10
+00/085A: B005            BCS $0861
+00/085C: 4EC000          TCLR1 $00C0
+00/085F: 2FEA            BRA $084B
+00/0861: 4EC100          TCLR1 $00C1
+00/0864: 2FE5            BRA $084B
+
+[18: ]
+00/0866: D45D            MOV $5D+X, A
+00/0868: 1C              ASL A
+00/0869: FD              MOV Y, A
+00/086A: F60018          MOV A, $1800+Y
+00/086D: D520FD          MOV $FD20+X, A
+00/0870: F60118          MOV A, $1801+Y
+00/0873: D521FD          MOV $FD21+X, A
+00/0876: F68018          MOV A, $1880+Y
+00/0879: D580FE          MOV $FE80+X, A
+00/087C: F68118          MOV A, $1881+Y
+00/087F: D581FE          MOV $FE81+X, A
+00/0882: 6F              RET 
+
+[]
+00/0883: FB5D            MOV Y, $5D+X
+00/0885: 7D              MOV A, X
+00/0886: 9F              XCN A
+00/0887: 5C              LSR A
+00/0888: 0804            OR A, #$04
+00/088A: C4F2            MOV $F2, A   [VxSRCN]
+00/088C: CBF3            MOV $F3, Y
+00/088E: 2F10            BRA $08A0
+
+[19: EnableADSREnvelopeAndSetAttackRate]
+00/0890: 280F            AND A, #$0F
+00/0892: C404            MOV $04, A        ;[CURRENT_SOUND_SEQ_READ]
+00/0894: F580FE          MOV A, $FE80+X    ;edddaaaa
+00/0897: 2870            AND A, #$70       ;01110000 (Remove everything but Decay rate)
+00/0899: 0404            OR A, $04         ;[CURRENT_SOUND_SEQ_READ]
+00/089B: 0880            OR A, #$80        ;Enable ADSR Adjustment Envelope.
+00/089D: D580FE          MOV $FE80+X, A
+00/08A0: C810            CMP X, #$10
+00/08A2: B007            BCS $08AB         ;UpdateADSRVoiceDSPRegisters.
+00/08A4: E4AE            MOV A, $AE
+00/08A6: 24B2            AND A, $B2
+00/08A8: F001            BEQ $08AB         ;UpdateADSRVoiceDSPRegisters.
+00/08AA: 6F              RET 
+
+[UpdateADSRVoiceDSPRegisters]
+00/08AB: 7D              MOV A, X
+00/08AC: 9F              XCN A
+00/08AD: 5C              LSR A
+00/08AE: 0805            OR A, #$05          ;[VxADSR1]
+00/08B0: FD              MOV Y, A
+00/08B1: F580FE          MOV A, $FE80+X
+00/08B4: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/08B7: FC              INC Y
+00/08B8: F581FE          MOV A, $FE81+X      ;[VxADSR2]
+00/08BB: 5F1B06          JMP $061B           ;Jump to SetDSPRegisterValue (Y = Register, A = Data).
+
+[1A: EnableADSREnvelopeAndSetDecayRate]
+00/08BE: 2807            AND A, #$07
+00/08C0: 9F              XCN A
+00/08C1: C404            MOV $04, A
+00/08C3: F580FE          MOV A, $FE80+X    ;edddaaaa
+00/08C6: 280F            AND A, #$0F
+00/08C8: 0404            OR A, $04
+00/08CA: 0880            OR A, #$80
+00/08CC: D580FE          MOV $FE80+X, A
+00/08CF: 2FCF            BRA $08A0
+
+[1B: EnableADSREnvelopeAndSetSustainLevel]
+00/08D1: 2807            AND A, #$07       ;lllrrrrr
+00/08D3: 9F              XCN A
+00/08D4: 1C              ASL A
+00/08D5: C404            MOV $04, A
+00/08D7: F581FE          MOV A, $FE81+X
+00/08DA: 281F            AND A, #$1F
+00/08DC: 0404            OR A, $04
+00/08DE: D581FE          MOV $FE81+X, A
+00/08E1: 2FBD            BRA $08A0
+
+[1C: EnableADSREnvelopeAndSetSustainRate]
+00/08E3: 281F            AND A, #$1F
+00/08E5: C404            MOV $04, A
+00/08E7: F581FE          MOV A, $FE81+X
+00/08EA: 28E0            AND A, #$E0
+00/08EC: 0404            OR A, $04
+00/08EE: D581FE          MOV $FE81+X, A
+00/08F1: 2FAD            BRA $08A0
+
+[1D: ]
+00/08F3: F45D            MOV A, $5D+X
+00/08F5: 1C              ASL A
+00/08F6: FD              MOV Y, A
+00/08F7: F68018          MOV A, $1880+Y
+00/08FA: D580FE          MOV $FE80+X, A
+00/08FD: F68118          MOV A, $1881+Y
+00/0900: D581FE          MOV $FE81+X, A
+00/0903: 2F9B            BRA $08A0
+
+[28: ]
+00/0905: FD              MOV Y, A
+00/0906: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0909: C810            CMP X, #$10
+00/090B: B009            BCS $0916
+00/090D: DD              MOV A, Y
+00/090E: EB04            MOV Y, $04
+00/0910: 7A06            ADDW YA, $06
+00/0912: D40C            MOV $0C+X, A
+00/0914: DB0D            MOV $0D+X, Y
+00/0916: 6F              RET 
+
+[27: ]
+00/0917: C436            MOV $36, A
+00/0919: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/091C: C434            MOV $34, A
+00/091E: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0921: C435            MOV $35, A
+00/0923: C810            CMP X, #$10
+00/0925: B012            BCS $0939
+00/0927: F5A0FE          MOV A, $FEA0+X
+00/092A: BC              INC A
+00/092B: D5A0FE          MOV $FEA0+X, A
+00/092E: 2E3608          CBNE $36, $0939
+00/0931: BA34            MOVW YA, $34
+00/0933: 7A06            ADDW YA, $06
+00/0935: D40C            MOV $0C+X, A
+00/0937: DB0D            MOV $0D+X, Y
+00/0939: 6F              RET 
+
+[2A: ]
+00/093A: C810            CMP X, #$10
+00/093C: B005            BCS $0943
+00/093E: E800            MOV A, #$00
+00/0940: D5A0FE          MOV $FEA0+X, A
+00/0943: 6F              RET 
+
+[1E: ]
+00/0944: BB5C            INC $5C+X
+00/0946: 7D              MOV A, X
+00/0947: 1C              ASL A
+00/0948: 60              CLRC 
+00/0949: 8804            ADC A, #$04
+00/094B: DE5C05          CBNE $5C+X, $0953
+00/094E: 80              SETC 
+00/094F: A804            SBC A, #$04
+00/0951: D45C            MOV $5C+X, A
+00/0953: FB5C            MOV Y, $5C+X
+00/0955: E404            MOV A, $04
+00/0957: F001            BEQ $095A
+00/0959: BC              INC A
+00/095A: D6C0FE          MOV $FEC0+Y, A
+00/095D: DD              MOV A, Y
+00/095E: 1C              ASL A
+00/095F: FD              MOV Y, A
+00/0960: F40C            MOV A, $0C+X
+00/0962: D600FF          MOV $FF00+Y, A
+00/0965: F40D            MOV A, $0D+X
+00/0967: D601FF          MOV $FF01+Y, A
+00/096A: 6F              RET 
+
+[1F: ]
+00/096B: FB5C            MOV Y, $5C+X
+00/096D: F6C0FE          MOV A, $FEC0+Y
+00/0970: F015            BEQ $0987
+00/0972: 9C              DEC A
+00/0973: D00F            BNE $0984
+00/0975: 7D              MOV A, X
+00/0976: 1C              ASL A
+00/0977: 9C              DEC A
+00/0978: 9B5C            DEC $5C+X
+00/097A: DE5C17          CBNE $17+X, $5C
+00/097D: 60              CLRC 
+00/097E: 8804            ADC A, #$04
+00/0980: D45C            MOV $5C+X, A
+00/0982: 2F10            BRA $0994
+00/0984: D6C0FE          MOV $FEC0+Y, A
+00/0987: DD              MOV A, Y
+00/0988: 1C              ASL A
+00/0989: FD              MOV Y, A
+00/098A: F600FF          MOV A, $FF00+Y
+00/098D: D40C            MOV $0C+X, A
+00/098F: F601FF          MOV A, $FF01+Y
+00/0992: D40D            MOV $0D+X, A
+00/0994: 6F              RET 
+
+[29: ]
+00/0995: FD              MOV Y, A
+00/0996: 3F6205          CALL $0562          ;Call ReadNextSoundScriptByte.
+00/0999: C810            CMP X, #$10
+00/099B: B012            BCS $09AF
+00/099D: E4B2            MOV A, $B2
+00/099F: 24C4            AND A, $C4
+00/09A1: F00C            BEQ $09AF
+00/09A3: 4EC400          TCLR1 $00C4
+00/09A6: DD              MOV A, Y
+00/09A7: EB04            MOV Y, $04
+00/09A9: 7A06            ADDW YA, $06
+00/09AB: D40C            MOV $0C+X, A
+00/09AD: DB0D            MOV $0D+X, Y
+00/09AF: 6F              RET 
+
+[17: ]
+00/09B0: D540FD          MOV $FD40+X, A
+00/09B3: 6F              RET 
+
+[2B: ]
+00/09B4: C810            CMP X, #$10
+00/09B6: B003            BCS $09BB
+00/09B8: C588FF          MOV $FF88, A
+00/09BB: 6F              RET 
+
+[20: ]
+[2C: ]
+[2D: ]
+00/09BC: AE              POP A
+00/09BD: AE              POP A
+00/09BE: E4B2            MOV A, $B2
+00/09C0: C810            CMP X, #$10
+00/09C2: B005            BCS $09C9
+00/09C4: 4EAD00          TCLR1 $00AD
+00/09C7: 2F0D            BRA $09D6
+00/09C9: 4EAE00          TCLR1 $00AE
+00/09CC: 7D              MOV A, X
+00/09CD: 5C              LSR A
+00/09CE: 2807            AND A, #$07
+00/09D0: FD              MOV Y, A
+00/09D1: E8FF            MOV A, #$FF
+00/09D3: D680FF          MOV $FF80+Y, A
+00/09D6: 3F1D08          CALL $081D
+00/09D9: 3F5608          CALL $0856
+00/09DC: 5FE507          JMP $07E5
+
+00/09DF: F580FC          MOV A, $FC80+X
+00/09E2: F026            BEQ $0A0A
+00/09E4: 9C              DEC A
+00/09E5: D580FC          MOV $FC80+X, A
+00/09E8: F500FC          MOV A, $FC00+X
+00/09EB: C434            MOV $34, A
+00/09ED: F501FC          MOV A, $FC01+X
+00/09F0: C435            MOV $35, A
+00/09F2: F521FC          MOV A, $FC21+X
+00/09F5: FD              MOV Y, A
+00/09F6: F520FC          MOV A, $FC20+X
+00/09F9: 7A34            ADDW YA, $34
+00/09FB: D500FC          MOV $FC00+X, A
+00/09FE: DD              MOV A, Y
+00/09FF: 7501FC          CMP A, $FC01+X
+00/0A02: D501FC          MOV $FC01+X, A
+00/0A05: F003            BEQ $0A0A
+00/0A07: 09B2C9          OR $C9, $B2
+00/0A0A: F581FC          MOV A, $FC81+X
+00/0A0D: F026            BEQ $0A35
+00/0A0F: 9C              DEC A
+00/0A10: D581FC          MOV $FC81+X, A
+00/0A13: F540FC          MOV A, $FC40+X
+00/0A16: C434            MOV $34, A
+00/0A18: F541FC          MOV A, $FC41+X
+00/0A1B: C435            MOV $35, A
+00/0A1D: F561FC          MOV A, $FC61+X
+00/0A20: FD              MOV Y, A
+00/0A21: F560FC          MOV A, $FC60+X
+00/0A24: 7A34            ADDW YA, $34
+00/0A26: D540FC          MOV $FC40+X, A
+00/0A29: DD              MOV A, Y
+00/0A2A: 7541FC          CMP A, $FC41+X
+00/0A2D: D541FC          MOV $FC41+X, A
+00/0A30: F003            BEQ $0A35
+00/0A32: 09B2C9          OR $C9, $B2
+00/0A35: F580FD          MOV A, $FD80+X
+00/0A38: C434            MOV $34, A
+00/0A3A: F581FD          MOV A, $FD81+X
+00/0A3D: C435            MOV $35, A
+00/0A3F: BA34            MOVW YA, $34
+00/0A41: F022            BEQ $0A65
+00/0A43: F5C1FC          MOV A, $FCC1+X
+00/0A46: 9C              DEC A
+00/0A47: D006            BNE $0A4F
+00/0A49: D580FD          MOV $FD80+X, A
+00/0A4C: D581FD          MOV $FD81+X, A
+00/0A4F: D5C1FC          MOV $FCC1+X, A
+00/0A52: F561FE          MOV A, $FE61+X
+00/0A55: FD              MOV Y, A
+00/0A56: F560FE          MOV A, $FE60+X
+00/0A59: 7A34            ADDW YA, $34
+00/0A5B: D560FE          MOV $FE60+X, A
+00/0A5E: DD              MOV A, Y
+00/0A5F: D561FE          MOV $FE61+X, A
+00/0A62: 09B2CA          OR $CA, $B2
+00/0A65: F54101          MOV A, $0141+X
+00/0A68: F055            BEQ $0ABF
+00/0A6A: F5A0FD          MOV A, $FDA0+X
+00/0A6D: C434            MOV $34, A
+00/0A6F: F5A1FD          MOV A, $FDA1+X
+00/0A72: C435            MOV $35, A
+00/0A74: F5E1FD          MOV A, $FDE1+X
+00/0A77: FD              MOV Y, A
+00/0A78: C436            MOV $36, A
+00/0A7A: F5E0FD          MOV A, $FDE0+X
+00/0A7D: 7A34            ADDW YA, $34
+00/0A7F: D5E0FD          MOV $FDE0+X, A
+00/0A82: DD              MOV A, Y
+00/0A83: E33509          BBS7 $35, $0A8F
+00/0A86: E3360D          BBS7 $36, $0A96
+00/0A89: 100B            BPL $0A96
+00/0A8B: E87F            MOV A, #$7F
+00/0A8D: 2F07            BRA $0A96
+00/0A8F: F33604          BBC7 $36, $0A96
+00/0A92: 3002            BMI $0A96
+00/0A94: E880            MOV A, #$80
+00/0A96: 75E1FD          CMP A, $FDE1+X
+00/0A99: D5E1FD          MOV $FDE1+X, A
+00/0A9C: F003            BEQ $0AA1
+00/0A9E: 09B2C9          OR $C9, $B2
+00/0AA1: F500FD          MOV A, $FD00+X
+00/0AA4: 9C              DEC A
+00/0AA5: D015            BNE $0ABC
+00/0AA7: 58FF34          EOR $34, #$FF
+00/0AAA: 58FF35          EOR $35, #$FF
+00/0AAD: 3A34            INCW $34
+00/0AAF: E434            MOV A, $34
+00/0AB1: D5A0FD          MOV $FDA0+X, A
+00/0AB4: E435            MOV A, $35
+00/0AB6: D5A1FD          MOV $FDA1+X, A
+00/0AB9: F5C0FC          MOV A, $FCC0+X
+00/0ABC: D500FD          MOV $FD00+X, A
+00/0ABF: 6F              RET 
+
+00/0AC0: F52101          MOV A, $0121+X
+00/0AC3: F06C            BEQ $0B31
+00/0AC5: FD              MOV Y, A
+00/0AC6: F50001          MOV A, $0100+X
+00/0AC9: D066            BNE $0B31
+00/0ACB: F5E0FC          MOV A, $FCE0+X
+00/0ACE: 9C              DEC A
+00/0ACF: D05D            BNE $0B2E
+00/0AD1: F500FE          MOV A, $FE00+X
+00/0AD4: DA34            MOVW $34, YA
+00/0AD6: F5C0FD          MOV A, $FDC0+X
+00/0AD9: C436            MOV $36, A
+00/0ADB: 3F5E0C          CALL $0C5E
+00/0ADE: D5C0FD          MOV $FDC0+X, A
+00/0AE1: 1C              ASL A
+00/0AE2: D003            BNE $0AE7
+00/0AE4: FD              MOV Y, A
+00/0AE5: 2F3A            BRA $0B21
+00/0AE7: 0D              PUSH PSW
+00/0AE8: 2D              PUSH A
+00/0AE9: 2D              PUSH A
+00/0AEA: E434            MOV A, $34
+00/0AEC: D500FE          MOV $FE00+X, A
+00/0AEF: 8D0F            MOV Y, #$0F
+00/0AF1: F561FE          MOV A, $FE61+X
+00/0AF4: CF              MUL YA
+00/0AF5: DA36            MOVW $36, YA
+00/0AF7: 8D0F            MOV Y, #$0F
+00/0AF9: F560FE          MOV A, $FE60+X
+00/0AFC: CF              MUL YA
+00/0AFD: DD              MOV A, Y
+00/0AFE: 8D00            MOV Y, #$00
+00/0B00: 7A36            ADDW YA, $36
+00/0B02: C436            MOV $36, A
+00/0B04: AE              POP A
+00/0B05: CF              MUL YA
+00/0B06: DA38            MOVW $38, YA
+00/0B08: AE              POP A
+00/0B09: EB36            MOV Y, $36
+00/0B0B: CF              MUL YA
+00/0B0C: DD              MOV A, Y
+00/0B0D: 8D00            MOV Y, #$00
+00/0B0F: 7A38            ADDW YA, $38
+00/0B11: 8E              POP PSW
+00/0B12: 900D            BCC $0B21
+00/0B14: 48FF            EOR A, #$FF
+00/0B16: C438            MOV $38, A
+00/0B18: DD              MOV A, Y
+00/0B19: 48FF            EOR A, #$FF
+00/0B1B: C439            MOV $39, A
+00/0B1D: 3A38            INCW $38
+00/0B1F: BA38            MOVW YA, $38
+00/0B21: D540FE          MOV $FE40+X, A
+00/0B24: DD              MOV A, Y
+00/0B25: D541FE          MOV $FE41+X, A
+00/0B28: 09B2CA          OR $CA, $B2
+00/0B2B: F5A0FC          MOV A, $FCA0+X
+
+[]
+00/0B2E: D5E0FC          MOV $FCE0+X, A
+00/0B31: F54001          MOV A, $0140+X
+00/0B34: F02D            BEQ $0B63
+00/0B36: FD              MOV Y, A
+00/0B37: F50101          MOV A, $0101+X
+00/0B3A: D027            BNE $0B63
+00/0B3C: F5E1FC          MOV A, $FCE1+X
+00/0B3F: 9C              DEC A
+00/0B40: D01E            BNE $0B60
+00/0B42: F501FE          MOV A, $FE01+X
+00/0B45: DA34            MOVW $34, YA
+00/0B47: F5C1FD          MOV A, $FDC1+X
+00/0B4A: C436            MOV $36, A
+00/0B4C: 3F5E0C          CALL $0C5E
+00/0B4F: D5C1FD          MOV $FDC1+X, A
+00/0B52: D501FD          MOV $FD01+X, A
+00/0B55: E434            MOV A, $34
+00/0B57: D501FE          MOV $FE01+X, A
+00/0B5A: 09B2C9          OR $C9, $B2
+00/0B5D: F5A1FC          MOV A, $FCA1+X
+00/0B60: D5E1FC          MOV $FCE1+X, A
+00/0B63: BAC9            MOVW YA, $C9
+00/0B65: D001            BNE $0B68
+00/0B67: 6F              RET 
+
+00/0B68: 7D              MOV A, X
+00/0B69: 280F            AND A, #$0F
+00/0B6B: C434            MOV $34, A
+00/0B6D: 9F              XCN A
+00/0B6E: 5C              LSR A
+00/0B6F: C435            MOV $35, A
+00/0B71: E4B2            MOV A, $B2
+00/0B73: 24C9            AND A, $C9
+00/0B75: D003            BNE $0B7A
+00/0B77: 5F0A0C          JMP $0C0A
+
+00/0B7A: 8F8036          MOV $36, #$80
+00/0B7D: 03B11C          BBS0 $B1, $0B9C
+00/0B80: F541FC          MOV A, $FC41+X
+00/0B83: 60              CLRC 
+00/0B84: 95E1FD          ADC A, $FDE1+X
+00/0B87: 2D              PUSH A
+00/0B88: F5E1FD          MOV A, $FDE1+X
+00/0B8B: AE              POP A
+00/0B8C: 3006            BMI $0B94
+00/0B8E: 9008            BCC $0B98
+00/0B90: E8FF            MOV A, #$FF
+00/0B92: 2F04            BRA $0B98
+00/0B94: B002            BCS $0B98
+00/0B96: E800            MOV A, #$00
+00/0B98: 48FF            EOR A, #$FF
+00/0B9A: C436            MOV $36, A
+
+[]
+00/0B9C: F501FC          MOV A, $FC01+X
+00/0B9F: FD              MOV Y, A
+00/0BA0: C437            MOV $37, A
+00/0BA2: F501FD          MOV A, $FD01+X
+00/0BA5: 1C              ASL A
+00/0BA6: F010            BEQ $0BB8
+00/0BA8: 9003            BCC $0BAD
+00/0BAA: 48FF            EOR A, #$FF
+00/0BAC: BC              INC A
+00/0BAD: CF              MUL YA
+00/0BAE: B008            BCS $0BB8
+00/0BB0: DD              MOV A, Y
+00/0BB1: 8437            ADC A, $37
+00/0BB3: 9002            BCC $0BB7
+00/0BB5: E8FF            MOV A, #$FF
+00/0BB7: FD              MOV Y, A
+00/0BB8: C810            CMP X, #$10
+00/0BBA: B00E            BCS $0BCA
+00/0BBC: E484            MOV A, $84
+00/0BBE: CF              MUL YA
+00/0BBF: E588FF          MOV A, $88FF
+00/0BC2: 745D            CMP A, $5D+X
+00/0BC4: F007            BEQ $0BCD
+00/0BC6: E4AC            MOV A, $AC
+00/0BC8: 2F02            BRA $0BCC
+
+00/0BCA: E890            MOV A, #$90
+00/0BCC: CF              MUL YA
+00/0BCD: CB37            MOV $37, Y
+00/0BCF: C810            CMP X, #$10
+00/0BD1: 9006            BCC $0BD9
+00/0BD3: AAB160          MOV1 C, $60B1
+00/0BD6: CA3400          MOV1 $0034, C
+00/0BD9: E436            MOV A, $36
+00/0BDB: FD              MOV Y, A
+00/0BDC: E437            MOV A, $37
+00/0BDE: CF              MUL YA
+00/0BDF: E4B2            MOV A, $B2
+00/0BE1: 24B3            AND A, $B3
+00/0BE3: F002            BEQ $0BE7
+00/0BE5: 8D00            MOV Y, #$00
+00/0BE7: DD              MOV A, Y
+00/0BE8: EB34            MOV Y, $34
+00/0BEA: D6CD00          MOV $00CD+Y, A
+00/0BED: 5C              LSR A
+00/0BEE: FD              MOV Y, A
+00/0BEF: E435            MOV A, $35
+00/0BF1: C810            CMP X, #$10
+00/0BF3: 9005            BCC $0BFA
+00/0BF5: 73B102          BBC3 $B1, $0BFA
+00/0BF8: 4801            EOR A, #$01
+00/0BFA: C4F2            MOV $F2, A
+00/0BFC: CBF3            MOV $F3, Y
+00/0BFE: E436            MOV A, $36
+00/0C00: 48FF            EOR A, #$FF
+00/0C02: EA3400          NOT1 $00.#$34
+00/0C05: AB35            INC $35
+00/0C07: 3335D1          BBC1 $35, $0BDB
+00/0C0A: 2235            SET1 $35
+00/0C0C: E4B2            MOV A, $B2
+00/0C0E: 24CA            AND A, $CA
+00/0C10: F043            BEQ $0C55
+00/0C12: F560FE          MOV A, $FE60+X
+00/0C15: C436            MOV $36, A
+00/0C17: F561FE          MOV A, $FE61+X
+00/0C1A: C437            MOV $37, A
+00/0C1C: F541FE          MOV A, $FE41+X
+00/0C1F: FD              MOV Y, A
+00/0C20: F540FE          MOV A, $FE40+X
+00/0C23: 7A36            ADDW YA, $36
+00/0C25: DA36            MOVW $36, YA
+00/0C27: C810            CMP X, #$10
+00/0C29: B01D            BCS $0C48
+00/0C2B: E49C            MOV A, $9C
+00/0C2D: 4880            EOR A, #$80
+00/0C2F: 0D              PUSH PSW
+00/0C30: 2D              PUSH A
+00/0C31: CF              MUL YA
+00/0C32: DA38            MOVW $38, YA
+00/0C34: AE              POP A
+00/0C35: EB36            MOV Y, $36
+00/0C37: CF              MUL YA
+00/0C38: DD              MOV A, Y
+00/0C39: 8D00            MOV Y, #$00
+00/0C3B: 7A38            ADDW YA, $38
+00/0C3D: 8E              POP PSW
+00/0C3E: 3008            BMI $0C48
+00/0C40: 1C              ASL A
+00/0C41: 2D              PUSH A
+00/0C42: DD              MOV A, Y
+00/0C43: 3C              ROL A
+00/0C44: FD              MOV Y, A
+00/0C45: AE              POP A
+00/0C46: 7A36            ADDW YA, $36
+00/0C48: F835            MOV X, $35
+00/0C4A: D8F2            MOV $F2, X
+00/0C4C: C4F3            MOV $F3, A
+00/0C4E: 3D              INC X
+00/0C4F: D8F2            MOV $F2, X
+00/0C51: CBF3            MOV $F3, Y
+00/0C53: F805            MOV X, $05
+00/0C55: E4B2            MOV A, $B2
+00/0C57: 4EC900          TCLR1 $00C9
+00/0C5A: 4ECA00          TCLR1 $00CA
+00/0C5D: 6F              RET 
+
+00/0C5E: DD              MOV A, Y
+00/0C5F: 283F            AND A, #$3F
+00/0C61: 1C              ASL A
+00/0C62: BC              INC A
+00/0C63: F33509          BBC7 $35, $0C6F
+00/0C66: D33506          BBC6 $35, $0C6F
+00/0C69: F3363E          BBC7 $36, $0CAA
+00/0C6C: 8F0036          MOV $36, #$00
+00/0C6F: 0B36            ASL $36
+00/0C71: D029            BNE $0C9C
+00/0C73: EB34            MOV Y, $34
+00/0C75: F027            BEQ $0C9E
+00/0C77: 133409          BBC0 $34, $0C83
+00/0C7A: 1234            CLR0 $34
+00/0C7C: 5C              LSR A
+00/0C7D: 5C              LSR A
+00/0C7E: D01E            BNE $0C9E
+00/0C80: BC              INC A
+00/0C81: 2F1B            BRA $0C9E
+00/0C83: 333408          BBC1 $34, $0C8E
+00/0C86: 3234            CLR1 $34
+00/0C88: 5C              LSR A
+00/0C89: D013            BNE $0C9E
+00/0C8B: BC              INC A
+00/0C8C: 2F10            BRA $0C9E
+00/0C8E: 5234            CLR2 $34
+00/0C90: 5C              LSR A
+00/0C91: C438            MOV $38, A
+00/0C93: 5C              LSR A
+00/0C94: 60              CLRC 
+00/0C95: 8438            ADC A, $38
+00/0C97: D005            BNE $0C9E
+00/0C99: BC              INC A
+00/0C9A: 2F02            BRA $0C9E
+00/0C9C: E800            MOV A, #$00
+00/0C9E: 384035          AND $35, #$40
+00/0CA1: 0B35            ASL $35
+00/0CA3: 588035          EOR $35, #$80
+00/0CA6: 0435            OR A, $35
+00/0CA8: 2F04            BRA $0CAE
+00/0CAA: E436            MOV A, $36
+00/0CAC: 0880            OR A, #$80
+00/0CAE: 6F              RET 
+
+[ProcessAPUCommand]
+00/0CAF: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/0CB1: F03D            BEQ $0CF0           ;Branch to NoOperation if there's no input from from the SNES.
+00/0CB3: BAF6            MOVW YA, $F6        ;Move [CPUI2] & [CPUI3] into Register Y/Accumulator.
+00/0CB5: DAB6            MOVW $B6, YA        ;Move [CPUI2] & [CPUI3] into [CURRENT_CPUI2_READ] & [CURRENT_CPUI3_READ].
+00/0CB7: BAF4            MOVW YA, $F4        ;Move [CPUI0] & [CPUI1] into Register Y/Accumulator.
+00/0CB9: DAB4            MOVW $B4, YA        ;Move [CPUI0] & [CPUI1] into [CURRENT_CPUI0_READ] & [CURRENT_CPUI1_READ].
+00/0CBB: 6883            CMP A, #$83         ;The SNES uses this as a signal value once, but it does not enter this path.
+00/0CBD: D002            BNE $0CC1           ;Its unclear why command 0x83 needs to set [CPUI1]
+00/0CBF: CBF5            MOV $F5, Y          ;Store the value we read from [CPUO1] into [CPUI1].
+00/0CC1: C4F4            MOV $F4, A          ;Store the value we read from [CPUO0] into [CPUI0].
+00/0CC3: 64F4            CMP A, $F4          ;Wait for the SNES to continue processing.
+00/0CC5: F0FC            BEQ $0CC3           ;Wait for the value to change.
+00/0CC7: 5D              MOV X, A            ;Move the command byte to Register X.
+00/0CC8: 100D            BPL $0CD7
+00/0CCA: C8FE            CMP X, #$FE         ;Test if this is the MemoryWrite command.
+00/0CCC: D003            BNE $0CD1
+00/0CCE: 5FEA11          JMP $11EA           ;Jump to TryExecuteMemoryOperation.
+
+[{X >= 0xF0 | (X >= 0x80 && X < 0x90)]
+; Valid Command Code Range: {X >= 0xF0 | (X >= 0x80 && X < 0x90)}
+; These are routine calls that do....things.
+00/0CD1: 8F00F4          MOV $F4, #$00       ;Move 0x00 into [CPUI0].
+00/0CD4: 5FF90F          JMP $0FF9
+
+[X < 7F]
+00/0CD7: C801            CMP X, #$01
+00/0CD9: F016            BEQ $0CF1
+00/0CDB: 8F00F4          MOV $F4, #$00       ;Move 0x00 to [CPUO0].
+00/0CDE: C802            CMP X, #$02
+00/0CE0: D003            BNE $0CE5
+[X == 2]
+00/0CE2: 5F100E          JMP $0E10           ;Loads the unknown data at 00/2C00. 0x02 is sound effect rane, so I guess I know what it is now at least.
+
+[X != 2]
+; Valid Command Code Range: (X > 0x10 && X < 0x20)
+00/0CE5: C810            CMP X, #$10
+00/0CE7: 9007            BCC $0CF0           ;Branch to NoOperation if the command code is < 0x10.
+00/0CE9: C820            CMP X, #$20
+00/0CEB: B003            BCS $0CF0           ;Branch to NoOperation if the command code is >= 0x20.
+[X >= 0x10 && X < 20]
+00/0CED: 5FF60E          JMP $0EF6
+
+[NoOperation]
+00/0CF0: 6F              RET                 ;Return.
+
+[X == 1]
+; $F4 = Command (Always 0x01)
+; $F5 = ???
+; $F6 = Echo Delay Size
+; $F7 = Echo Volume.
+00/0CF1: E8FF            MOV A, #$FF         ;Move 0xFF into the Accumulator. (Fade Out All Voices)
+00/0CF3: 8D5C            MOV Y, #$5C         ;Move [KOF] into Register Y.
+00/0CF5: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/0CF8: 8F00F1          MOV $F1, #$00       ;Move 0x00 into [CONTROL].
+00/0CFB: 8F40FA          MOV $FA, #$40       ;Move 0x40 into [T0TARGET].
+00/0CFE: 8F01F1          MOV $F1, #$01       ;Move 0x01 into [CONTROL].
+00/0D01: E4FD            MOV A, $FD          ;Move [T0OUT] into the Accumulator. (Forcing it back to zero so we get a full wait?)
+00/0D03: E4FD            MOV A, $FD          ;Move [T0OUT] into the Accumulator.
+00/0D05: F0FC            BEQ $0D03           ;Wait for the timer to tick.
+00/0D07: 8F00F1          MOV $F1, #$00       ;Move 0x00 into [CONTROL].
+00/0D0A: 8F24FA          MOV $FA, #$24       ;Move 0x24 into [T0TARGET].
+00/0D0D: 8F01F1          MOV $F1, #$01       ;Move 0x01 into [CONTROL].
+00/0D10: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/0D12: E4F6            MOV A, $F6          ;Move [CPUI2] into the Accumulator.
+00/0D14: 280F            AND A, #$0F         ;Remove the high nibble.
+00/0D16: C4DF            MOV $DF, A          ;Move the Accumulator into [EDL_REGISTER_VALUE].
+00/0D18: E4F7            MOV A, $F7          ;Move [CPUI3] into the Accumulator.
+00/0D1A: C4A7            MOV $A7, A          ;Move [CPUi3] into [EVOL_REGISTER_VALUE].
+00/0D1C: D8F4            MOV $F4, X          ;Move Register X into [CPUI0].
+00/0D1E: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/0D20: F0FC            BEQ $0D1E           ;Wait for the SNES to signal the chip to continue.
+00/0D22: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/0D24: BAF6            MOVW YA, $F6        ;Move [CPUI2] & [CPUI3] into Register Y/Accumulator.
+00/0D26: C4C8            MOV $C8, A          ;Move [CPUI2] into [EFB_REGISTER_VALUE].
+00/0D28: CBC7            MOV $C7, Y          ;Move [CPUI3] into [FILTER_COEF_INDEX].
+00/0D2A: D8F4            MOV $F4, X          ;Move Register X into [CPUI0].
+00/0D2C: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/0D2E: F0FC            BEQ $0D2C           ;Wait for the SNES to signal the chip to continue.
+00/0D30: 3FDE12          CALL $12DE          ;Call InitializeDSPEchoRegisters.
+00/0D33: 3FEA11          CALL $11EA          ;Call TryExecuteMemoryOperation.
+00/0D36: E800            MOV A, #$00         ;Move 0x00 into the Accumulator.
+00/0D38: FD              MOV Y, A            ;Move 0x00 into Register Y.
+00/0D39: DAAD            MOVW $AD, YA
+00/0D3B: DABC            MOVW $BC, YA
+00/0D3D: DABE            MOVW $BE, YA
+00/0D3F: DAC0            MOVW $C0, YA
+00/0D41: C4B8            MOV $B8, A          ;Move 0x00 into [EON_REGISTER_VALUE].
+00/0D43: C4B9            MOV $B9, A          ;Move 0x00 into [NON_REGISTER_VALUE].
+00/0D45: C4BA            MOV $BA, A          ;Move 0x00 into [PMON_REGISTER_VALUE].
+00/0D47: 32B1            CLR1 $B1
+00/0D49: DAAF            MOVW $AF, YA        ;Move 0x00 into [KON_REGISTER_VALUE] & [KOF_REGISTER_VALUE].
+00/0D4B: C490            MOV $90, A
+00/0D4D: E290            SET7 $90
+00/0D4F: C497            MOV $97, A
+00/0D51: C49C            MOV $9C, A
+00/0D53: E29C            SET7 $9C
+00/0D55: C4A3            MOV $A3, A
+00/0D57: DAC9            MOVW $C9, YA
+00/0D59: DAC2            MOVW $C2, YA
+00/0D5B: C4C4            MOV $C4, A
+00/0D5D: DACB            MOVW $CB, YA
+00/0D5F: 8F017D          MOV $7D, #$01
+00/0D62: 8FFF7E          MOV $7E, #$FF
+00/0D65: 8FFFAC          MOV $AC, #$FF
+00/0D68: E3B102          BBS7 $B1, $0D6D
+00/0D6B: C4B3            MOV $B3, A
+00/0D6D: 3F2F13          CALL $132F          ;Call InitializeEchoBuffers.
+00/0D70: 730403          BBC3 $04, $0D76
+00/0D73: 5FDD0D          JMP $0DDD           ;Call ResetStackAndReturnToMainLoop.
+
+[]
+; So the pointers loaded into 1A00 are relative to their locations in the SNES ROM.
+; Why when the rest of the pointers are relative to the APU? Who knows.
+; Since these pointers are useless as is, this routine fixes up the address so it can find the sound script relative to the APU memory layout.
+00/0D76: CD10            MOV X, #$10
+00/0D78: F5011A          MOV A, $1A01+X
+00/0D7B: D40B            MOV $0B+X, A          ;This is a weird copy
+00/0D7D: 1D              DEC X
+00/0D7E: D0F8            BNE $0D78
+00/0D80: E5001A          MOV A, $1A00
+00/0D83: C406            MOV $06, A
+00/0D85: E5011A          MOV A, $1A01          ;First pointer is the base address.
+00/0D88: C407            MOV $07, A
+00/0D8A: E814            MOV A, #$14
+00/0D8C: 8D1A            MOV Y, #$1A           ;10 pointers per table
+00/0D8E: 9A06            SUBW YA, $06          ;
+00/0D90: DA06            MOVW $06, YA          ;Address fix-up amount
+00/0D92: CD0E            MOV X, #$0E
+00/0D94: 8F80B2          MOV $B2, #$80
+00/0D97: E5121A          MOV A, $1A12
+00/0D9A: EC131A          MOV  Y, $1A13         ;Last pointer.
+00/0D9D: DA34            MOVW $34, YA
+00/0D9F: F40C            MOV A, $0C+X
+00/0DA1: FB0D            MOV Y, $0D+X          ;Current pointer
+00/0DA3: 5A34            CMPW YA, $34          ;So it seems the last pointer is invalid.
+00/0DA5: F011            BEQ $0DB8             ;And we are looking for the last valid pointer.
+00/0DA7: 09B2AD          OR $AD, $B2
+00/0DAA: 7A06            ADDW YA, $06          ;Add the address fix-up to create a valid pointer.
+00/0DAC: D40C            MOV $0C+X, A          ;Move into [SOUND_SEQ_POINTER (Low)].
+00/0DAE: DB0D            MOV $0D+X, Y
+00/0DB0: E8FF            MOV A, #$FF
+00/0DB2: C588FF          MOV $FF88, A
+00/0DB5: 3FE50D          CALL $0DE5
+
+[]
+00/0DB8: 1D              DEC X
+00/0DB9: 1D              DEC X
+00/0DBA: 4BB2            LSR $B2
+00/0DBC: D0E1            BNE $0D9F
+00/0DBE: E4B7            MOV A, $B7
+00/0DC0: 28F0            AND A, #$F0
+00/0DC2: 9F              XCN A
+00/0DC3: 8D11            MOV Y, #$11
+00/0DC5: CF              MUL YA
+00/0DC6: C484            MOV $84, A
+00/0DC8: E4B6            MOV A, $B6
+00/0DCA: 28F0            AND A, #$F0
+00/0DCC: C4B5            MOV $B5, A
+00/0DCE: E4B7            MOV A, $B7
+00/0DD0: 280F            AND A, #$0F
+00/0DD2: 04B5            OR A, $B5
+00/0DD4: C4B5            MOV $B5, A
+00/0DD6: E881            MOV A, #$81     ;Move 0x81 into the Accumulator.
+00/0DD8: C4B4            MOV $B4, A      ;Move 0x81 into [CURRENT_CPUI0_READ].
+00/0DDA: 3F1110          CALL $1011
+
+[ResetStackAndReturnToMainLoop]
+; Where did you come from? Where did you go? Where did you come from Cotton-Eyed Joe?
+; Reset to the top of the stack, clear the timers and jump to the main loop.
+; Like nothing we did ever happened.
+00/0DDD: CDFF            MOV X, #$FF     ;Move 0xFF into Register X.
+00/0DDF: BD              MOV SP, X       ;Move 0xFF into the stack pointer.
+00/0DE0: E4FD            MOV A, $FD      ;Move [T0OUT] into the Accumulator. (Read timer to reset it)
+00/0DE2: 5F7902          JMP $0279       ;Jump to MainProgramLoop.
+
+[]
+00/0DE5: 7D              MOV A, X
+00/0DE6: 1C              ASL A
+00/0DE7: D45C            MOV $5C+X, A
+00/0DE9: E800            MOV A, #$00
+00/0DEB: D52001          MOV $0120+X, A
+00/0DEE: D580FD          MOV $FD80+X, A
+00/0DF1: D581FD          MOV $FD81+X, A
+00/0DF4: D52101          MOV $0121+X, A
+00/0DF7: D54001          MOV $0140+X, A
+00/0DFA: D54101          MOV $0141+X, A
+00/0DFD: D5E0FD          MOV $FDE0+X, A
+00/0E00: D5E1FD          MOV $FDE1+X, A
+00/0E03: D540FD          MOV $FD40+X, A
+00/0E06: D561FD          MOV $FD61+X, A
+00/0E09: D580FC          MOV $FC80+X, A
+00/0E0C: BC              INC A
+00/0E0D: D43C            MOV $3C+X, A
+00/0E0F: 6F              RET 
+
+[For 02 Command]
+; 00/2C00: 00 30 00 00
+; 00/2C04: 10 30 1B 30
+; 00/2C08: 2A 30 00 00
+; 00/2C0C: 3C 30 46 30
+00/0E10: FAB52C          MOV $2C, $B5       ;high byte of music ID.
+00/0E13: 8F002D          MOV $2D, #$00
+00/0E16: 0B2C            ASL $2C
+00/0E18: 2B2D            ROL $2D
+00/0E1A: 0B2C            ASL $2C
+00/0E1C: 2B2D            ROL $2D
+00/0E1E: E800            MOV A, #$00
+00/0E20: 8D2C            MOV Y, #$2C
+00/0E22: 7A2C            ADDW YA, $2C
+00/0E24: DA2C            MOVW $2C, YA      ;Something like 00/2C004 for $B5 == 1
+00/0E26: CD00            MOV X, #$00
+00/0E28: 8D01            MOV Y, #$01
+00/0E2A: F72C            MOV A, [$2C]+Y
+00/0E2C: D009            BNE $0E37
+00/0E2E: 8D03            MOV Y, #$03
+00/0E30: F72C            MOV A, [$2C]+Y
+00/0E32: F017            BEQ $0E4B
+00/0E34: DC              DEC Y
+00/0E35: 2F08            BRA $0E3F
+
+[$2C+1 != 0]
+00/0E37: 8D03            MOV Y, #$03
+00/0E39: F72C            MOV A, [$2C]+Y
+00/0E3B: D00F            BNE $0E4C
+00/0E3D: 8D00            MOV Y, #$00
+00/0E3F: F72C            MOV A, [$2C]+Y
+00/0E41: C430            MOV $30, A
+00/0E43: FC              INC Y
+00/0E44: F72C            MOV A, [$2C]+Y
+00/0E46: C431            MOV $31, A
+00/0E48: 5F110F          JMP $0F11
+00/0E4B: 6F              RET 
+
+[$2C+3 != 0]
+00/0E4C: 8F40B2          MOV $B2, #$40
+00/0E4F: CD1C            MOV X, #$1C
+00/0E51: 3FCE0F          CALL $0FCE
+00/0E54: DD              MOV A, Y
+00/0E55: F00A            BEQ $0E61
+00/0E57: C810            CMP X, #$10
+00/0E59: F025            BEQ $0E80
+00/0E5B: 4BB2            LSR $B2
+00/0E5D: 1D              DEC X
+00/0E5E: 1D              DEC X
+00/0E5F: 2F1F            BRA $0E80
+
+00/0E61: 78FEAE          CMP $AE, #$FE
+00/0E64: 9001            BCC $0E67
+00/0E66: 6F              RET 
+
+00/0E67: 8F40B2          MOV $B2, #$40
+00/0E6A: CD1C            MOV X, #$1C
+00/0E6C: E4B2            MOV A, $B2
+00/0E6E: 24AE            AND A, $AE
+00/0E70: D007            BNE $0E79
+00/0E72: E4B2            MOV A, $B2
+00/0E74: 1C              ASL A
+00/0E75: 24AE            AND A, $AE
+00/0E77: F007            BEQ $0E80
+00/0E79: 1D              DEC X
+00/0E7A: 1D              DEC X
+00/0E7B: 4BB2            LSR $B2
+00/0E7D: D0ED            BNE $0E6C
+00/0E7F: 6F              RET 
+
+00/0E80: E4B2            MOV A, $B2
+00/0E82: 0BB2            ASL $B2
+00/0E84: 04B2            OR A, $B2
+00/0E86: 0EB000          TSET1 $00B0      ;KOF Register Values
+00/0E89: 4EAF00          TCLR1 $00AF      ;KON Register Values
+00/0E8C: 4EC900          TCLR1 $00C9
+00/0E8F: 4ECA00          TCLR1 $00CA
+00/0E92: 4EB800          TCLR1 $00B8      ;EON Register Values
+00/0E95: 4EBA00          TCLR1 $00BA      ;PMON Register Values
+00/0E98: 4EB900          TCLR1 $00B9      ;NON Register Values
+00/0E9B: 4EBD00          TCLR1 $00BD
+00/0E9E: 4EC100          TCLR1 $00C1
+00/0EA1: 4EBF00          TCLR1 $00BF
+00/0EA4: 4EC300          TCLR1 $00C3
+00/0EA7: 0EAE00          TSET1 $00AE
+00/0EAA: 3D              INC X
+00/0EAB: 3D              INC X
+00/0EAC: 7D              MOV A, X
+00/0EAD: 5C              LSR A
+00/0EAE: 2807            AND A, #$07
+00/0EB0: FD              MOV Y, A
+00/0EB1: E4B5            MOV A, $B5        ;Music Id (High Byte)
+00/0EB3: D680FF          MOV $FF80+Y, A
+00/0EB6: D67FFF          MOV $FF7F+Y, A
+00/0EB9: 4D              PUSH X
+00/0EBA: 3F910F          CALL $0F91
+00/0EBD: CE              POP X
+00/0EBE: 8D03            MOV Y, #$03
+
+00/0EC0: F72C            MOV A, [$2C]+Y
+00/0EC2: D40D            MOV $0D+X, A       ;Store byte 3 of 00/2C00 data into $0D
+00/0EC4: DC              DEC Y
+00/0EC5: F72C            MOV A, [$2C]+Y
+00/0EC7: D40C            MOV $0C+X, A       ;Store byte 2 of 00/2C00 data into $0D
+00/0EC9: 3FE50D          CALL $0DE5         ;Clears lots of things
+00/0ECC: BB3C            INC $3C+X
+00/0ECE: E864            MOV A, #$64
+00/0ED0: D501FC          MOV $FC01+X, A
+00/0ED3: E4B7            MOV A, $B7
+00/0ED5: D541FC          MOV $FC41+X, A
+00/0ED8: E4B6            MOV A, $B6
+00/0EDA: D581FC          MOV $FC81+X, A
+00/0EDD: E4B4            MOV A, $B4
+00/0EDF: D560FC          MOV $FC60+X, A
+00/0EE2: E4B5            MOV A, $B5
+00/0EE4: D561FC          MOV $FC61+X, A
+00/0EE7: 6D              PUSH Y
+00/0EE8: E804            MOV A, #$04
+00/0EEA: 3F6608          CALL $0866
+00/0EED: EE              POP Y
+00/0EEE: 1D              DEC X
+00/0EEF: 1D              DEC X
+00/0EF0: 4BB2            LSR $B2
+00/0EF2: DC              DEC Y
+00/0EF3: 10CB            BPL $0EC0
+00/0EF5: 6F              RET 
+
+00/0EF6: 7D              MOV A, X
+00/0EF7: 280F            AND A, #$0F
+00/0EF9: 1C              ASL A
+00/0EFA: FD              MOV Y, A
+00/0EFB: F63C15          MOV A, $153C+Y
+00/0EFE: D001            BNE $0F01
+00/0F00: 6F              RET 
+
+00/0F01: C431            MOV $31, A
+00/0F03: F63B15          MOV A, $153B+Y
+00/0F06: C430            MOV $30, A
+00/0F08: 8FFEB5          MOV $B5, #$FE        // Music ID
+00/0F0B: 8F0FB6          MOV $B6, #$0F        // Fade
+00/0F0E: 8F80B7          MOV $B7, #$80        // Volume
+
+[]
+00/0F11: 8F80B2          MOV $B2, #$80
+00/0F14: CD1E            MOV X, #$1E
+00/0F16: 3FCE0F          CALL $0FCE
+00/0F19: DD              MOV A, Y
+00/0F1A: D016            BNE $0F32
+00/0F1C: 78FFAE          CMP $AE, #$FF
+00/0F1F: F06F            BEQ $0F90
+00/0F21: 8F80B2          MOV $B2, #$80
+00/0F24: CD1E            MOV X, #$1E
+00/0F26: E4B2            MOV A, $B2
+00/0F28: 24AE            AND A, $AE
+00/0F2A: F006            BEQ $0F32
+00/0F2C: 1D              DEC X
+00/0F2D: 1D              DEC X
+00/0F2E: 4BB2            LSR $B2
+00/0F30: 2FF4            BRA $0F26
+
+[]
+00/0F32: E4B2            MOV A, $B2
+00/0F34: 0EB000          TSET1 $00B0          ;KOF Register Values
+00/0F37: 4EAF00          TCLR1 $00AF          ;KON Register Values
+00/0F3A: 4EC900          TCLR1 $00C9
+00/0F3D: 4ECA00          TCLR1 $00CA
+00/0F40: 4EB800          TCLR1 $00B8          ;EON Register Values
+00/0F43: 4EBA00          TCLR1 $00BA          ;PMON Register Values
+00/0F46: 4EB900          TCLR1 $00B9          ;NON Register Values
+00/0F49: 4EBD00          TCLR1 $00BD
+00/0F4C: 4EC100          TCLR1 $00C1
+00/0F4F: 4EBF00          TCLR1 $00BF
+00/0F52: 4EC300          TCLR1 $00C3
+00/0F55: 0EAE00          TSET1 $00AE
+00/0F58: 7D              MOV A, X
+00/0F59: 5C              LSR A
+00/0F5A: 2807            AND A, #$07
+00/0F5C: FD              MOV Y, A
+00/0F5D: E4B5            MOV A, $B5
+00/0F5F: D680FF          MOV $FF80+Y, A
+00/0F62: 4D              PUSH X
+00/0F63: 3F910F          CALL $0F91
+00/0F66: CE              POP X
+00/0F67: BA30            MOVW YA, $30
+00/0F69: D40C            MOV $0C+X, A
+00/0F6B: DB0D            MOV $0D+X, Y
+00/0F6D: 3FE50D          CALL $0DE5
+00/0F70: BB3C            INC $3C+X
+00/0F72: E804            MOV A, #$04
+00/0F74: 3F6608          CALL $0866
+00/0F77: E864            MOV A, #$64
+00/0F79: D501FC          MOV $FC01+X, A
+00/0F7C: E4B7            MOV A, $B7
+00/0F7E: D541FC          MOV $FC41+X, A
+00/0F81: E4B6            MOV A, $B6
+00/0F83: D581FC          MOV $FC81+X, A
+00/0F86: E4B4            MOV A, $B4
+00/0F88: D560FC          MOV $FC60+X, A
+00/0F8B: E4B5            MOV A, $B5
+00/0F8D: D561FC          MOV $FC61+X, A
+00/0F90: 6F              RET 
+
+00/0F91: E4B7            MOV A, $B7
+00/0F93: 9F              XCN A
+00/0F94: 28F0            AND A, #$F0
+00/0F96: D002            BNE $0F9A
+00/0F98: E880            MOV A, #$80
+00/0F9A: C4B5            MOV $B5, A
+00/0F9C: 38F0B7          AND $B7, #$F0
+00/0F9F: D002            BNE $0FA3
+00/0FA1: E2B7            SET7 $B7
+00/0FA3: 38F0B6          AND $B6, #$F0
+00/0FA6: E4B7            MOV A, $B7
+00/0FA8: 80              SETC 
+00/0FA9: A4B5            SBC A, $B5
+00/0FAB: 0D              PUSH PSW
+00/0FAC: B003            BCS $0FB1
+00/0FAE: 48FF            EOR A, #$FF
+00/0FB0: BC              INC A
+00/0FB1: F8B6            MOV X, $B6
+00/0FB3: D003            BNE $0FB8
+00/0FB5: AE              POP A
+00/0FB6: 2F15            BRA $0FCD
+00/0FB8: 8D00            MOV Y, #$00
+00/0FBA: 9E              DIV YA, X
+00/0FBB: C4B5            MOV $B5, A
+00/0FBD: E800            MOV A, #$00
+00/0FBF: 9E              DIV YA, X
+00/0FC0: C4B4            MOV $B4, A
+00/0FC2: 8E              POP PSW
+00/0FC3: 9008            BCC $0FCD
+00/0FC5: 58FFB4          EOR $B4, #$FF
+00/0FC8: 58FFB5          EOR $B5, #$FF
+00/0FCB: 3AB4            INCW $B4
+00/0FCD: 6F              RET 
+
+[]
+00/0FCE: 8D08            MOV Y, #$08
+00/0FD0: E4B5            MOV A, $B5            ;[CPUI1] (Music High Byte)
+00/0FD2: 767FFF          CMP A, $FF7F+Y
+00/0FD5: F004            BEQ $0FDB
+00/0FD7: FEF9            DBNZ Y, $0FD2
+00/0FD9: 2F1D            BRA $0FF8             ;Exit if not found
+
+00/0FDB: E4B6            MOV A, $B6            ;Value of [CPUI2].(Fade Out)
+00/0FDD: 280F            AND A, #$0F
+00/0FDF: F015            BEQ $0FF6             ;Exit if zero
+00/0FE1: CB34            MOV $34, Y
+00/0FE3: 8B34            DEC $34
+00/0FE5: 0B34            ASL $34
+00/0FE7: 8234            SET4 $34
+00/0FE9: 7D              MOV A, X
+00/0FEA: 2F04            BRA $0FF0
+
+00/0FEC: 4BB2            LSR $B2
+00/0FEE: 9C              DEC A
+00/0FEF: 9C              DEC A
+
+00/0FF0: 2E34F9          CBNE $34, $0FEC
+00/0FF3: 5D              MOV X, A
+00/0FF4: 2F02            BRA $0FF8
+
+00/0FF6: AE              POP A
+00/0FF7: AE              POP A
+00/0FF8: 6F              RET 
+
+00/0FF9: C8F0            CMP X, #$F0
+00/0FFB: B004            BCS $1001
+00/0FFD: C890            CMP X, #$90
+00/0FFF: B00D            BCS $100E
+00/1001: 7D              MOV A, X
+00/1002: 281F            AND A, #$1F
+00/1004: 1C              ASL A
+00/1005: FD              MOV Y, A
+00/1006: F6B314          MOV A, $14B3+Y
+00/1009: 2D              PUSH A
+00/100A: F6B214          MOV A, $14B2+Y
+00/100D: 2D              PUSH A
+00/100E: 6F              RET 
+
+[03: ]
+00/100F: A2B1            SET5 $B1
+
+[00: ]
+00/1011: E4B5            MOV A, $B5          ;[CPUI1]
+00/1013: 38F0B5          AND $B5, #$F0
+00/1016: 280F            AND A, #$0F
+00/1018: 8D11            MOV Y, #$11
+00/101A: CF              MUL YA
+00/101B: C4B6            MOV $B6, A
+00/101D: FAB5F5          MOV $F5, $B5  [CPUO1]
+00/1020: EBB6            MOV Y, $B6    [CPUI2]
+00/1022: E4B5            MOV A, $B5
+00/1024: C48B            MOV $8B, A
+00/1026: D00D            BNE $1035
+00/1028: CB84            MOV $84, Y
+00/102A: C483            MOV $83, A
+00/102C: C488            MOV $88, A
+00/102E: C487            MOV $87, A
+00/1030: 09ADC9          OR $C9, $AD
+00/1033: 2F30            BRA $1065
+
+00/1035: DD              MOV A, Y
+00/1036: 80              SETC 
+00/1037: A484            SBC A, $84
+00/1039: F0E9            BEQ $1024
+00/103B: 0D              PUSH PSW
+00/103C: B003            BCS $1041
+00/103E: 48FF            EOR A, #$FF
+00/1040: BC              INC A
+00/1041: F8B5            MOV X, $B5
+00/1043: 8D00            MOV Y, #$00
+00/1045: 9E              DIV YA, X
+00/1046: C435            MOV $35, A
+00/1048: E800            MOV A, #$00
+00/104A: 9E              DIV YA, X
+00/104B: C434            MOV $34, A
+00/104D: BA34            MOVW YA, $34
+00/104F: D002            BNE $1053
+00/1051: AB34            INC $34
+00/1053: 8E              POP PSW
+00/1054: B008            BCS $105E
+00/1056: 58FF34          EOR $34, #$FF
+00/1059: 58FF35          EOR $35, #$FF
+00/105C: 3A34            INCW $34
+00/105E: BA34            MOVW YA, $34
+00/1060: DA87            MOVW $87, YA
+00/1062: 8F0083          MOV $83, #$00
+00/1065: 6F              RET 
+
+[06: ]
+00/1066: E4B5            MOV A, $B5
+00/1068: 2807            AND A, #$07
+00/106A: F00A            BEQ $1076
+00/106C: 73B501          BBC3 $B5, $1070
+00/106F: 9C              DEC A
+00/1070: 8D12            MOV Y, #$12
+00/1072: CF              MUL YA
+00/1073: 63B502          BBS3 $B5, $1078
+00/1076: 4880            EOR A, #$80
+00/1078: C4B6            MOV $B6, A
+00/107A: 38F0B5          AND $B5, #$F0
+00/107D: EBB6            MOV Y, $B6
+00/107F: E4B5            MOV A, $B5
+00/1081: C497            MOV $97, A
+00/1083: D00A            BNE $108F
+00/1085: CB90            MOV $90, Y
+00/1087: C48F            MOV $8F, A
+00/1089: C494            MOV $94, A
+00/108B: C493            MOV $93, A
+00/108D: 2F30            BRA $10BF
+00/108F: DD              MOV A, Y
+00/1090: 80              SETC 
+00/1091: A490            SBC A, $90
+00/1093: F0EC            BEQ $1081
+00/1095: 0D              PUSH PSW
+00/1096: B003            BCS $109B
+00/1098: 48FF            EOR A, #$FF
+00/109A: BC              INC A
+00/109B: F8B5            MOV X, $B5
+00/109D: 8D00            MOV Y, #$00
+00/109F: 9E              DIV YA, X
+00/10A0: C435            MOV $35, A
+00/10A2: E800            MOV A, #$00
+00/10A4: 9E              DIV YA, X
+00/10A5: C434            MOV $34, A
+00/10A7: BA34            MOVW YA, $34
+00/10A9: D002            BNE $10AD
+00/10AB: AB34            INC $34
+00/10AD: 8E              POP PSW
+00/10AE: B008            BCS $10B8
+00/10B0: 58FF34          EOR $34, #$FF
+00/10B3: 58FF35          EOR $35, #$FF
+00/10B6: 3A34            INCW $34
+00/10B8: BA34            MOVW YA, $34
+00/10BA: DA93            MOVW $93, YA
+00/10BC: 8F008F          MOV $8F, #$00
+00/10BF: 6F              RET 
+
+[09: ]
+00/10C0: ABB4            INC $B4
+00/10C2: E4B5            MOV A, $B5
+00/10C4: 2807            AND A, #$07
+00/10C6: F00A            BEQ $10D2
+00/10C8: 73B501          BBC3 $B5, $10CC
+00/10CB: 9C              DEC A
+00/10CC: 8D12            MOV Y, #$12
+00/10CE: CF              MUL YA
+00/10CF: 63B502          BBS3 $B5, $10D4
+00/10D2: 4880            EOR A, #$80
+00/10D4: C4B6            MOV $B6, A
+00/10D6: 38F0B5          AND $B5, #$F0
+00/10D9: EBB6            MOV Y, $B6
+00/10DB: E4B5            MOV A, $B5
+00/10DD: C4A3            MOV $A3, A
+00/10DF: D00D            BNE $10EE
+00/10E1: CB9C            MOV $9C, Y
+00/10E3: C49B            MOV $9B, A
+00/10E5: C4A0            MOV $A0, A
+00/10E7: C49F            MOV $9F, A
+00/10E9: 09ADCA          OR $CA, $AD
+00/10EC: 2F30            BRA $111E
+
+00/10EE: DD              MOV A, Y
+00/10EF: 80              SETC 
+00/10F0: A49C            SBC A, $9C
+00/10F2: F0E9            BEQ $10DD
+00/10F4: 0D              PUSH PSW
+00/10F5: B003            BCS $10FA
+00/10F7: 48FF            EOR A, #$FF
+00/10F9: BC              INC A
+00/10FA: F8B5            MOV X, $B5
+00/10FC: 8D00            MOV Y, #$00
+00/10FE: 9E              DIV YA, X
+00/10FF: C435            MOV $35, A
+00/1101: E800            MOV A, #$00
+00/1103: 9E              DIV YA, X
+00/1104: C434            MOV $34, A
+00/1106: BA34            MOVW YA, $34
+00/1108: D002            BNE $110C
+00/110A: AB34            INC $34
+00/110C: 8E              POP PSW
+00/110D: B008            BCS $1117
+00/110F: 58FF34          EOR $34, #$FF
+00/1112: 58FF35          EOR $35, #$FF
+00/1115: 3A34            INCW $34
+00/1117: BA34            MOVW YA, $34
+00/1119: DA9F            MOVW $9F, YA
+00/111B: 8F009B          MOV $9B, #$00
+00/111E: 6F              RET 
+
+[13: ]
+[14: ]
+00/111F: 13B404          BBC0 $B4, $1126
+00/1122: 12B1            CLR0 $B1
+00/1124: 2F02            BRA $1128
+00/1126: 02B1            SET0 $B1
+00/1128: 8FFFC9          MOV $C9, #$FF
+00/112B: 6F              RET 
+
+[10: ]
+[11: ]
+[12: ]
+00/112C: 23B424          BBS1 $B4, $1153    ;[CURRENT_CPUI0_READ]
+00/112F: E4AE            MOV A, $AE
+00/1131: 48FF            EOR A, #$FF
+00/1133: 0EB000          TSET1 $00B0        ;[KOF_REGISTER_VALUE]
+00/1136: 4EAF00          TCLR1 $00AF        ;[KON_REGISTER_VALUE]
+00/1139: 4EB800          TCLR1 $00B8        ;[EON_REGISTER_VALUE]
+00/113C: 4EBA00          TCLR1 $00BA        ;[PMON_REGISTER_VALUE]
+00/113F: 4EB900          TCLR1 $00B9        ;[NON_REGISTER_VALUE]
+00/1142: E800            MOV A, #$00
+00/1144: C4AD            MOV $AD, A
+00/1146: C4CB            MOV $CB, A
+00/1148: C4BC            MOV $BC, A
+00/114A: C4C0            MOV $C0, A
+00/114C: C4BE            MOV $BE, A
+00/114E: B2B1            CLR5 $B1
+00/1150: 03B426          BBS0 $B4, $1179    ;[CURRENT_CPUI0_READ]
+00/1153: E4AE            MOV A, $AE
+00/1155: 0EB000          TSET1 $00B0        ;[KOF_REGISTER_VALUE]
+00/1158: 4EAF00          TCLR1 $00AF        ;[KON_REGISTER_VALUE]
+00/115B: 4EB800          TCLR1 $00B8        ;[EON_REGISTER_VALUE]
+00/115E: 4EBA00          TCLR1 $00BA        ;[PMON_REGISTER_VALUE]
+00/1161: 4EB900          TCLR1 $00B9        ;[NON_REGISTER_VALUE]
+00/1164: 92B1            CLR4 $B1
+00/1166: E800            MOV A, #$00
+00/1168: C4AE            MOV $AE, A
+00/116A: C4BD            MOV $BD, A
+00/116C: C4C1            MOV $C1, A
+00/116E: C4BF            MOV $BF, A
+00/1170: 8D08            MOV Y, #$08
+00/1172: E8FF            MOV A, #$FF
+00/1174: D67FFF          MOV $FF7F+Y, A
+00/1177: FEFB            DBNZ Y, $1174
+00/1179: 6F              RET 
+
+00/117A: FAB5B3          MOV $B3, $B5        ;[CURRENT_CPUI1_READ]
+00/117D: 8FFFC9          MOV $C9, #$FF
+00/1180: 6F              RET 
+
+[1B: ]
+00/1181: FAADC4          MOV $C4, $AD
+00/1184: 6F              RET 
+
+[1C: ]
+00/1185: 60              CLRC 
+00/1186: E8FF            MOV A, #$FF
+00/1188: 84B5            ADC A, $B5          ;[CURRENT_CPUI1_READ]
+00/118A: CAB160          MOV1 $60B1, C
+00/118D: 6F              RET 
+
+[16: ]
+[17: ]
+;Toggles ADSR Envelope Mode
+00/118E: 03B43A          BBS0 $B4, $11CB
+00/1191: 8D05            MOV Y, #$05         ;Move [VxADSR1] into Register Y.
+
+[ClearADSREnvelopeMode]
+00/1193: CBF2            MOV $F2, Y          ;Move [VxADSR1] into [DSPADDR].
+00/1195: E4F3            MOV A, $F3          ;Move [DSPDATA] into the Accumulator.
+00/1197: 287F            AND A, #$7F         ;Remove the ADSR Envelope Mode bit.
+00/1199: C4F3            MOV $F3, A          ;Move the settings back into [DSPADDR].
+00/119B: DD              MOV A, Y            ;Move [VxADSR1] into the Accumulator.
+00/119C: 60              CLRC                ;Clear Carry Flag.
+00/119D: 8810            ADC A, #$10         ;Add 0x10 to the [VxADSR1] to move to the next voice.
+00/119F: FD              MOV Y, A            ;Move [VxADR1] back to Register Y.
+00/11A0: 10F1            BPL $1193           ;Branch to ClearADSREnvelopeMode until all 8 voice envelopes are changed.
+00/11A2: CD00            MOV X, #$00         ;Move 0x00 into Register X. (Muting all voice channels)
+00/11A4: 8D00            MOV Y, #$00         ;Move [VxVOLL] into Register Y.
+
+[ClearVoiceVolume]
+00/11A6: CBF2            MOV $F2, Y          ;Move [VxVOLL] into [DSPADDR].
+00/11A8: D8F3            MOV $F3, X          ;Move 0x00 into [DSPADDR].
+00/11AA: FC              INC Y               ;Move to the [VxVOLR] DSP Register.
+00/11AB: CBF2            MOV $F2, Y          ;Move [VxVOLR] into [DSPADDR].
+00/11AD: D8F3            MOV $F3, X          ;Move 0x00 into [DSPADDR].
+00/11AF: DD              MOV A, Y            ;Move [VxADSR1] into the Accumulator.
+00/11B0: 60              CLRC                ;Clear Carry Flag.
+00/11B1: 880F            ADC A, #$0F         ;Add 0x0F to 0x01 to get to 0x2X and so on.
+00/11B3: FD              MOV Y, A            ;Move the next [VxVOLL] into Register Y.
+00/11B4: 10F0            BPL $11A6           ;Branch to ClearVoiceVolume until all 8 voices are muted.
+00/11B6: BAAD            MOVW YA, $AD
+00/11B8: F006            BEQ $11C0
+00/11BA: DACB            MOVW $CB, YA
+00/11BC: BA00            MOVW YA, $00
+00/11BE: DAAD            MOVW $AD, YA
+00/11C0: C4AF            MOV $AF, A
+00/11C2: 8D10            MOV Y, #$10
+00/11C4: D6CC00          MOV $00CC+Y, A
+00/11C7: FEFB            DBNZ Y, $11C4
+00/11C9: 2F1E            BRA $11E9           ;Branch and exit the routine.
+
+[SetADSREnvelopeMode]
+00/11CB: 8D05            MOV Y, #$05         ;Move [VxADSR1] into Register Y.
+
+[SetADSREnvelopeModeLoop]
+00/11CD: CBF2            MOV $F2, Y          ;Move [VxADSR1] into [DSPADDR].
+00/11CF: E4F3            MOV A, $F3          ;Move [DSPDATA] into the Accumulator.
+00/11D1: 0880            OR A, #$80          ;Set the ADSR Envelope Mode bit.
+00/11D3: C4F3            MOV $F3, A          ;Move the settings back into [DSPADDR].
+00/11D5: DD              MOV A, Y            ;Move [VxADSR1] into the Accumulator.
+00/11D6: 60              CLRC                ;Clear Carry Flag.
+00/11D7: 8810            ADC A, #$10         ;Add 0x10 to the [VxADSR1] to move to the next voice.
+00/11D9: FD              MOV Y, A            ;Move [VxADR1] back to Register Y.
+00/11DA: 10F1            BPL $11CD           ;Branch to SetADSREnvelopeModeLoop until all 8 voice envelopes are changed.
+00/11DC: BACB            MOVW YA, $CB
+00/11DE: F009            BEQ $11E9
+00/11E0: 8FFFC9          MOV $C9, #$FF
+00/11E3: DAAD            MOVW $AD, YA
+00/11E5: BA00            MOVW YA, $00
+00/11E7: DACB            MOVW $CB, YA
+00/11E9: 6F              RET                 ;Return.
+
+[TryExecuteMemoryOperation]
+; Secret of Mana uses the IPL ROM boot loader to initially copy the SPC code and some amount of data to the APU.
+; All writes after initalization will be handled by this interface.
+; Start up command: 04 02 1A00 - [CPUI1] - Loading Routine Index, [CPUI2/3] - RAMAddress to load
+00/11EA: E4F5            MOV A, $F5          ;Move [CPUI1] into the Accumulator.
+00/11EC: C404            MOV $04, A          ;
+00/11EE: 2807            AND A, #$07         ;SpcMemoryOperationPointerTable has eight entries, but index 0 is unreachable.
+00/11F0: C4F5            MOV $F5, A          ;Store the filtered value back into [CPUI1].
+00/11F2: D004            BNE $11F8           ;If any of the bottom three bits are set then branch to ExecuteMemoryCommand.
+00/11F4: D8F4            MOV $F4, X          ;Store Register X in [CPUI0].
+00/11F6: 2F1B            BRA $1213           ;Branch and return, there's nothing to do.
+
+[ExecuteMemoryCommand]
+00/11F8: 1C              ASL A               ;Multiply the Id by two to create an index in the pointer function table.
+00/11F9: 2D              PUSH A              ;Push the index into the stack.
+00/11FA: BAF6            MOVW YA, $F6        ;Move the destination address to Register Y/Accumulator.
+00/11FC: DA2C            MOVW $2C, YA        ;Move the destination address to the indirect pointer.
+00/11FE: EE              POP Y               ;Pop the index into Register Y.
+00/11FF: F61914          MOV A, $1419+Y      ;Move the high byte of the function pointer from SpcMemoryOperationPointerTable into the Accumulator.
+00/1202: 2D              PUSH A              ;Push it into the stack.
+00/1203: F61814          MOV A, $1418+Y      ;Move the low byte into the Accumulator.
+00/1206: 2D              PUSH A              ;Push the byte on the stack.Now we have altered our return address. The RET in this routine will go to the requested routine.
+00/1207: 8D00            MOV Y, #$00         ;Move 0x00 into Register Y.
+00/1209: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/120B: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/120D: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/120F: F0FC            BEQ $120D           ;Wait for the SNES to signal the chip to continue.
+00/1211: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/1213: 6F              RET                 ;Return.
+
+[03: SpcCommand_MemoryWriteLong]
+; Reading Stuff from SNES and writing it to RAM somewhere
+; This one is used. $4DF1
+00/1214: E4F5            MOV A, $F5          ;Move [CPUI1] into the Accumulator.
+00/1216: D72C            MOV [$2C]+Y, A      ;Store the transfer byte into the selected RAM address.
+00/1218: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/121A: FC              INC Y               ;Increment the RAM pointer.
+00/121B: E4F6            MOV A, $F6          ;Move [CPUI2] into the Accumulator.
+00/121D: D72C            MOV [$2C]+Y, A      ;Store the transfer byte into the selected RAM address.
+00/121F: FC              INC Y               ;Increment the RAM pointer.
+00/1220: E4F7            MOV A, $F7          ;Move [CPUI3] into the Accumulator.
+00/1222: D72C            MOV [$2C]+Y, A      ;Store the transfer byte into the selected RAM address.
+00/1224: 60              CLRC                ;Clear Carry Flag.
+00/1225: 98032C          ADC $2C, #$03       ;Add 0x03 to the MSB of the RAM Address.
+00/1228: 98002D          ADC $2D, #$00       ;Add the carry to the LSB of the RAM Address.
+00/122B: 8D00            MOV Y, #$00         ;Reset the indexer to zero.
+00/122D: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/122F: F0FC            BEQ $122D           ;Wait for the SNES to signal the chip to continue.
+00/1231: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X..
+00/1233: D0DF            BNE $1214           ;If the signal was non-zero then continue to transfer bytes.
+00/1235: 2FB3            BRA $11EA           ;Branch to TryExecuteMemoryOperation.
+
+[02: SpcCommand_MemoryWriteShort]
+; An initialization routine. This is gonna load a giant chuck of bytes into $1A00.
+; $002C is loaded with the address provided from [CPUI2/3]. (Should be $1A00)
+00/1237: E4F6            MOV A, $F6          ;Move [CPUI2] into the Accumulator.
+00/1239: D72C            MOV [$2C]+Y, A      ;Store the transfer byte into the selected RAM address.
+00/123B: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/123D: FC              INC Y               ;Increment the RAM pointer.
+00/123E: E4F7            MOV A, $F7          ;Move [CPUI3] into the Accumulator.
+00/1240: D72C            MOV [$2C]+Y, A      ;Store the transfer byte into the selected RAM address.
+00/1242: 3A2C            INCW $2C            ;Increment the RAM Address.
+00/1244: 3A2C            INCW $2C            ;Increment the RAM Address again to skip over the area that was just written to.
+00/1246: DC              DEC Y               ;Decrement the RAM pointer.
+00/1247: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/1249: F0FC            BEQ $1247           ;Wait for the SNES to signal the chip to continue.
+00/124B: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/124D: D0E8            BNE $1237           ;If the signal was non-zero then continue to transfer bytes.
+00/124F: 2F99            BRA $11EA           ;Branch to TryExecuteMemoryOperation.
+
+[01: SpcCommand_MemoryWriteByte]
+; Seems unused
+00/1251: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/1253: E4F7            MOV A, $F7          ;Move [CPUI3] into the Accumulator.
+00/1255: D72C            MOV [$2C]+Y, A      ;Store the transfer byte into the selected RAM address.
+00/1257: 3A2C            INCW $2C            ;Increment the RAM Address.
+00/1259: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/125B: F0FC            BEQ $1259           ;Wait for the SNES to signal the chip to continue.
+00/125D: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/125F: D0F0            BNE $1251           ;If the signal was non-zero then continue to transfer bytes.
+00/1261: 2F87            BRA $11EA           ;Branch to TryExecuteMemoryOperation.
+
+[00: SpcCommand_CooperativeNoOp]
+[04: SpcCommand_CooperativeNoOp]
+[05: SpcCommand_CooperativeNoOp]
+[06: SpcCommand_CooperativeNoOp]
+; Seems to basically be a cooperative noop.
+; Seems unused
+00/1263: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/1265: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/1267: F0FC            BEQ $1265           ;Wait for the SNES to signal the chip to continue.
+00/1269: F8F4            MOV X, $F4          ;Move [CPUI0] into the Accumulator.
+00/126B: D0F6            BNE $1263           ;If the signal was non-zero then continue to transfer bytes.
+00/126D: 5FEA11          JMP $11EA           ;Jump to TryExecuteMemoryOperation.
+
+[07: SpcCommand_MemoryMove]
+00/1270: BAF6            MOVW YA, $F6        ;Move [CPUI2] & [CPUI3] into the Register Y/Accumulator.
+00/1272: DA2E            MOVW $2E, YA        ;Store values in $2E. Okay so we passed in a second RAM address.
+00/1274: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/1276: 3EF4            CMP X, $F4          ;Waiting until the SNES gives us a signal.
+00/1278: F0FC            BEQ $1276           ;Signal the SNES to continue processing.
+00/127A: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/127C: BAF6            MOVW YA, $F6        ;Move [CPUI2] & [CPUI3] into the Register Y/Accumulator.
+00/127E: DA34            MOVW $34, YA        ;Store the transfer size.
+00/1280: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/1282: 8D00            MOV Y, #$00         ;Move 0x00 into Register Y.
+00/1284: F72C            MOV A, [$2C]+Y      ;Move a value from the source address into the Accumulator.
+00/1286: D72E            MOV [$2E]+Y, A      ;Store the value in the destination address.
+00/1288: FC              INC Y               ;Increment Register Y.
+00/1289: D004            BNE $128F           ;If the counter rolls over then we need to increment the address.
+00/128B: AB2D            INC $2D             ;Increment the low byte of the address.
+00/128D: AB2F            INC $2F             ;Increment the bank byte of the address.
+00/128F: 1A34            DECW $34            ;Decrement TransferSize.
+00/1291: D0F1            BNE $1284           ;Branch up and continue loading if TransferSize != 0.
+00/1293: 3EF4            CMP X, $F4          ;Waiting until the SNES gives us a signal.
+00/1295: F0FC            BEQ $1293           ;Signal the SNES to continue processing.
+00/1297: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/1299: F00E            BEQ $12A9           ;If [CPUI0] is zero then Exit.
+00/129B: BAF6            MOVW YA, $F6        ;Move the destination address to Register Y/Accumulator.
+00/129D: DA2C            MOVW $2C, YA        ;Move the destination address to the indirect pointer.
+00/129F: D8F4            MOV $F4, X          ;Signal the SNES to continue processing.
+00/12A1: 3EF4            CMP X, $F4          ;Waiting for [CPUI0] to change it's value.
+00/12A3: F0FC            BEQ $12A1           ;Wait for the SNES to signal the chip to continue.
+00/12A5: F8F4            MOV X, $F4          ;Move [CPUI0] into Register X.
+00/12A7: 2FC7            BRA $1270           ;So we completed the transfer, set the source address as the destination address, and now head up and start all over?
+                                             ;I suppose it's possible during all the signal waiting to load a new address into $F6/F7 to keep the party going.
+00/12A9: 5FEA11          JMP $11EA           ;Jump to TryExecuteMemoryOperation.
+
+
+[18: ]
+[19: ]
+[1A: ]
+00/12AC: EAB420          NOT1 $20B4           ;$20B4->$00B4, Bit 1
+00/12AF: AAB420          MOV1 C, $20B4        ;$20B4->$00B4, Bit 1 : Move Bit 1 of $B4 To Carry Flag.
+00/12B2: CAB120          MOV1 $20B1, C        ;$20B1->$00B1, Bit 1 : Move Carry Flag to Bit 1 of $B1.
+00/12B5: B004            BCS $12BB
+00/12B7: E824            MOV A, #$24          ;Move 0x24 into the Accumulator.
+00/12B9: 2F02            BRA $12BD
+
+00/12BB: E801            MOV A, #$01          ;Move 0x01 into the Accumulator.
+00/12BD: 8F00F1          MOV $F1, #$00        ;Store 0x00 into [CONTROL]. (Disable All Timers)
+00/12C0: C4FA            MOV $FA, A           ;Store Accumulator (Either 0x01 or 0x24 depending on ???) into [T0TARGET].
+00/12C2: 8F01F1          MOV $F1, #$01        ;Store 0x01 into [CONTROL]. (Enable Timer1)
+00/12C5: 6F              RET                  ;Return.
+
+[1F: ]
+; So if the ports are FF, FE, DC, FD then set bit 7 of $B1, otherwise clear it.
+00/12C6: E8FF            MOV A, #$FF
+00/12C8: 8DFE            MOV Y, #$FE
+00/12CA: 5AB4            CMPW YA, $B4
+00/12CC: D00C            BNE $12DA
+00/12CE: E8FD            MOV A, #$FD
+00/12D0: 8DFC            MOV Y, #$FC
+00/12D2: 5AB6            CMPW YA, $B6
+00/12D4: D004            BNE $12DA
+00/12D6: E2B1            SET7 $B1
+00/12D8: 2F02            BRA $12DC
+00/12DA: F2B1            CLR7 $B1
+00/12DC: 6F              RET 
+
+[01: DummiedOut]
+[02: DummiedOut]
+00/12DD: 6F              RET 
+
+[InitializeDSPEchoRegisters]
+00/12DE: 8F6CF2          MOV $F2, #$6C       ;Move [FLG] into [DSPADDR].
+00/12E1: E4F3            MOV A, $F3          ;Move the [FLG] value into the Accumulator.
+00/12E3: 0820            OR A, #$20          ;Set Echo Buffer Writes Disabled.
+00/12E5: C4F3            MOV $F3, A          ;Store the flags back into [FLG].
+00/12E7: E800            MOV A, #$00         ;Move 0x00 into the Accumulator.
+00/12E9: 8D4D            MOV Y, #$4D         ;Move [EON] into Register Y.
+00/12EB: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/12EE: 8D0D            MOV Y, #$0D         ;Move [EFB] into Register Y.
+00/12F0: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/12F3: 8D2C            MOV Y, #$2C         ;Move [EVOLL] into Register Y.
+00/12F5: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/12F8: 8D3C            MOV Y, #$3C         ;Move [EVOLR] into Register Y.
+00/12FA: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/12FD: 8D7D            MOV Y, #$7D         ;Move [EDL] into Register Y.
+00/12FF: CBF2            MOV $F2, Y          ;Move [EDL] into [DSPADDR].
+00/1301: E4F3            MOV A, $F3          ;Move the value of [EDL] to the Accumulator.
+00/1303: 280F            AND A, #$0F         ;Clear the high nibble of [EDL].
+00/1305: C4E0            MOV $E0, A          ;Move the loaded [EDL] into [PREVIOUS_EDL_VALUE].
+00/1307: E4DF            MOV A, $DF          ;Move [EDL_REGISTER_VALUE] into the Accumulator.
+00/1309: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/130C: FD              MOV Y, A            ;Move [EDL_REGISTER_VALUE] into Register Y.
+00/130D: D001            BNE $1310           ;[EDL_REGISTER_VALUE] must be non-zero to create the ESA value.
+00/130F: BC              INC A               ;So increment the value if needed.
+00/1310: 1C              ASL A               ;Multiply By 2.
+00/1311: 1C              ASL A               ;Multiply By 2.
+00/1312: 1C              ASL A               ;Multiply By 2.
+00/1313: 48FF            EOR A, #$FF         ;Invert the value.
+00/1315: BC              INC A               ;Add one to the value.
+00/1316: 60              CLRC                ;Clear Carry Flag.
+00/1317: 88FA            ADC A, #$FA         ;Add 0xFA to the value.
+00/1319: 8D6D            MOV Y, #$6D         ;Move [ESA] into Register Y. (0xEA at startup, from 0x02 $DF)
+00/131B: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/131E: C4E2            MOV $E2, A          ;Move the value into [ECHO_WRITE_BUFFER_ADDRESS2].
+00/1320: 8F00E1          MOV $E1, #$00       ;Move 0x00 into [ECHO_WRITE_BUFFER_ADDRESS1].
+00/1323: 8F01F1          MOV $F1, #$01       ;Store 0x01 into [CONTROL]. (Enable Timer1)
+00/1326: 8F80FB          MOV $FB, #$80       ;Store 0x80 into [T1TARGET].
+00/1329: 8F03F1          MOV $F1, #$03       ;Store 0x03 into [CONTROL]. (Enable Timer1 & Timer2)
+00/132C: E4FE            MOV A, $FE          ;Move [T1OUT] into the Accumulator.
+00/132E: 6F              RET                 ;Return.
+
+[InitializeEchoBuffers]
+00/132F: E800            MOV A, #$00         ;Move 0x00 into the Accumulator.
+00/1331: FD              MOV Y, A            ;Move 0x00 into Register Y.
+00/1332: D7E1            MOV [$E1]+Y, A      ;Clear the [ECHO_WRITE_BUFFER_ADDRESS].
+00/1334: FC              INC Y               ;Increment Register Y.
+00/1335: D0FB            BNE $1332           ;Loop 256 times.
+00/1337: ABE2            INC $E2             ;Increment the high byte of the address.
+00/1339: 78FAE2          CMP $E2, #$FA       ;[ECHO_WRITE_BUFFER_ADDRESS] spans from $EA00 to $FA00.
+00/133C: D0F4            BNE $1332           ;Keep clearing until the end of the buffer is reached.
+00/133E: E4FE            MOV A, $FE          ;Move [T1OUT] into the Accumulator.
+00/1340: 2F05            BRA $1347           ;Branch to SetEchoBufferWriteEnabled.
+
+[WaitForEDLChangeTimer]
+00/1342: EBFE            MOV Y, $FE          ;Move [T1OUT] into Register Y.
+00/1344: F0FC            BEQ $1342           ;Wait for [T1OUT] to be non-zero.
+00/1346: BC              INC A               ;Increment Accumulator.
+
+[SetEchoBufferWriteEnabled]
+00/1347: 64E0            CMP A, $E0          ;Compare the Accumulator with the [PREVIOUS_EDL_VALUE].
+00/1349: 90F7            BCC $1342           ;Branch to WaitForEDLChangeTimer if the value is less than [PREVIOUS_EDL_VALUE].
+00/134B: 8F6CF2          MOV $F2, #$6C       ;Load [FLG] into [DSPADDR].
+00/134E: E4F3            MOV A, $F3          ;Move the [FLG] value into the Accumulator.
+00/1350: 28DF            AND A, #$DF         ;Set Echo Buffer Writes Enabled.
+00/1352: C4F3            MOV $F3, A          ;Move the flags back into [FLG].
+00/1354: E4FE            MOV A, $FE          ;Move [T1OUT] into the Accumulator.
+00/1356: 2F05            BRA $135D           ;Branch to SetEchoVolume.
+
+[WaitForEchoBufferEnabled]
+00/1358: EBFE            MOV Y, $FE          ;Move [T1OUT] into Register Y.
+00/135A: F0FC            BEQ $1358           ;Wait for [T1OUT] to be non-zero.
+00/135C: BC              INC A               ;Increment Accumulator.
+
+[SetEchoVolume]
+00/135D: 64DF            CMP A, $DF          ;Compare the Accumulator against [EDL_REGISTER_VALUE].
+00/135F: 90F7            BCC $1358           ;Branch to WaitForEchoBufferEnabled if the value is less than [EDL_REGISTER_VALUE].
+00/1361: E4A7            MOV A, $A7          ;Move [EVOL_REGISTER_VALUE] into the Accumulator.
+00/1363: 8D2C            MOV Y, #$2C         ;Move [EVOLL] into Register Y.
+00/1365: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/1368: 8D3C            MOV Y, #$3C         ;Move [EVOLR] into Register Y.
+00/136A: 3F1B06          CALL $061B          ;Call SetDSPRegisterValue (Y = Register, A = Data).
+00/136D: 3803C7          AND $C7, #$03       ;Restrict the range of [FILTER_COEF_INDEX] to 00-03.
+00/1370: E4C7            MOV A, $C7          ;Move [FILTER_COEF_INDEX] into the Accumulator.
+00/1372: 1C              ASL A               ;Multiply By 2.
+00/1373: 1C              ASL A               ;Multiply By 2.
+00/1374: 1C              ASL A               ;Multiply By 2.
+00/1375: FD              MOV Y, A            ;Move the offset to Register Y.
+00/1376: CD0F            MOV X, #$0F         ;Move [FFCx] into Register X.
+
+[LoadFilterCoefficient]
+00/1378: F60C15          MOV A, $150C+Y
+00/137B: D8F2            MOV $F2, X          ;Move [FFCx] into [DSPADDR].
+00/137D: C4F3            MOV $F3, A          ;Move the current coefficient into [DSPDATA].
+00/137F: FC              INC Y               ;Increment Register Y.
+00/1380: 7D              MOV A, X            ;Move [FFCx] into the Accumulator.
+00/1381: 60              CLRC                ;Clear Carry Flag.
+00/1382: 8810            ADC A, #$10         ;Add 0x10 to [FFCx] to move to the next register.
+00/1384: 5D              MOV X, A            ;Move [FFCx] back to Register X.
+00/1385: 10F1            BPL $1378           ;Branch to LoadFilterCoefficient and load the next register.
+00/1387: 8D0D            MOV Y, #$0D         ;Move [EFB] into Register Y.
+00/1389: E4C8            MOV A, $C8          ;Move [EFB_REGISTER_VALUE] to the Accumulator,
+00/138B: 5F1B06          JMP $061B           ;Jump to SetDSPRegisterValue (Y = Register, A = Data).
+
+00/138E: E834            MOV A, #$34
+00/1390: C439            MOV $39, A
+00/1392: E8CD            MOV A, #$CD
+00/1394: 8F0003          MOV $03, #$00
+00/1397: 43B105          BBS2 $B1, $139F
+00/139A: 8F09B2          MOV $B2, #$09
+00/139D: 2F08            BRA $13A7
+
+00/139F: 8F49B2          MOV $B2, #$49
+00/13A2: 60              CLRC 
+00/13A3: 8808            ADC A, #$08 
+00/13A5: E203            SET7 $03
+00/13A7: C43A            MOV $3A, A
+00/13A9: 60              CLRC 
+00/13AA: 8808            ADC A, #$08
+00/13AC: C402            MOV $02, A
+00/13AE: F83A            MOV X, $3A
+00/13B0: EBB2            MOV Y, $B2
+00/13B2: CBF2            MOV $F2, Y
+00/13B4: EBF3            MOV Y, $F3
+00/13B6: 6D              PUSH Y
+00/13B7: BF              MOV A, (X)+
+00/13B8: CF              MUL YA
+00/13B9: DD              MOV A, Y
+00/13BA: 2870            AND A, #$70
+00/13BC: C438            MOV $38, A
+00/13BE: EE              POP Y
+00/13BF: BF              MOV A, (X)+
+00/13C0: CF              MUL YA
+00/13C1: DD              MOV A, Y
+00/13C2: D83A            MOV $3A, X
+00/13C4: F839            MOV X, $39
+00/13C6: 9F              XCN A
+00/13C7: 2807            AND A, #$07
+00/13C9: 0438            OR A, $38
+00/13CB: 0403            OR A, $03
+00/13CD: AF              MOV (X)+, A
+00/13CE: D839            MOV $39, X
+00/13D0: 60              CLRC 
+00/13D1: 9810B2          ADC $B2, #$10
+00/13D4: 69023A          CMP $3A, $02
+00/13D7: D0D5            BNE $13AE
+00/13D9: BA34            MOVW YA, $34
+00/13DB: DAF4            MOVW $F4, YA
+00/13DD: BA36            MOVW YA, $36
+00/13DF: DAF6            MOVW $F6, YA
+00/13E1: 5804B1          EOR $B1, #$04
+00/13E4: 6F              RET 
+
+[]
+00/13E5: E48B            MOV A, $8B
+00/13E7: F00F            BEQ $13F8
+00/13E9: 8B8B            DEC $8B
+00/13EB: BA87            MOVW YA, $87
+00/13ED: 7A83            ADDW YA, $83
+00/13EF: 7E84            CMP Y, $84
+00/13F1: DA83            MOVW $83, YA
+00/13F3: F003            BEQ $13F8
+00/13F5: 09ADC9          OR $C9, $AD
+00/13F8: E497            MOV A, $97
+00/13FA: F008            BEQ $1404
+00/13FC: 8B97            DEC $97
+00/13FE: BA93            MOVW YA, $93
+00/1400: 7A8F            ADDW YA, $8F
+00/1402: DA8F            MOVW $8F, YA
+00/1404: E4A3            MOV A, $A3
+00/1406: F00F            BEQ $1417
+00/1408: 8BA3            DEC $A3
+00/140A: BA9F            MOVW YA, $9F
+00/140C: 7A9B            ADDW YA, $9B
+00/140E: 7E9C            CMP Y, $9C
+00/1410: DA9B            MOVW $9B, YA
+00/1412: F003            BEQ $1417
+00/1414: 09ADCA          OR $CA, $AD
+00/1417: 6F              RET 
+
+------------------------
+Data
+------------------------
+
+[SpcMemoryOperationPointerTable]
+; Index 0 is unreachable, not that you'd want to call it.
+; Secret of Mana only uses MemoryWriteShort, MemoryWriteLong and MemoryMove, but MemoryWriteByte functions as expected.
+; The cooperative noop routines do nothing but perform the synchronization handshake.
+00/1418: 6312 [00: SpcCommand_CooperativeNoOp (Dummied Out)]
+00/141A: 5112 [01: SpcCommand_MemoryWriteByte (Dummied Out)]
+00/141C: 3712 [02: SpcCommand_MemoryWriteShort]
+00/141E: 1412 [03: SpcCommand_MemoryWriteLong]
+00/1420: 6312 [04: SpcCommand_CooperativeNoOp (Dummied Out)]
+00/1422: 6312 [05: SpcCommand_CooperativeNoOp (Dummied Out)]
+00/1424: 6312 [06: SpcCommand_CooperativeNoOp (Dummied Out)]
+00/1426: 7012 [07: SpcCommand_MemoryMove (Dummied Out)]
+
+[SequencerPointerTable - 00/054E]
+00/1428: 6806 [00: EventMap[0xD2] = EVENT_VOLUME]
+00/142A: 7406 [01: EventMap[0xD3] = EVENT_VOLUME_FADE]
+00/142C: B406 [02: EventMap[0xD4] = EVENT_PAN]
+00/142E: E406 [03: EventMap[0xD5] = EVENT_PAN_FADE]
+00/1430: 2007 [04: EventMap[0xD6] = EVENT_PITCH_SLIDE]
+00/1432: 3707 [05: EventMap[0xD7] = EVENT_VIBRATO_ON]
+00/1434: 4907 [06: EventMap[0xD8] = EVENT_VIBRATO_OFF]
+00/1436: 4D07 [07: EventMap[0xD9] = EVENT_TREMOLO_ON]
+00/1438: 5F07 [08: EventMap[0xDA] = EVENT_TREMOLO_OFF]
+00/143A: 6307 [09: EventMap[0xDB] = EVENT_PAN_LFO_ON]
+00/143C: B407 [0A: EventMap[0xDC] = EVENT_PAN_LFO_OFF]
+00/143E: 3108 [0B: EventMap[0xDD] = EVENT_NOISE_FREQ]
+00/1440: F507 [0C: EventMap[0xDE] = EVENT_NOISE_ON]
+00/1442: 1D08 [0D: EventMap[0xDF] = EVENT_NOISE_OFF]
+00/1444: 3F08 [0E: EventMap[0xE0] = EVENT_PITCHMOD_ON]
+00/1446: 5608 [0F: EventMap[0xE1] = EVENT_PITCHMOD_OFF]
+00/1448: CE07 [10: EventMap[0xE2] = EVENT_ECHO_ON]
+00/144A: E507 [11: EventMap[0xE3] = EVENT_ECHO_OFF]
+00/144C: CA07 [12: EventMap[0xE4] = EVENT_OCTAVE]
+00/144E: C007 [13: EventMap[0xE5] = EVENT_OCTAVE_UP]
+00/1450: C607 [14: EventMap[0xE6] = EVENT_OCTAVE_DOWN]
+00/1452: 2F07 [15: EventMap[0xE7] = EVENT_TRANSPOSE_ABS]
+00/1454: 2B07 [16: EventMap[0xE8] = EVENT_TRANSPOSE_REL]
+00/1456: B009 [17: EventMap[0xE9] = EVENT_TUNING]
+00/1458: 6608 [18: EventMap[0xEA] = EVENT_PROGCHANGE]
+00/145A: 9008 [19: EventMap[0xEB] = EVENT_ADSR_AR]
+00/145C: BE08 [1A: EventMap[0xEC] = EVENT_ADSR_DR]
+00/145E: D108 [1B: EventMap[0xED] = EVENT_ADSR_SL]
+00/1460: E308 [1C: EventMap[0xEE] = EVENT_ADSR_SR]
+00/1462: F308 [1D: EventMap[0xEF] = EVENT_ADSR_DEFAULT]
+00/1464: 4409 [1E: EventMap[0xF0] = EVENT_LOOP_START]
+00/1466: 6B09 [1F: EventMap[0xF1] = EVENT_LOOP_END]
+00/1468: BC09 [20: EventMap[0xF2] = EVENT_END]
+00/146A: 2006 [21: EventMap[0xF3] = EVENT_TEMPO]
+00/146C: 2D06 [22: EventMap[0xF4] = EVENT_TEMPO_FADE]
+00/146E: B306 [23: EventMap[0xF5] = EVENT_ECHO_VOLUME]       // No Operation in Seiken Densetsu 2
+00/1470: B006 [24: EventMap[0xF6] = EVENT_ECHO_VOLUME_FADE]  // No Operation in Seiken Densetsu 2
+00/1472: 3307 [25: EventMap[0xF7] = EVENT_ECHO_FEEDBACK_FIR] // No Operation in Seiken Densetsu 2
+00/1474: 6506 [26: EventMap[0xF8] = EVENT_MASTER_VOLUME]
+00/1476: 1709 [27: EventMap[0xF9] = EVENT_LOOP_BREAK]
+00/1478: 0509 [28: EventMap[0xFA] = EVENT_GOTO]
+00/147A: 9509 [29: EventMap[0xFB] = EVENT_CPU_CONTROLED_JUMP]
+00/147C: 3A09 [2A: EventMap[0xFC] = EVENT_LOOP_RESTART]
+00/147E: B409 [2B: EventMap[0xFD] = EVENT_IGNORE_MASTER_VOLUME_BY_PROGNUM]
+00/1480: BC09 [2C: EventMap[0xFE] = EVENT_END]
+00/1482: BC09 [2D: EventMap[0xFF] = EVENT_END]
+
+[]
+; 00/054E - Uses as a boolean flag to load a value from ($0C) and store it in $04.
+; 00/056D - Number of times to increment the pointer stored at $2C.
+00/1484: 01 [00: ]
+00/1485: 02 [01: ]
+00/1486: 01 [02: ]
+00/1487: 02 [03: ]
+00/1488: 02 [04: ]
+00/1489: 03 [05: ]
+00/148A: 00 [06: ]
+00/148B: 03 [07: ]
+00/148C: 00 [08: ]
+00/148D: 02 [09: ]
+00/148E: 00 [0A: ]
+00/148F: 01 [0B: ]
+00/1490: 00 [0C: ]
+00/1491: 00 [0D: ]
+00/1492: 00 [0E: ]
+00/1493: 00 [0F: ]
+00/1494: 00 [10: ]
+00/1495: 00 [11: ]
+00/1496: 01 [12: ]
+00/1497: 00 [13: ]
+00/1498: 00 [14: ]
+00/1499: 01 [15: ]
+00/149A: 01 [16: ]
+00/149B: 01 [17: ]
+00/149C: 01 [18: ]
+00/149D: 01 [19: ]
+00/149E: 01 [1A: ]
+00/149F: 01 [1B: ]
+00/14A0: 01 [1C: ]
+00/14A1: 00 [1D: ]
+00/14A2: 01 [1E: ]
+00/14A3: 00 [1F: ]
+00/14A4: 00 [20: ]
+00/14A5: 01 [21: ]
+00/14A6: 02 [22: ]
+00/14A7: 01 [23: ]
+00/14A8: 02 [24: ]
+00/14A9: 02 [25: ]
+00/14AA: 01 [26: ]
+00/14AB: 03 [27: ]
+00/14AC: 02 [28: ]
+00/14AD: 02 [29: ]
+00/14AE: 00 [2A: ]
+00/14AF: 01 [2B: ]
+00/14B0: 00 [2C: ]
+00/14B1: 00 [2D: ]
+
+[Function Pointer Table - 00/0FF9]
+00/14B2: 1110 [00: ]
+00/14B4: DD12 [01: DummiedOut]
+00/14B6: DD12 [02: DummiedOut]
+00/14B8: 0F10 [03: ]
+00/14BA: DD12 [04: DummiedOut]
+00/14BC: DD12 [05: DummiedOut]
+00/14BE: 6610 [06: ]
+00/14C0: DD12 [07: DummiedOut]
+00/14C2: DD12 [08: DummiedOut]
+00/14C4: C010 [09: ]
+00/14C6: DD12 [0A: DummiedOut]
+00/14C8: DD12 [0B: DummiedOut]
+00/14CA: DD12 [0C: DummiedOut]
+00/14CC: DD12 [0D: DummiedOut]
+00/14CE: DD12 [0E: DummiedOut]
+00/14D0: DD12 [0F: DummiedOut]
+00/14D2: 2C11 [10: ]
+00/14D4: 2C11 [11: ]
+00/14D6: 2C11 [12: ]
+00/14D8: 1F11 [13: ]
+00/14DA: 1F11 [14: ]
+00/14DC: 7A11 [15: ]
+00/14DE: 8E11 [16: ]
+00/14E0: 8E11 [17: ]
+00/14E2: AC12 [18: ]
+00/14E4: AC12 [19: ]
+00/14E6: AC12 [1A: ]
+00/14E8: 8111 [1B: ]
+00/14EA: 8511 [1C: ]
+00/14EC: DD12 [1D: DummiedOut]
+00/14EE: DD12 [1E: DummiedOut]
+00/14F0: C612 [1F: ]
+
+[Used By 00/04ED]
+; Not pointers
+; Tuning Values
+00/14F2: 79 08
+00/14F4: FA 08
+00/14F6: 83 09
+00/14F8: 14 0A
+00/14FA: AD 0A
+00/14FC: 50 0B
+00/14FE: FC 0B
+00/1500: B2 0C
+00/1502: 74 0D
+00/1504: 41 0E
+00/1506: 1A 0F
+00/1508: 00 10
+00/150A: F3 10
+
+[EchoFilterCoefficientTable]
+00/150C: 7F 00 00 00 00 00 00 00 [00: ]
+00/1514: 0C 21 2B 2B 13 FF F3 F9 [01: ]
+00/151C: 58 BF DB F0 FE 07 0C 0C [02: ]
+00/1524: 34 33 00 D9 E5 01 FC EB [03: ]
+
+[Loaded into $3C]
+; Note Duration
+00/152C: C0 [00: ]
+00/152D: 90 [01: ]
+00/152E: 60 [02: ]
+00/152F: 40 [03: ]
+00/1530: 48 [04: ]
+00/1531: 30 [05: ]
+00/1532: 20 [06: ]
+00/1533: 24 [07: ]
+00/1534: 18 [08: ]
+00/1535: 10 [09: ]
+00/1536: 0C [0A: ]
+00/1537: 08 [0B: ]
+00/1538: 06 [0C: ]
+00/1539: 04 [0D: ]
+00/153A: 03 [0E: ]
+
+[PointerTable to the Data below]
+00/153B: 5B15 [00: ]
+00/153D: 6A15 [01: ]
+00/153F: 7A15 [02: ]
+00/1541: 0000 [03: ]
+00/1543: 0000 [04: ]
+00/1545: 0000 [05: ]
+00/1547: 0000 [06: ]
+00/1549: 0000 [07: ]
+00/154B: 0000 [08: ]
+00/154D: 0000 [09: ]
+00/154F: 0000 [0A: ]
+00/1551: 0000 [0B: ]
+00/1553: 0000 [0C: ]
+00/1555: 0000 [0D: ]
+00/1557: 0000 [0E: ]
+00/1559: 0000 [0F: ]
+
+[Spc Sequences For Something...]
+00/155B: D2 FF EA 03 E4 08 D6 28 74 D7 00 04 FF 56 F2
+00/156A: D2 FF EA 00 E4 04 D7 00 00 FF D6 04 0C 0B 1B F2
+00/157A: D2 FF EA 03 E4 07 D7 00 18 DD 94 D6 18 7E EE 14 71 F2
+
+[DSPRegistersTable]
+00/158C: 4C [00: KON]
+00/158D: 5C [01: KOF]
+00/158E: 2D [02: PMON]
+00/158F: 3D [03: NON]
+00/1590: 4D [04: EON]
+00/1591: 6C [05: FLG]
+
+[DSPRegistersMemoryOffsetTable]
+00/1592: AF [00: ]
+00/1593: B0 [01: ]
+00/1594: BA [02: ]
+00/1595: B9 [03: ]
+00/1596: B8 [04: ]
+00/1597: BB [05: ]
+
+----------------------------------------
+[05: 1800]
+----------------------------------------
+; Two bytes, loaded into an array at $FD20-$FD21
+00/1800: E0 A0 [00: ]
+00/1802: E0 A0 [01: ]
+00/1804: E0 A0 [02: ]
+00/1806: E0 A0 [03: ]
+00/1808: 00 00 [04: ]
+00/180A: E0 A0 [05: ]
+00/180C: E0 A0 [06: ]
+00/180E: 00 00 [07: ]
+00/1810: 00 00 [08: ]
+00/1812: 00 00 [09: ]
+00/1814: 00 00 [0A: ]
+00/1816: 00 00 [0B: ]
+
+00/1840-00/187F: ???
+
+----------------------------------------
+[04: AkaoADSRDefaultValueTable]
+----------------------------------------
+; Two bytes, loaded into an array at $FE80-$FE81
+; These are DSP Register Values
+; edddaaaa
+; 11111111 [Envelope Mode: ADSR, Decay Rate: R=7*2+16, Attack Rate: R=15*2+1]
+
+; lllrrrrr
+; 11100000 [Sustain Level: 07, Sustain Rate: 0]
+00/1880: FF E0 [00: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1882: FF E0 [01: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1884: FF E0 [02: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1886: FF E0 [03: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1888: FF E0 [04: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/188A: FF E0 [05: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/188C: FF E0 [06: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/188E: FF E0 [07: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1890: FF E0 [08: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1892: FF E0 [09: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1894: FF E0 [0A: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+00/1896: FF E0 [0B: Envelope Control: ADSR, Attack Rate: 31, Decay Rate: 30, Sustain Rate: 00, Sustain Level: 07]
+
+
+00/18C0: ffe02eb75bad568b45a2f1789c6e97cb
+00/18D0: e5f2592c36bbdd6e170b0582e17018ac
+00/18E0: 769b4da673b95c0ea7d3e9f45a0d06a3
+00/18F0: d1e8d4ca45a2f1f8dccec7633118acf6
+----------------------------------------
+[03: SoundFXSampleSourceDirectory]
+----------------------------------------
+; This seems to be a pointer table to data loaded into the 00/4800 section.
+; The DIR DSP Register is set to this offset.
+; The first 2 bytes is the starting address of a sample. This is fetched and used when a key-on (KON) event is triggered for a voice.
+; The second 2 bytes is the loop address of a sample. 
+; This is fetched whenever a BRR sample block with both the "end" flag and "loop" flag is reached, allowing a smooth transition from that block to the new position. 
+
+00/1900: 0048 0048 [00: ]
+00/1904: 2448 2448 [01: ]
+00/1908: 4848 4848 [02: ]
+00/190C: 6C48 8748 [03: ]
+00/1910: AB48 C648 [04: ]
+00/1914: D848 D848 [05: ]
+00/1918: EA48 EA48 [06: ]
+00/191C: FC48 1749 [07: ]
+00/1920: 4E4B 694B [08: ]
+00/1924: 804C 9B4C [09: ]
+00/1928: 614D 7C4D [0A: ]
+
+[Uninitalized Garbage]
+00/192C: ???? ???? [0B: ]
+00/1930: ???? ???? [0C: ]
+00/1934: ???? ???? [0D: ]
+00/1938: ???? ???? [0E: ]
+00/193C: ???? ???? [0F: ]
+00/1940: ???? ???? [10: ]
+00/1944: ???? ???? [11: ]
+00/1948: ???? ???? [12: ]
+00/194C: ???? ???? [13: ]
+00/1950: ???? ???? [14: ]
+00/1954: ???? ???? [15: ]
+00/1958: ???? ???? [16: ]
+00/195C: ???? ???? [17: ]
+00/1960: ???? ???? [18: ]
+00/1964: ???? ???? [19: ]
+00/1968: ???? ???? [1A: ]
+00/196C: ???? ???? [1B: ]
+00/1970: ???? ???? [1C: ]
+00/1974: ???? ???? [1D: ]
+00/1978: ???? ???? [1E: ]
+00/197C: ???? ???? [1F: ]
+
+00/1980: F14D DC8F [20: ]
+00/1984: 4522 B158 [21: ]
+00/1988: 0C26 B3D9 [22: ]
+00/198C: 6C16 ABD5 [23: ]
+
+00/1A00-00/2355: ???
+
+----------------------------------------
+[01: AkaoSoundFXSequenceData]
+----------------------------------------
+; Pointer sets....left and right channels?
+; 256 total pointers.
+002C00: 0030 0000 [00: ]
+002C04: 1030 1B30 [01: ]
+002C08: 2A30 0000 [02: ]
+002C0C: 3C30 4630 [03: ]
+002C10: 5230 5430 [04: ]
+002C14: 5B30 5D30 [05: ]
+002C18: 7530 8B30 [06: ]
+002C1C: A530 A730 [07: ]
+002C20: BB30 CA30 [08: ]
+002C24: D930 0000 [09: ]
+002C28: E530 EE30 [0A: ]
+002C2C: FA30 0231 [0B: ]
+002C30: 0831 0000 [0C: ]
+002C34: 1B31 2D31 [0D: ]
+002C38: 3D31 0000 [0E: ]
+002C3C: 5031 6031 [0F: ]
+002C40: 8731 9931 [10: ]
+002C44: C031 CC31 [11: ]
+002C48: D531 E031 [12: ]
+002C4C: ED31 FC31 [13: ]
+002C50: 0D32 1C32 [14: ]
+002C54: 2D32 3932 [15: ]
+002C58: 4032 5632 [16: ]
+002C5C: 6A32 7C32 [17: ]
+002C60: 8F32 9732 [18: ]
+002C64: A632 BB32 [19: ]
+002C68: D232 E132 [1A: ]
+002C6C: F132 0000 [1B: ]
+002C70: FE32 0A33 [1C: ]
+002C74: 1933 1B33 [1D: ]
+002C78: 2833 3733 [1E: ]
+002C7C: 4733 5333 [1F: ]
+002C80: 6133 6C33 [20: ]
+002C84: 7433 7F33 [21: ]
+002C88: 8A33 9A33 [22: ]
+002C8C: A833 C433 [23: ]
+002C90: DC33 0000 [24: ]
+002C94: E833 0000 [25: ]
+002C98: FA33 FC33 [26: ]
+002C9C: 0E34 1A34 [27: ]
+002CA0: 2734 3534 [28: ]
+002CA4: 4534 0000 [29: ]
+002CA8: 5134 5F34 [2A: ]
+002CAC: 7034 7E34 [2B: ]
+002CB0: 8F34 A534 [2C: ]
+002CB4: BF34 C134 [2D: ]
+002CB8: D734 D934 [2E: ]
+002CBC: EC34 FA34 [2F: ]
+002CC0: 0935 1535 [30: ]
+002CC4: 1E35 1F35 [31: ]
+002CC8: 3E35 4F35 [32: ]
+002CCC: 5F35 6C35 [33: ]
+002CD0: 7C35 9435 [34: ]
+002CD4: AE35 BB35 [35: ]
+002CD8: CC35 E435 [36: ]
+002CDC: F635 0336 [37: ]
+002CE0: 1636 2336 [38: ]
+002CE4: 3236 0000 [39: ]
+002CE8: 3C36 4436 [3A: ]
+002CEC: 4C36 5B36 [3B: ]
+002CF0: 6A36 7636 [3C: ]
+002CF4: 8136 9136 [3D: ]
+002CF8: A136 B036 [3E: ]
+002CFC: BF36 D036 [3F: ]
+002D00: DE36 EB36 [40: ]
+002D04: FB36 0F37 [41: ]
+002D08: 2437 2F37 [42: ]
+002D0C: 3C37 4C37 [43: ]
+002D10: 5D37 5F37 [44: ]
+002D14: 6E37 0000 [45: ]
+002D18: 8A37 9A37 [46: ]
+002D1C: AA37 0000 [47: ]
+002D20: BD37 C237 [48: ]
+002D24: DD37 EB37 [49: ]
+002D28: F837 0638 [4A: ]
+002D2C: 1438 1F38 [4B: ]
+002D30: 2A38 3F38 [4C: ]
+002D34: 5438 7038 [4D: ]
+002D38: 8438 0000 [4E: ]
+002D3C: 9438 A538 [4F: ]
+002D40: B738 C838 [50: ]
+002D44: DA38 E438 [51: ]
+002D48: EF38 0639 [52: ]
+002D4C: 2039 3739 [53: ]
+002D50: 4E39 0000 [54: ]
+002D54: 5739 6039 [55: ]
+002D58: 6E39 8839 [56: ]
+002D5C: A239 BC39 [57: ]
+002D60: D339 DB39 [58: ]
+002D64: E639 EE39 [59: ]
+002D68: F939 0B3A [5A: ]
+002D6C: 0000 0000 [5B: ]
+002D70: 0000 0000 [5C: ]
+002D74: 0000 0000 [5D: ]
+002D78: 0000 0000 [5E: ]
+002D7C: 0000 0000 [5F: ]
+002D80: 163A 1E3A [60: ]
+002D84: 0000 0000 [61: ]
+002D88: 0000 0000 [62: ]
+002D8C: 0000 0000 [63: ]
+002D90: 0000 0000 [64: ]
+002D94: 0000 0000 [65: ]
+002D98: 0000 0000 [66: ]
+002D9C: 0000 0000 [67: ]
+002DA0: 293A 353A [68: ]
+002DA4: 403A 4C3A [69: ]
+002DA8: 573A 703A [6A: ]
+002DAC: 893A A23A [6B: ]
+002DB0: 0000 0000 [6C: ]
+002DB4: 0000 0000 [6D: ]
+002DB8: 0000 0000 [6E: ]
+002DBC: BB3A C13A [6F: ]
+002DC0: C53A D53A [70: ]
+002DC4: E73A F63A [71: ]
+002DC8: 083B 0E3B [72: ]
+002DCC: 163B 183B [73: ]
+002DD0: 0000 0000 [74: ]
+002DD4: 0000 0000 [75: ]
+002DD8: 0000 0000 [76: ]
+002DDC: 0000 0000 [77: ]
+002DE0: 0000 0000 [78: ]
+002DE4: 0000 0000 [79: ]
+002DE8: 0000 0000 [7A: ]
+002DEC: 0000 0000 [7B: ]
+002DF0: 0000 0000 [7C: ]
+002DF4: 0000 0000 [7D: ]
+002DF8: 0000 0000 [7E: ]
+002DFC: 0000 0000 [7F: ]
+002E00: 253B 363B [80: ]
+002E04: 443B 5F3B [81: ]
+002E08: 7C3B 873B [82: ]
+002E0C: 943B 963B [83: ]
+002E10: A73B B93B [84: ]
+002E14: CC3B E13B [85: ]
+002E18: FA3B 0D3C [86: ]
+002E1C: 1E3C 2C3C [87: ]
+002E20: 3D3C 473C [88: ]
+002E24: 5B3C 823C [89: ]
+002E28: A73C 0000 [8A: ]
+002E2C: AA3C B23C [8B: ]
+002E30: BD3C C93C [8C: ]
+002E34: D53C EC3C [8D: ]
+002E38: 003D 1C3D [8E: ]
+002E3C: 3B3D 563D [8F: ]
+002E40: 733D 833D [90: ]
+002E44: 963D B13D [91: ]
+002E48: C83D DD3D [92: ]
+002E4C: F43D 033E [93: ]
+002E50: 103E 203E [94: ]
+002E54: 2E3E 303E [95: ]
+002E58: 423E 563E [96: ]
+002E5C: 6B3E 893E [97: ]
+002E60: AB3E 0000 [98: ]
+002E64: C33E CB3E [99: ]
+002E68: D43E E63E [9A: ]
+002E6C: F43E 003F [9B: ]
+002E70: 0F3F 1F3F [9C: ]
+002E74: 2E3F 463F [9D: ]
+002E78: 643F 7C3F [9E: ]
+002E7C: 903F A33F [9F: ]
+002E80: B73F E23F [A0: ]
+002E84: 0940 3240 [A1: ]
+002E88: 5E40 6040 [A2: ]
+002E8C: 7A40 0000 [A3: ]
+002E90: 8C40 8E40 [A4: ]
+002E94: 9E40 A040 [A5: ]
+002E98: BB40 C940 [A6: ]
+002E9C: D440 E240 [A7: ]
+002EA0: EF40 F040 [A8: ]
+002EA4: 0341 1041 [A9: ]
+002EA8: 1D41 2B41 [AA: ]
+002EAC: 3D41 4441 [AB: ]
+002EB0: 4E41 5041 [AC: ]
+002EB4: 6341 6541 [AD: ]
+002EB8: 8D41 8F41 [AE: ]
+002EBC: A941 AC41 [AF: ]
+002EC0: C341 DC41 [B0: ]
+002EC4: F741 1342 [B1: ]
+002EC8: 3642 4542 [B2: ]
+002ECC: 5A42 6942 [B3: ]
+002ED0: 7C42 8A42 [B4: ]
+002ED4: 9542 A342 [B5: ]
+002ED8: AE42 BC42 [B6: ]
+002EDC: C742 D642 [B7: ]
+002EE0: E542 E842 [B8: ]
+002EE4: 0043 1043 [B9: ]
+002EE8: 1D43 3943 [BA: ]
+002EEC: 5843 6743 [BB: ]
+002EF0: 7643 8C43 [BC: ]
+002EF4: A343 B543 [BD: ]
+002EF8: C743 C943 [BE: ]
+002EFC: E043 0000 [BF: ]
+002F00: F143 0244 [C0: ]
+002F04: 1644 3644 [C1: ]
+002F08: 5844 5944 [C2: ]
+002F0C: 7144 8944 [C3: ]
+002F10: 9A44 AB44 [C4: ]
+002F14: C344 DB44 [C5: ]
+002F18: F244 0045 [C6: ]
+002F1C: 1245 3245 [C7: ]
+002F20: 5145 6045 [C8: ]
+002F24: 7145 8245 [C9: ]
+002F28: 9145 A245 [CA: ]
+002F2C: B145 B945 [CB: ]
+002F30: C645 D745 [CC: ]
+002F34: EB45 FC45 [CD: ]
+002F38: 1046 1346 [CE: ]
+002F3C: 2746 2A46 [CF: ]
+002F40: 4046 5246 [D0: ]
+002F44: 6046 6A46 [D1: ]
+002F48: 7946 8546 [D2: ]
+002F4C: 9246 9546 [D3: ]
+002F50: A446 A746 [D4: ]
+002F54: BB46 C546 [D5: ]
+002F58: CF46 EB46 [D6: ]
+002F5C: 0947 2147 [D7: ]
+002F60: 3647 4D47 [D8: ]
+002F64: 5F47 6D47 [D9: ]
+002F68: 7E47 9947 [DA: ]
+002F6C: B447 D647 [DB: ]
+002F70: 0000 0000 [DC: ]
+002F74: 0000 0000 [DD: ]
+002F78: 0000 0000 [DE: ]
+002F7C: 0000 0000 [DF: ]
+002F80: 0000 0000 [E0: ]
+002F84: 0000 0000 [E1: ]
+002F88: 0000 0000 [E2: ]
+002F8C: 0000 0000 [E3: ]
+002F90: 0000 0000 [E4: ]
+002F94: 0000 0000 [E5: ]
+002F98: 0000 0000 [E6: ]
+002F9C: 0000 0000 [E7: ]
+002FA0: 0000 0000 [E8: ]
+002FA4: 0000 0000 [E9: ]
+002FA8: 0000 0000 [EA: ]
+002FAC: 0000 0000 [EB: ]
+002FB0: 0000 0000 [EC: ]
+002FB4: 0000 0000 [ED: ]
+002FB8: 0000 0000 [EE: ]
+002FBC: 0000 0000 [EF: ]
+002FC0: 0000 0000 [F0: ]
+002FC4: 0000 0000 [F1: ]
+002FC8: 0000 0000 [F2: ]
+002FCC: 0000 0000 [F3: ]
+002FD0: 0000 0000 [F4: ]
+002FD4: 0000 0000 [F5: ]
+002FD8: 0000 0000 [F6: ]
+002FDC: 0000 0000 [F7: ]
+002FE0: 0000 0000 [F8: ]
+002FE4: 0000 0000 [F9: ]
+002FE8: 0000 0000 [FA: ]
+002FEC: 0000 0000 [FB: ]
+002FF0: 0000 0000 [FC: ]
+002FF4: 0000 0000 [FD: ]
+002FF8: 0000 0000 [FE: ]
+002FFC: 0000 0000 [FF: ]
+
+00/3000: D2 F0 EA 06 E4 08 D7 00 18 C1 E9 25 EE 15 50 F2
+00/3010: EA 0A E4 04 D7 00 04 FF 0A 56 F2
+00/301B: E4 04 D7 00 04 FF E9 30 E0 D6 14 38 73 1A F2
+00/302A: D2 80 D9 00 08 C9 E4 06 57 E4 01 D6 0C 4C EE 16 0A F2
+00/303C: E4 02 D6 24 71 55 EE 1A C0 F2
+00/3046: EA 08 E4 02 D6 18 71 0A EE 1A C0 F2
+00/3052: E7 02
+00/3054: E4 09 D6 10 60 08 F2
+00/305B: E9 04
+00/305D: D2 3C EA 03 E4 2F D7 00 08 FF F0 04 E8 02 D6 2C 1D 06 C0 F1 EE 16 B9 F2
+00/3075: EA 05 E4 1A D7 0C 0C 89 EB 06 D6 0C 2C 71 D6 00 0A EE 0F B4 B9 F2
+00/308B: EA 03 E4 1A D7 0C 0C 89 EB 06 D6 0C 2C 62 E9 03 EA 05 D6 00 01 EE 0F B4 B9 F2
+00/30A5: E9 08
+00/30A7: EA 05 E4 06 D2 8C D5 00 80 D9 00 07 FF EE 13 D6 30 05 A7 F2
+00/30BB: D2 B4 E4 02 D7 00 04 E4 EB 08 EE 15 8C C1 F2
+00/30CA: D2 B4 EA 07 E4 03 D7 00 04 FF EE 15 8C C1 F2
+00/30D9: D2 B4 EA 01 E4 07 E9 15 EE 15 9C F2
+00/30E5: EA 03 E4 04 D6 0C 30 74 F2
+00/30EE: EA 04 E4 04 E9 08 E0 D6 0C 4B 74 F2
+00/30FA: EA 08 E4 04 93 3B 95 F2
+00/3102: E4 07 2A 95 68 F2
+00/3108: D5 00 80 EA 03 E4 08 D5 00 80 D6 28 74 D7 00 04 FF 56 F2
+00/311B: D5 00 80 EA 02 E4 05 E9 04 D6 0C 0C 0D D6 10 0C 66 F2
+00/312D: D5 00 80 EA 03 E4 05 D6 0C 0C 0D D6 10 0C 66 F2
+00/313D: EA 03 E4 07 D5 00 80 D7 00 18 DD 94 D6 18 7E EE 14 71 F2
+00/3150: D2 90 EA 00 E4 02 D9 00 00 F1 4B B9 EE 11 B6 F2
+00/3160: D2 90 EA 03 E4 06 E0 F0 04 D6 3C C8 84 F1 F0 04 D6 3C C8 81 F1 F0 02 D6 3C C8 80 F1 D3 78 00 F0 06 D6 3C C8 7E F1 F2
+00/3187: D2 90 EA 00 E4 02 D9 00 00 F1 4B B4 B6 BC EE 11 B6 F2
+00/3199: D2 90 EA 03 E4 06 E0 F0 0C D6 3C C8 84 F1 F0 0A D6 3C C8 81 F1 F0 07 D6 3C C8 80 F1 D3 78 00 F0 06 D6 3C C8 7E F1 F2
+00/31C0: E4 09 DE DD 16 0E DD 17 EE 17 28 F2
+00/31CC: E4 07 E9 30 0E EE 17 27 F2
+00/31D5: E4 01 2B D3 C8 FF 4A F0 00 C2 F1
+00/31E0: E4 01 D0 E0 29 D3 C8 FF 3B F0 00 C2 F1
+00/31ED: EA 05 E4 05 D5 00 80 E2 D6 30 18 EB 06 6F F2
+00/31FC: EA 05 E4 05 D5 00 80 E2 E9 14 D6 30 18 EB 06 06 F2
+00/320D: EA 05 E4 07 D5 00 80 E2 D6 30 E7 EB 06 6F F2
+00/321C: EA 05 E4 07 D5 00 80 E2 E9 14 D6 30 E7 EB 06 06 F2
+00/322D: DE DD 12 0A DD 1A EE 14 04 DD 1E F2
+00/3239: E4 02 0A EE 14 04 F2
+00/3240: EA 05 E2 DE F0 01 DD 10 0B DD 1A 09 F1 DD 10 EB 08 EE 0F 00 B9 F2
+00/3256: E4 03 D9 00 00 F1 E2 F0 01 0B 63 F1 E6 EB 08 EE 0F 3C B9 F2
+00/326A: EA 03 E4 06 D5 00 80 E2 D9 00 0C E9 E9 50 EE 12 A5 F2
+00/327C: EA 03 E4 06 D5 00 80 E2 E0 D9 00 0C FF E9 48 EE 12 A7 F2
+00/328F: D2 8C EA 07 E4 03 1C F2
+00/3297: E4 07 E0 D7 00 00 C9 A4 D2 50 D6 08 0B 0A F2
+00/32A6: D2 A0 E4 06 D7 00 00 FB DB 04 D2 EB 08 F0 03 D6 0C 08 55 F1 F2
+00/32BB: D2 30 EA 03 E4 06 D7 00 00 FB DB 04 28 EB 08 F0 03 D6 18 1C 55 F1 F2
+00/32D2: EA 07 E4 0A D9 00 01 F8 DB 18 3C EE 14 78 F2
+00/32E1: EA 0A E4 0A E0 D9 00 02 F8 DB 18 C3 EE 14 78 F2
+00/32F1: D2 B4 E4 01 EB 08 EE 17 D6 18 3C 07 F2
+00/32FE: EA 04 E4 05 EB 0A 2B D6 18 47 28 F2
+00/330A: EA 03 E4 01 EB 0A D7 00 00 FF D6 18 6E 55 F2
+00/3319: E7 03
+00/331B: D2 80 E4 02 E2 D9 00 0C 7F EE 11 2D F2
+00/3328: D2 FF EA 03 E4 02 F0 00 93 CC B1 D1 C3 F1 F2
+00/3337: D2 FF EA 03 E4 03 E0 F0 00 D1 48 CC 75 C3 F1 F2
+00/3347: EA 07 E4 04 D6 18 04 08 EE 12 B6 F2
+00/3353: EA 07 E4 04 E9 04 D6 18 04 26 EE 12 B6 F2
+00/3361: EA 03 DE DD 1E 0B 0D EE 11 00 F2
+00/336C: E4 02 D1 0C EE 11 5A F2
+00/3374: EA 07 E4 1A D6 08 02 58 CF B2 F2
+00/337F: EA 0A E4 2E D6 08 04 58 CF B2 F2
+00/338A: D2 10 D5 00 80 E4 03 DB FF 81 00 F0 00 B4 F1 F2
+00/339A: D2 10 D5 00 80 DE DD 1E 4B F0 00 B4 F1 F2
+00/33A8: D2 8C D5 00 80 EA 03 E4 4A D7 00 00 FF E7 04 D6 02 10 D3 C8 00 F0 0F EE 1A 0A F1 F2
+00/33C4: D2 78 D5 00 80 EA 0A E4 0E D7 00 00 F1 E0 D3 C8 00 F0 0F EE 1A 0A F1 F2
+00/33DC: EA 00 DE DD 1C B2 DD 1E EE 18 A9 F2
+00/33E8: D2 28 E4 06 D7 00 0C FF D9 00 0A FF 04 C0 EE 1C C0 F2
+00/33FA: E9 04
+00/33FC: D2 B4 EA 05 E4 07 D5 00 80 D7 00 14 BB 0D EE 17 92 F2
+00/340E: D5 00 80 EA 02 E4 08 D6 30 04 43 F2
+00/341A: D5 00 80 EA 02 E4 08 E0 D6 30 04 43 F2
+00/3427: D5 00 80 EA 0A E4 07 D7 00 04 FF 0D 67 F2
+00/3435: D2 64 EA 0A E4 07 E7 03 D7 00 04 FF E0 0D 67 F2
+00/3445: D5 00 80 EA 05 E4 07 D6 0C 7C 1A F2
+00/3451: D5 00 80 EA 03 E4 04 EE 13 D6 30 50 4D F2
+00/345F: D5 00 80 EA 03 E4 04 E0 E9 04 EE 13 D6 30 50 4D F2
+00/3470: D5 00 80 EA 03 E4 06 EE 12 D6 3C DC 1F F2
+00/347E: D5 00 80 EA 03 E4 06 E0 E9 10 EE 12 D6 3C DC 1F F2
+00/348F: E4 05 F0 01 0C D1 0C D1 F1 D0 D7 00 00 C4 EA 05 E4 07 EE 14 8C F2
+00/34A5: E4 05 E0 F0 01 57 D1 48 D1 F1 D0 E1 D7 00 00 C4 EA 05 E4 07 E9 04 EE 14 8C F2
+00/34BF: E9 04
+00/34C1: D2 80 EA 05 E4 07 D7 00 08 C9 D6 0C 04 F0 07 0C F1 D6 0C 04 0A F2
+00/34D7: E9 04
+00/34D9: D2 78 EA 04 E4 16 D3 C8 00 F0 10 E8 04 D6 0C 14 0A F1 F2
+00/34EC: D2 B4 EA 05 E4 06 D7 00 08 93 EE 13 A6 F2
+00/34FA: D2 B4 EA 05 E4 06 E0 D7 00 08 93 EE 13 A6 F2
+00/3509: E4 04 CD D6 08 14 EB 08 EE 1A 09 F2
+00/3515: DE DD 1C EB 08 EE 1A 08 F2
+00/351E: D1
+00/351F: D2 32 DE F0 04 DD 11 0A CF F1 DF D2 50 EA 06 E4 07 D7 00 04 93 E9 14 D6 18 25 07 EE 14 B9 F2
+00/353E: E4 05 EB 0A D6 0C C8 73 EF EA 08 E5 D6 08 D0 84 F2
+00/354F: E4 04 EB 0A D6 0C CC 19 E5 EA 08 D6 08 D0 84 F2
+00/355F: D2 78 E4 02 EE 14 0D E5 D6 24 80 08 F2
+00/356C: D2 78 E0 E4 03 EE 14 D6 24 E4 0D D6 24 E4 08 F2
+00/357C: D2 A0 D5 00 80 E4 14 D6 08 30 0C CE D2 64 EA 06 E4 07 E9 31 EE 12 3C F2
+00/3594: D2 A0 D5 00 80 EA 03 E4 05 D6 06 C8 0B CF D2 64 EA 06 E4 07 E9 04 EE 12 69 F2
+00/35AE: D2 8C E4 09 D6 14 20 2A D6 30 EB BD F2
+00/35BB: D2 8C DE DD 14 2A DD 10 29 DD 1A EE 18 27 DD 1E F2
+00/35CC: D2 8C E4 09 D7 00 14 FF D9 00 04 D3 D6 04 33 0B D6 10 40 0A EE 17 BC F2
+00/35E4: D2 8C DE DD 10 0D DD 14 0C DD 1A 0A EE 17 BC DD 1E F2
+00/35F6: D2 8C E4 03 D6 0C 65 2A D6 30 EC BD F2
+00/3603: D2 8C E4 03 DE DD 14 0B DE DD 1A 0D DE DD 1D 0B DD 1E F2
+00/3616: D2 8C E4 09 D6 0C 1C 2A D6 30 DA BC F2
+00/3623: D2 8C DE DD 11 0C DD 19 0C EE 18 BD DD 1E F2
+00/3632: D5 00 80 EA 0A E4 1C A4 77 F2
+00/363C: E4 0A EA 06 66 CF 84 F2
+00/3644: E4 0A EA 03 66 CF 84 F2
+00/364C: EA 03 E4 07 EB 0D 49 58 67 76 85 94 A3 F2 F2
+00/365B: EA 04 E4 06 EB 0B 49 58 67 76 85 94 A3 F2 F2
+00/366A: D2 78 EA 00 DE DD 19 0B DD 1E 0C F2
+00/3676: D2 8C EA 01 E4 03 A2 E4 07 B1 F2
+00/3681: D2 80 EA 01 E4 02 D7 00 0A 7F 84 D6 08 1E BF F2
+00/3691: D2 80 EA 03 E4 03 D7 00 0A 7F 39 D6 08 1E BF F2
+00/36A1: EA 0A E4 01 EB 0A D6 18 0C 0B D6 0C 28 B0 F2
+00/36B0: D2 78 E4 02 EB 0A D6 0A 3C 0B D6 0A 3C A1 F2
+00/36BF: D2 80 EA 03 E4 03 D7 00 0E 78 D6 79 01 EB 08 4D F2
+00/36D0: D3 60 50 EA 00 E4 16 D6 28 01 EB 08 20 F2
+00/36DE: EA 03 E4 07 D7 18 0C 54 D6 7F FD 1F F2
+00/36EB: EA 03 E4 07 EB 03 D7 18 0C 54 D6 7F FD CF 1F F2
+00/36FB: D2 B4 EA 03 E4 06 E2 D6 18 0C EB 08 9E E4 07 D6 18 0A 17 F2
+00/370F: D2 46 EA 00 E4 07 E2 DE DD 1E D6 18 0C EB 05 9E D6 18 0A 17 F2
+00/3724: EA 06 E4 10 D6 0C 06 EB 0F 54 F2
+00/372F: D2 2E EA 04 E4 06 D6 1C 38 EB 0F 54 F2
+00/373C: EA 00 E4 03 D6 3C 02 D7 00 02 7F 7C EE 18 BE F2
+00/374C: EA 0A E4 04 E0 D6 3C 03 D7 00 02 7F 7C EE 18 BE F2
+00/375D: E9 08
+00/375F: D2 A4 EA 09 E4 03 D6 10 24 D7 00 04 54 46 F2
+00/376E: EA 0A E4 06 D6 3C 64 3A D1 D6 15 F5 D7 00 01 7F 39 D1 D6 15 F5 D7 00 04 7F 48 D1 F2
+00/378A: EA 04 E4 05 D7 00 04 DD D6 24 40 50 EE 17 BE F2
+00/379A: EA 04 E4 05 D7 00 04 DD D6 24 40 50 EE 17 BE F2
+00/37AA: EA 0A E4 02 D7 00 04 FF D3 0C C8 F0 05 D6 28 74 59 F1 F2
+00/37BD: E9 03 DB 0C 9B
+00/37C2: EA 0A E4 07 CD D7 00 08 93 DB 0C 64 EE 10 D6 48 2C 05 C0 EA 05 E4 07 EE 13 2E F2
+00/37DD: D2 3C EB 0A EE 14 DE DD 14 F0 05 54 F1 F2
+00/37EB: D2 B4 E4 01 EB 0A EE 14 F0 05 72 F1 F2
+00/37F8: D2 FF EA 07 E4 03 D7 00 13 FF EE 12 4D F2
+00/3806: D2 FF EA 0A E4 01 D7 00 13 FF EE 12 89 F2
+00/3814: EA 03 E4 06 D6 30 1A EB 0C 17 F2
+00/381F: EA 0A E4 06 D6 30 1A EB 0A 17 F2
+00/382A: D2 A0 EA 00 E4 02 D7 00 03 7F EB 0C D6 10 05 2A D6 10 05 64 F2
+00/383F: D2 B4 EA 07 E4 03 D7 00 03 7F EB 0C D6 10 05 39 D6 10 05 64 F2
+00/3854: D2 C8 EA 07 E4 03 D7 00 00 63 F0 06 D6 03 02 37 F1 D3 4C 00 F0 05 D6 03 02 37 F1 F2
+00/3870: D2 C8 EA 06 E4 02 F0 06 0C CF F1 D3 4C 00 F0 05 0C CF F1 F2
+00/3884: EA 0A E4 08 D6 FF 74 D7 00 00 FF 7A EE 16 B4 F2
+00/3894: D2 80 EA 08 E4 03 D7 00 04 FF EE 18 D6 14 14 53 F2
+00/38A5: D2 80 E4 02 E0 D7 00 04 FF E7 CC EE 18 D6 14 44 80 F2
+00/38B7: D2 80 EA 08 E4 03 D7 00 04 FF EE 14 D6 28 04 4B F2
+00/38C8: D2 80 E4 02 E0 D7 00 04 FF E7 CC EE 14 D6 28 04 4B F2
+00/38DA: D2 80 EA 05 E4 07 65 86 A3 F2
+00/38E4: D2 40 EA 05 E4 07 DE DD 1E 0D F2
+00/38EF: E4 02 D9 0C 34 5B D7 04 2C 93 EB 0A D6 30 0C 9D D6 1C F0 EE 13 BA F2
+00/3906: EA 0A E4 01 E0 D9 0C 34 5B D7 04 2C 93 EB 0A D6 30 0C 9D D6 1C F0 EE 13 BA F2
+00/3920: EA 03 E4 07 D6 14 04 D7 00 04 71 EB 0C 26 D6 60 FA D7 00 07 71 B9 F2
+00/3937: EA 05 E4 08 D6 14 04 D7 00 09 71 EB 0C 26 D6 60 FA D7 00 07 71 B9 F2
+00/394E: EA 03 E4 10 D6 28 04 08 F2
+00/3957: E4 06 CD F0 02 0C 67 F1 F2
+00/3960: D2 78 E4 07 CD F0 02 0D D6 0C 15 0A F1 F2
+00/396E: F0 03 D2 50 EF DE DD 19 0A DF D2 A0 EA 05 E4 07 D6 11 2A EE 14 09 C1 F1 B6 F2
+00/3988: E4 07 E0 F0 03 D2 50 EF D6 04 41 0A D2 A0 EA 05 D6 11 2A EE 14 90 C1 F1 B6 F2
+00/39A2: D2 80 D5 00 80 EA 03 E4 07 E9 03 D0 D7 00 0C C5 D6 E8 F4 EB 06 EE 11 A6 B4 F2
+00/39BC: D2 80 D5 00 80 EA 03 E4 07 D7 00 0C C5 D6 E8 F4 EB 06 EE 11 A6 B4 F2
+00/39D3: E4 05 EB 0C EE 18 06 F2
+00/39DB: E4 0A EB 0A EE 18 D6 18 30 AB F2
+00/39E6: E4 05 EB 0C EE 18 06 F2
+00/39EE: E4 0A EB 0A EE 18 D6 18 30 AB F2
+00/39F9: EA 03 DE DD 14 3A DD 1A 0E DD 10 28 DD 16 EE 14 20 F2
+00/3A0B: D2 C8 E4 02 37 93 E5 EE 14 11 F2
+00/3A16: E4 05 EB 0C EE 18 06 F2
+00/3A1E: E4 0A EB 0A EE 18 D6 18 30 AB F2
+00/3A29: D2 C8 EA 08 E4 1A EE 14 94 E6 B0 F2
+00/3A35: D2 C8 EA 07 E4 19 D6 03 02 B1 F2
+00/3A40: D2 C8 EA 08 E4 1A EE 14 94 E6 B0 F2
+00/3A4C: D2 C8 EA 07 E4 19 D6 03 02 B1 F2
+00/3A57: D2 C8 EA 07 E4 02 EE 17 F0 01 D6 04 10 0C E5 65 E6 F1 EE 14 D6 0C 04 14 F2
+00/3A70: D2 C8 EA 07 E4 03 EE 17 F0 01 D6 04 10 0C E5 38 E6 F1 EE 14 D6 18 03 23 F2
+00/3A89: D2 C8 EA 07 E4 02 EE 17 F0 01 D6 04 10 0C E5 65 E6 F1 EE 14 D6 0C 04 14 F2
+00/3AA2: D2 C8 EA 07 E4 03 EE 17 F0 01 D6 04 10 0C E5 38 E6 F1 EE 14 D6 18 03 23 F2
+00/3ABB: D2 80 E4 02 86 F2
+00/3AC1: E4 05 3B F2
+00/3AC5: EA 0A E4 08 D6 28 6F D7 00 04 C9 51 EE 14 B9 F2
+00/3AD5: EA 03 E4 04 E9 04 D6 28 6F D7 00 04 C9 51 EE 14 B9 F2
+00/3AE7: E4 02 DB 30 7F D6 90 98 EB 08 2E EE 12 B9 F2
+00/3AF6: EA 06 E4 03 E0 DB 30 84 D6 90 98 EB 08 2E EE 12 B9 F2
+00/3B08: E4 05 76 CF 94 F2
+00/3B0E: EA 07 E4 0C 76 CF 94 F2
+00/3B16: E9 00
+00/3B18: E4 04 D9 01 0C DD EE 16 D6 10 3C 08 F2
+00/3B25: EA 0A E4 03 D7 00 00 FF D6 90 03 4D BC EE 13 BB F2
+00/3B36: EA 0A E4 03 D7 00 00 FF 20 BC EE 15 BB F2
+00/3B44: E4 03 EB 0B D6 60 10 AE E5 D6 30 F9 44 E6 D6 60 14 AE D6 40 FD E5 41 EE 14 BB F2
+00/3B5F: EA 0A E4 02 EB 0B D6 60 10 AE E5 D6 30 F9 44 E6 D6 60 14 AE E5 D6 40 FD 41 EE 14 BB F2
+00/3B7C: D2 FF EA 03 E4 02 CB 93 CC B1 F2
+00/3B87: D2 FF EA 03 E4 03 E0 CB D1 48 CC 75 F2
+00/3B94: E4 02
+00/3B96: E4 02 CE F0 0D E8 05 0B F1 D6 30 64 BC EE 16 B9 F2
+00/3BA7: E4 01 DB 08 7C D7 00 08 FF D6 18 04 00 B5 EE 14 B6 F2
+00/3BB9: E4 03 E0 DB 30 3C D7 00 08 FF D6 18 04 00 B5 EE 14 B6 F2
+00/3BCC: D2 C8 EA 05 E4 2C D7 00 04 FF F0 04 D6 18 04 05 F1 EE 15 B9 F2
+00/3BE1: EA 05 E4 07 CB E2 D7 00 0C 9D DB 18 80 F0 01 D6 00 34 35 EE 13 B6 EF F1 F2
+00/3BFA: EA 05 E4 08 F0 02 D6 24 0A D7 00 03 7F 0A D0 E9 1C F1 F2
+00/3C0D: EA 05 E4 09 F0 02 D6 24 0A D7 00 03 7F 09 D1 F1 F2
+00/3C1E: D2 28 EA 00 DE DD 13 EB 0C 01 EE 15 BC F2
+00/3C2C: D5 00 80 EA 09 E4 04 D6 7C F0 EB 0C 97 EE 15 BC F2
+00/3C3D: D2 3C DE DD 19 0B DD 10 0B F2
+00/3C47: D2 FF EA 00 E4 03 E0 D7 00 00 FF D6 14 1C 0B D6 14 1C 0B F2
+00/3C5B: F0 01 F0 03 EA 08 E4 08 D7 00 00 F1 1B EA 05 E4 07 D8 EE 16 33 F1 C8 D2 8C EA 04 E4 04 D6 60 EC 37 EE 13 B8 CD F1 F2
+00/3C82: F0 01 F0 03 DE DD 1D 0E D1 DF D2 A8 EA 06 E4 07 EE 16 33 F1 C8 D2 60 EA 04 E4 07 D6 60 EC 73 EE 13 B8 CD F1 F2
+00/3CA7: DD 10 F2
+00/3CAA: D2 A0 EA 07 E4 03 1C F2
+00/3CB2: D2 44 E4 09 E0 D7 00 00 C9 0E F2
+00/3CBD: E4 04 D7 00 00 5C EB 09 EE 12 6A F2
+00/3CC9: E4 04 D7 00 00 5C EB 09 EE 12 6A F2
+00/3CD5: E4 04 E9 04 E0 EB 07 D6 28 03 7E D2 78 EA 05 E4 07 E9 3A EE 14 69 F2
+00/3CEC: E4 04 EB 07 D6 28 03 7E D2 78 EA 05 E4 07 E9 34 EE 14 69 F2
+00/3D00: EA 03 E4 11 D7 00 0C DD D6 18 0D 0A CD D2 30 D6 18 0D 0A CD D2 0C D6 18 0D 0A CD F2
+00/3D1C: EA 03 E4 0E E9 0C E0 D7 00 0C DD D6 18 0D 0A CD D2 30 D6 18 0D 0A CD D2 0C D6 18 0D 0A CD F2
+00/3D3B: D2 3C EA 00 E4 20 D6 3C 1C 71 CA D6 3C 1C 71 CD D6 3C 1C 71 CF D6 3C 1C 71 CF F2
+00/3D56: D2 3C EA 00 E4 20 D1 E0 D6 3C 1C 71 CA D6 3C 1C 71 CD D6 3C 1C 71 CF D6 3C 1C 71 CF F2
+00/3D73: EA 03 E4 06 D7 00 00 D3 D6 30 60 7A EE 14 BC F2
+00/3D83: EA 03 E4 06 D7 00 00 D3 E9 04 E0 D6 30 60 7A EE 14 BC F2
+00/3D96: E4 07 F0 02 B3 CA F1 EA 00 E4 02 DE F0 02 DD 14 0A DD 0F 0A F1 DD 10 EE 14 08 F2
+00/3DB1: EA 05 E4 06 F0 02 B3 CA F1 E1 EA 04 E4 02 F0 02 46 0A F1 EE 14 08 F2
+00/3DC8: EA 06 E4 06 D6 60 0C 22 C0 D3 8C 00 F0 00 D6 02 14 2B CE F1 F2
+00/3DDD: E4 00 D6 60 0C 22 C0 EA 03 E4 05 D3 8C 00 F0 00 D6 02 14 B2 CE F1 F2
+00/3DF4: E4 07 D6 18 2C 09 E4 12 EE 14 D6 40 50 3C F2
+00/3E03: D6 18 1E 09 DE DD 1D EE 14 3C DD 1E F2
+00/3E10: D2 B4 E4 01 E9 04 F0 01 D6 18 62 E8 05 09 F1 F2
+00/3E20: D2 B4 E4 02 F0 01 D6 18 58 E8 05 09 F1 F2
+00/3E2E: E9 00
+00/3E30: EA 09 E4 04 F0 02 0E D1 3B CE F1 2C 0E D0 3B D0 2C F2
+00/3E42: D2 C8 EA 07 E4 02 E9 50 D6 30 0A EB 09 07 C1 EF EE 14 A9 F2
+00/3E56: D2 C8 EA 07 E4 02 E0 E9 54 D6 30 0A EB 09 07 C1 EF EE 14 A9 F2
+00/3E6B: E4 03 D6 18 04 35 C0 E4 05 EE 18 37 C0 D2 78 EA 09 E4 04 F0 01 2C 0E D0 3B D0 2C CE F1 F2
+00/3E89: E4 03 D6 18 04 E9 04 35 C0 E4 05 EE 18 37 C0 D2 78 EA 09 E4 04 E9 00 F0 01 2C 0E D0 3B D0 2C CE F1 F2
+00/3EAB: EA 03 E4 07 D6 0C 0C 0A D6 0C 54 0A CE D6 30 60 35 D6 60 3F EE 10 32 F2
+00/3EC3: D2 B4 EA 07 E4 05 39 F2
+00/3ECB: D2 DC EA 07 E4 03 CF 93 F2
+00/3ED4: EA 05 E4 05 E9 32 D7 00 0C 49 D6 60 02 04 EE 14 BC F2
+00/3EE6: EA 05 E4 05 E9 36 D6 60 02 04 EE 14 BC F2
+00/3EF4: EA 00 E4 20 D6 C0 1C 6D EE 14 BC F2
+00/3F00: EA 00 E4 20 E0 E9 04 D6 C0 1C 6D EE 14 BC F2
+00/3F0F: D2 FF E4 06 D1 EB 08 F0 08 D6 0C 18 2A CF F1 F2
+00/3F1F: D2 FF E4 07 EB 08 F0 08 D6 0C 28 2A CF F1 F2
+00/3F2E: EA 0A E4 03 F0 02 58 CF B2 CF F1 CB 58 CF B2 C8 D2 DC E4 02 D1 67 68 F2
+00/3F46: EA 09 E4 03 F0 02 E0 D6 08 04 58 CF B2 CF F1 CB 58 CF B2 C8 D2 DC EA 03 E4 03 D1 1C 1B F2
+00/3F64: E4 03 F0 03 D7 00 04 E7 EA 02 D6 08 04 0D EA 09 D0 D6 08 1D B1 CC F1 F2
+00/3F7C: EA 0A E4 05 D7 00 00 E7 D1 F0 03 85 D0 D6 0C 1C 48 CC F1 F2
+00/3F90: EA 03 E4 06 D7 24 0C E7 EB 04 D6 F0 24 0B B9 EE 10 B6 F2
+00/3FA3: EA 03 E4 06 E0 D7 24 3C E7 EB 04 D6 F0 24 0B B9 EE 10 B6 F2
+00/3FB7: EA 0A E4 04 D6 18 14 0C CF D2 C8 EA 08 E4 07 EB 07 F0 01 F0 02 CE D6 04 0C 0C F1 D6 04 0C 0C CE F1 CA D6 04 0C 0C D6 04 0C 0C F2
+00/3FE2: DE DD 1B 0C CF DF D2 C8 E4 0A EB 08 D1 F0 01 F0 02 CE D6 04 0C 2A F1 D6 04 0C 2A CE F1 CA D6 04 0C 2A D6 04 0C 2A F2
+00/4009: EA 03 E4 05 D0 D6 30 1C EB 07 50 CD EF D2 C8 EA 05 E4 03 D6 30 F2 4F BD CF D2 50 EA 03 E4 06 EE 14 F0 02 D6 60 18 AC F1 F2
+00/4032: EA 03 E4 05 D0 D6 30 1C E9 04 E0 EB 07 50 CD EF D2 C8 EA 05 E4 03 D6 30 F2 6D BD CF D2 50 EA 03 E4 06 EE 14 F0 02 D6 60 18 AC F1 F2
+00/405E: E9 04
+00/4060: E4 03 EB 08 D0 D6 30 18 07 C1 EA 06 E4 07 EE 16 F0 01 D6 0C 08 33 E8 0B F1 F2
+00/407A: D2 8C EA 03 E4 04 E2 D7 00 0C B1 EE 13 D6 18 3B 01 F2
+00/408C: E9 04
+00/408E: EA 01 E4 04 D7 00 08 DD D6 18 24 93 EE 14 AC F2
+00/409E: E9 05
+00/40A0: EA 06 E4 05 D7 00 18 C9 01 CE EE 14 D6 0C 18 07 E6 EA 05 A2 EE 13 D6 0C 18 9A F2
+00/40BB: EA 0A E4 02 D6 68 06 EB 0C A7 EE 16 BD F2
+00/40C9: D2 28 E4 03 EB 0C A7 EE 16 BD F2
+00/40D4: D2 A4 EA 07 E4 03 E0 EB 09 0C EE 15 40 F2
+00/40E2: D2 A4 EA 07 E4 03 EB 09 0C EE 15 40 F2
+00/40EF: D0
+00/40F0: EA 02 E4 0A EB 0C EE 12 D7 01 02 E7 E9 49 D6 60 EF 6F F2
+00/4103: E4 0E EB 0A F0 05 D6 0C 64 36 C2 F1 F2
+00/4110: E4 08 EB 0A F0 05 D6 0C 39 09 C2 F1 F2
+00/411D: E4 03 E0 EB 0A D6 18 3C 47 D6 18 50 56 F2
+00/412B: EA 05 E4 02 E9 04 E0 EB 0A D6 18 3C 47 D6 18 50 56 F2
+00/413D: D2 78 E4 02 65 91 F2
+00/4144: D2 78 EA 06 E4 03 E0 1A 19 F2
+00/414E: E9 20
+00/4150: EA 03 E4 0B D7 00 08 C9 D3 64 00 F0 0C D6 14 02 1A F1 F2
+00/4163: E9 06
+00/4165: EA 06 E4 05 D7 00 18 C9 01 CE EE 14 D6 0C 18 07 E5 E5 D6 0C C8 09 CB D6 0C BC 45 CD EA 05 E4 04 A2 EE 13 D6 0C 18 9A F2
+00/418D: E9 00
+00/418F: E4 03 E9 08 D7 00 0C F1 D6 60 30 02 EE 14 BA EF E4 06 D6 60 CF 02 EE 14 B9 F2
+00/41A9: D0 E9 01
+00/41AC: D2 82 EA 05 E4 05 E8 04 D7 00 08 C9 74 29 74 92 74 92 E5 EE 12 20 F2
+00/41C3: E4 01 D7 00 02 BF E2 94 D2 FF EB 0A 8F D3 30 3C B9 D3 30 90 B9 EE 0E B4 F2
+00/41DC: E4 01 D7 00 02 BF E2 E0 D0 92 D2 FF EB 0A 80 D3 30 3C B9 D3 30 90 B9 EE 0E B4 F2
+00/41F7: D2 A0 EA 05 E4 07 D7 00 0C A7 F0 01 D6 40 08 46 D9 00 08 9D EE 14 8E C0 DA EF F1 F2
+00/4213: D2 A0 EA 05 E4 07 D7 00 0C A7 CD F0 01 D6 40 09 E9 04 46 E0 E9 00 D9 00 08 9D EE 14 AC C0 DA E1 EF F1 F2
+00/4236: E4 02 D1 F0 04 2A 2A D0 F1 D2 B4 EE 18 80 F2
+00/4245: DE EB 0B F0 04 DD 16 0C DD 18 0C D0 F1 D2 B4 DD 14 EE 18 80 F2
+00/425A: E4 06 D7 00 19 FF D6 F0 C0 00 B5 EE 11 B6 F2
+00/4269: E4 06 E0 DB 44 14 D7 00 19 FF D6 F0 B8 A5 B5 EE 11 B6 F2
+00/427C: E4 07 EB 0A EE 15 F0 07 D6 0A B7 09 F1 F2
+00/428A: E4 01 EB 1A F0 07 48 D0 CF F1 F2
+00/4295: E4 07 EB 0A EE 15 F0 0B D6 0A B7 09 F1 F2
+00/42A3: E4 01 EB 1A F0 0B 48 D0 CF F1 F2
+00/42AE: E4 07 EB 0A EE 15 F0 18 D6 0A B7 09 F1 F2
+00/42BC: E4 01 EB 1A F0 18 48 D0 CF F1 F2
+00/42C7: E4 02 DB 0C C8 D7 00 00 FF 4B B8 EE 16 B9 F2
+00/42D6: E4 01 DB 0C C8 D7 00 28 FF 00 B8 EE 16 B9 F2
+00/42E5: CE E9 02
+00/42E8: D2 A0 EA 05 E4 07 D7 00 04 89 EE 11 F0 01 90 90 D6 90 03 8A BE F1 BC F2
+00/4300: EA 02 E4 07 D9 00 18 89 D6 C0 02 4E EE 14 B9 F2
+00/4310: EA 01 E4 07 D9 00 18 89 4E EE 14 B9 F2
+00/431D: EA 0A E4 11 D7 00 0C E7 EE 14 D6 30 FA 07 F0 01 D6 30 FA 09 C1 C2 F1 D6 30 FA 05 F2
+00/4339: EA 09 E4 0A D7 00 0C E7 E9 03 E0 EE 14 D6 30 FA 07 F0 01 D6 30 FA 09 C1 C2 F1 D6 30 FA 05 F2
+00/4358: D2 C8 E4 00 DB 30 50 D6 0A 10 35 EE 15 BB F2
+00/4367: D2 C8 E4 00 DB 30 B0 D6 0C 0C 8F EE 15 BB F2
+00/4376: EA 03 E4 05 D7 00 00 F1 E9 94 0D D6 C0 22 BE D6 A4 B8 EE 14 BC F2
+00/438C: EA 03 E4 05 E9 94 E0 D7 00 00 F1 0D D6 C0 22 BE D6 A4 B8 EE 14 BC F2
+00/43A3: D2 8C E4 00 DB 30 50 F0 0A D6 0A 10 36 F1 EE 15 BB F2
+00/43B5: D2 8C E4 00 DB 30 B0 F0 0A D6 0C 0C 90 F1 EE 15 BB F2
+00/43C7: E9 04
+00/43C9: D2 A0 EA 00 E4 03 D7 00 08 BF D6 30 1C 0C EB 06 D6 40 C4 EE 15 6B F2
+00/43E0: D2 A0 EA 05 E4 06 EB 08 D7 00 0C B8 D6 28 38 70 F2
+00/43F1: D2 8C EA 06 E4 07 D6 08 05 57 D6 0C 05 EE 14 4F F2
+00/4402: D2 8C EA 06 E4 07 E0 E9 0C D6 08 05 57 D6 0C 05 EE 14 4F F2
+00/4416: D2 8C EA 00 E4 15 D7 00 00 BF D6 10 48 EE 14 05 D7 00 04 89 D2 F0 EA 05 E4 21 75 75 EE 14 6C F2
+00/4436: D2 8C EA 00 E4 15 E9 04 D7 00 00 BF D6 10 48 EE 14 05 D7 00 04 89 D2 F0 EA 05 E4 12 75 75 EE 14 6C F2
+00/4458: D1
+00/4459: D2 8C EA 05 E4 07 D7 00 04 89 F0 03 F0 02 65 F1 95 A4 EE 15 AF F1 B9 F2
+00/4471: EA 05 E2 DE F0 01 DD 12 0C DD 1A 09 DD 0F 0A F1 DD 10 EB 08 EE 10 00 F2
+00/4489: EA 04 E4 02 E2 F0 01 0C 09 0A F1 EB 08 EE 10 00 F2
+00/449A: EA 04 E4 02 E2 F0 02 0C 09 0A F1 EB 08 EE 10 00 F2
+00/44AB: EA 05 E2 DE F0 02 DD 12 0C DD 1A 09 DD 0F 0A F1 DD 10 EB 08 EE 10 00 F2
+00/44C3: D2 A0 EA 0A E4 2B D7 00 04 FF F0 05 D6 14 2E 0B CF D6 14 32 57 CD F1 F2
+00/44DB: D2 A0 E4 15 D7 00 04 FF CE F0 05 D6 14 36 0B CF D6 14 38 57 CD F1 F2
+00/44F2: DE F0 04 DD 13 EE 12 0C DD 16 09 F1 B7 F2
+00/4500: D2 A0 E4 03 EE 12 D7 00 04 F4 E0 F0 04 39 09 F1 B7 F2
+00/4512: D2 FF EA 08 E4 07 EB 07 F0 01 F0 01 F0 02 CE D6 04 0C 0C F1 D6 04 0C 0C CE F1 D6 04 0C 0C F1 F2
+00/4532: D2 FF E4 0A EB 08 D1 F0 01 F0 01 F0 02 CE D6 04 0C 2A F1 D6 04 0C 2A CE F1 D6 04 0C 2A F1 F2
+00/4551: D2 A0 E4 06 D9 00 04 9D CC EB 08 EE 12 02 F2
+00/4560: D2 A0 E4 06 E0 D9 00 04 9D CC EE 16 F0 0A 0D F1 F2
+00/4571: EA 08 E4 03 F0 02 F0 0E E8 02 0E F1 C9 E7 00 F1 F2
+00/4582: E4 04 F0 02 F0 0E E8 02 0E F1 C9 E7 00 F1 F2
+00/4591: EA 08 E4 03 F0 03 F0 0E E8 02 0E F1 CE E7 00 F1 F2
+00/45A2: E4 04 F0 03 F0 0E E8 02 0E F1 CE E7 00 F1 F2
+00/45B1: D2 A8 E4 02 EE 18 80 F2
+00/45B9: D2 A8 EB 0B EE 18 DE DD 14 80 DD 1E F2
+00/45C6: D2 80 E4 05 F0 03 EB 08 EE 16 D6 60 DC 06 EF F1 F2
+00/45D7: D2 80 EA 09 E4 07 D1 F0 03 EB 08 EE 16 D6 60 DC 06 EF F1 F2
+00/45EB: D2 80 E4 05 F0 02 EB 08 EE 16 D6 60 DC 07 EF F1 F2
+00/45FC: D2 80 EA 09 E4 07 D1 F0 02 EB 08 EE 16 D6 60 DC 07 EF F1 F2
+00/4610: E9 04 D0
+00/4613: D2 82 EA 05 E4 06 D7 00 06 89 2A 39 48 57 66 75 EE 12 A7 F2
+00/4627: D0 E9 01
+00/462A: D2 82 EA 05 E4 05 E8 06 D7 00 0C C9 A0 CE A1 93 75 57 EE 12 6B F2
+00/4640: EA 03 E4 08 D7 00 00 FF D6 18 F0 08 75 D6 0C 0C A0 F2
+00/4652: EA 05 E4 07 D6 18 F0 08 E6 D6 0C 31 A0 F2
+00/4660: E4 05 F0 0E D6 18 C8 AD F1 F2
+00/466A: D2 A0 EA 03 E4 05 CF F0 15 D6 18 C8 09 F1 F2
+00/4679: D2 78 E4 04 EB 02 00 BA EE 13 B8 F2
+00/4685: D2 78 E4 04 EB 02 E0 00 BA EE 13 B8 F2
+00/4692: E9 04 CD
+00/4695: D2 A0 EA 05 E4 06 D3 78 00 F0 09 48 93 F1 F2
+00/46A4: E9 04 CF
+00/46A7: D2 8C EA 03 E4 07 EB 0C D3 80 00 F0 03 48 57 75 93 CF F1 F2
+00/46BB: E4 02 DB 18 64 A6 EE 16 B9 F2
+00/46C5: E4 03 DB 18 96 3D EE 16 B9 F2
+00/46CF: EA 03 E4 0A EB 0A E2 D7 0C 03 F6 D6 30 F0 44 E4 05 D6 48 23 32 D6 2C DC EE 14 B8 F2
+00/46EB: EA 03 E4 0A EB 0A E2 E0 D1 D7 10 01 FF D6 30 F0 44 E4 05 D6 48 24 32 D6 2C DC EE 14 B8 F2
+00/4709: D2 78 E4 07 EB 06 7E D7 00 01 FF D9 00 02 DD DB 08 32 EB 08 EE 14 7C F2
+00/4721: D2 78 DE DD 1F EB 06 42 DB 18 C8 D9 00 06 D9 EB 08 EE 14 40 F2
+00/4736: D2 A8 EA 05 E4 06 E7 03 D7 00 0C 89 66 75 93 A2 D6 08 24 EE 12 A7 F2
+00/474D: D2 A8 EA 05 E4 07 D7 00 0C 89 66 75 84 93 EE 12 98 F2
+00/475F: D2 8C EA 00 E4 06 D7 00 04 89 EE 16 32 F2
+00/476D: D2 8C EA 01 E4 06 E0 D7 00 04 89 E9 98 EE 16 50 F2
+00/477E: D2 B4 EA 03 E4 05 E9 CC CF D7 00 00 FB EB 08 45 D6 28 05 44 EE 12 D6 28 FD B6 F2
+00/4799: D2 B4 EA 03 E4 05 E9 CC E0 D7 00 00 F1 EB 08 45 D6 28 05 44 EE 12 D6 28 FD B6 F2
+00/47B4: D2 78 EA 05 E4 05 F0 3C D6 10 30 0C D6 0C C8 94 CE F1 D3 FF 00 F0 0D D6 10 30 0C D6 0C C8 94 CE F1 F2
+00/47D6: D2 78 EA 06 CF F0 3C E4 04 D6 10 30 84 E5 D6 0C C8 58 CE F1 D3 FF 00 F0 0D E4 04 D6 10 30 84 E5 D6 0C C8 58 CE F1 F2 FF FF FF
+
+----------------------------------------
+[02: SoundFXBitRateReductionSampleData]
+----------------------------------------
+; Data here pointed to by the table loaded into [03: 1900]
+; Oh! This seems to be the sample data!
+; In BRR Format. 9 bytes per sample.
+
+[00: ]
+[01: ]
+         Hd B1 B2 B3 B4 B5 B6 B7 B8
+00/4800: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/4809: 8A 34 44 44 54 33 54 44 43  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4812: 96 7C CC CC CC CC CC CC CC  [Range: 09, Filer: 01, Loop: Yes, End: No]
+00/481B: 8B DC CB CC DC CC CC CC CD  [Range: 08, Filer: 02, Loop: Yes, End: Yes]
+
+[02: ]
+[03: ]
+         Hd B1 B2 B3 B4 B5 B6 B7 B8
+00/4824: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/482D: 96 6C CC CC CC CC CC CC CC  [Range: 09, Filer: 01, Loop: Yes, End: No]
+00/4836: 8A DC CB CD CC CC CC CC DC  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/483F: 8B CC CC CC CC CD CC CC CC  [Range: 08, Filer: 02, Loop: Yes, End: Yes]
+
+[04: ]
+[05: ]
+         Hd B1 B2 B3 B4 B5 B6 B7 B8
+00/4848: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/4851: 8A EB CC BC CD CC CC CC DC  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/485A: 8A CB CD CC CD BC CD CC CC  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4863: 8B CC CC CD CC CC CC CC CD  [Range: 08, Filer: 02, Loop: Yes, End: Yes]
+
+[06: ]
+00/486C: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/4875: 7A 53 32 22 44 44 42 01 10  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/487E: 7A 01 1F EC DD DD DD EC BC  [Range: 07, Filer: 02, Loop: Yes, End: No]
+
+[07: ]
+00/4887: 7A CC EE DD ED DD F0 00 11  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4890: 7A 3F 01 23 23 32 11 22 24  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4899: 7A 44 32 22 44 44 42 01 10  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/48A2: 7B 02 0E EE CC DF DD DC BC  [Range: 07, Filer: 02, Loop: Yes, End: Yes]
+
+[08: ]
+00/48AB: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/48B4: BA E0 21 FD DF 24 2F D0 23  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/48BD: BA E2 EC F1 20 FE 02 42 0D  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+
+[09: ]
+00/48C6: BA E0 21 FD DF 24 2F D0 23  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/48CF: BB E2 EC F1 20 FE 02 42 0D  [Range: 0B, Filer: 02, Loop: Yes, End: Yes]
+
+[0A: ]
+[0B: ]
+00/48D8: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/48E1: 97 6C CC CC CC CC CC CC CC  [Range: 09, Filer: 01, Loop: Yes, End: Yes]
+
+[0C: ]
+[0D: ]
+00/48EA: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/48F3: 8B EB CC BC CD CC CC CC DC  [Range: 08, Filer: 02, Loop: Yes, End: Yes]
+
+[0E: ]
+00/48FC: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/4905: AA 2E 21 D1 2F 0E F3 42 AC  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/490E: AA 40 02 1E DF 65 FF F0 FD  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+
+[0F: ]
+00/4917: 9A 47 9E 10 53 FD 34 EE F3  [Range: 09, Filer: 02, Loop: Yes, End: No]
+00/4920: AA F0 2E E4 EC 22 EF 02 3D  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4929: 96 BE BA DA B0 20 DF 63 CE  [Range: 09, Filer: 01, Loop: Yes, End: No]
+00/4932: AA 32 ED 04 2F BD 53 DE E2  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/493B: A6 33 ED CE 2F E0 DE 12 00  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4944: AA 1C D7 1A B2 63 DE EF 6F  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/494D: A6 D1 3F DF 10 DE 45 13 52  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4956: AA 00 23 B0 1C 33 C4 4C 00  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/495F: A6 F3 DB 0E F0 02 EB E2 4F  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4968: AA 91 21 2E 14 CC 1F 31 D6  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4971: AA 3D B2 3C F2 11 E2 3D 14  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/497A: B6 0E 04 31 0F 00 F1 EC 02  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4983: A6 F0 34 1A D0 AB 10 DD CD  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/498C: B6 11 FF 00 11 01 EF 52 F0  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4995: AA F2 50 FA 15 FA F5 50 D2  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/499E: BA 1E 02 0F EF 12 1C D4 10  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/49A7: A6 21 F0 FF 43 FF E0 45 51  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/49B0: AA 24 DC 14 1F 21 D1 5C D6  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/49B9: AA 2C 10 10 E3 DD 52 3E EF  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/49C2: AA E3 BC 5F E2 FF 11 ED 23  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/49CB: B6 02 50 E3 3F DE 0F DF 12  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/49D4: AA B0 3C 13 01 02 B9 75 CA  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/49DD: B6 D1 1D 01 EF 0F F0 F0 21  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/49E6: A6 EF 20 CD E1 20 64 F2 34  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/49EF: A6 0B 15 1B B2 63 CE 44 F9  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/49F8: BA 33 E0 2E 02 ED 03 30 CF  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4A01: AA 13 1E 12 D0 51 B1 2F 3F  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4A0A: BA D0 02 3D C3 41 FF 00 FD  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4A13: BA 23 FD 33 EE 01 0D F4 0E  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4A1C: A6 EE 23 ED DD 05 2C EF F2  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4A25: A6 53 DC F2 43 0F 05 60 04  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4A2E: AA F0 FE 42 B0 30 DF 11 E4  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4A37: B6 FC 14 1E E4 50 11 14 31  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4A40: BA FF 41 F0 CE 51 E0 03 1F  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4A49: BA 3F D0 12 DD 20 31 CD 14  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4A52: A6 51 FB 03 24 FF 52 F0 0E  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4A5B: 96 F6 6F AD 47 21 1C 9E 5F  [Range: 09, Filer: 01, Loop: Yes, End: No]
+00/4A64: AA A0 33 EC 10 33 DF 0C D2  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4A6D: BA 2E D2 10 10 D0 10 11 DC  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4A76: B6 F4 1E 02 0F 03 31 EE F0  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4A7F: AA 31 D0 1C 04 0B F5 4D D1  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4A88: A6 34 33 42 05 5F CD EE CB  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4A91: BA 11 F0 0F 1F 04 0C F3 1E  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4A9A: AA 0D 02 02 FB F3 30 22 BB  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4AA3: A6 DF 03 2D DF 03 41 23 0E  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4AAC: 96 0D E1 CE 60 14 EF 25 40  [Range: 09, Filer: 01, Loop: Yes, End: No]
+00/4AB5: A6 0E E1 54 CA E2 30 25 3F  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4ABE: A6 E0 30 D0 01 41 14 30 E2  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4AC7: BA 3F CE 43 0D D1 1F 13 FF  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4AD0: AA F2 62 DB DE E2 20 E4 5B  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4AD9: A6 BD F0 33 1F 14 2F 0E DF  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4AE2: AA 00 EE 33 FF FD 05 20 CD  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4AEB: 96 E2 F0 31 ED F7 6C F4 04  [Range: 09, Filer: 01, Loop: Yes, End: No]
+00/4AF4: B6 FC 02 FD F2 20 FF 0F E0  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4AFD: A6 10 BC EF 11 DE 00 0F C1  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4B06: AA 3C E5 3F EF 30 D0 42 E0  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4B0F: 9A BE 5E F5 43 BA 34 0D FF  [Range: 09, Filer: 02, Loop: Yes, End: No]
+00/4B18: A6 E0 0D D0 00 CD 33 43 CD  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4B21: BA 20 0F F1 F0 10 F1 F1 40  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4B2A: A6 40 D1 5E AD 11 CA E2 30  [Range: 0A, Filer: 01, Loop: Yes, End: No]
+00/4B33: AA 15 FF 0E F2 21 DD F1 12  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4B3C: AA 2E 11 E1 1F 1D F3 51 AC  [Range: 0A, Filer: 02, Loop: Yes, End: No]
+00/4B45: AB 40 12 0E D0 64 E0 00 ED  [Range: 0A, Filer: 02, Loop: Yes, End: Yes]
+
+[10: ]
+00/4B4E: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/4B57: 9A 10 10 11 10 FF 1F F0 43  [Range: 09, Filer: 02, Loop: Yes, End: No]
+00/4B60: 8A 0D E2 13 41 DD 01 FE 25  [Range: 08, Filer: 02, Loop: Yes, End: No]
+
+[11: ]
+00/4B69: 8A 52 0E D0 21 F0 1E D0 34  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4B72: 8A 32 22 1F ED 04 31 25 30  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4B7B: 7A C2 54 FC F2 10 35 5F CF  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4B84: 7A 2F CE 36 32 1D AB F0 03  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4B8D: 8A 21 EC E1 43 0E EE EF 14  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4B96: 8A 41 EE E0 00 FF EF FF 02  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4B9F: 8A 0D D0 20 DD EE EE 00 F0  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4BA8: 8A 11 1F CB CD 01 21 10 ED  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4BB1: 7A BF 23 1F DC E3 31 DF 56  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4BBA: 9A FD D1 43 FE 01 0F F2 21  [Range: 09, Filer: 02, Loop: Yes, End: No]
+00/4BC3: 9A FE E1 31 CC F3 42 0E EE  [Range: 09, Filer: 02, Loop: Yes, End: No]
+00/4BCC: 7A E4 4F AD 34 FB C1 33 21  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4BD5: 8A 10 EE 23 20 F0 24 2F DF  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4BDE: 8A 23 11 22 FE 14 42 01 21  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4BE7: 7A D0 57 3C B2 73 FC E0 EF  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4BF0: 8A 12 00 24 2E DE 23 1E EF  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4BF9: 8A 01 00 00 F0 10 ED 15 50  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C02: 86 43 44 2E CE 35 31 10 DB  [Range: 08, Filer: 01, Loop: Yes, End: No]
+00/4C0B: 8A 13 11 33 EC E2 30 DF 12  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C14: 8A 1F DD 01 11 0E DD E1 44  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C1D: 7A 1B 9B E1 2F DE 36 4E C1  [Range: 07, Filer: 02, Loop: Yes, End: No]
+00/4C26: 8A 34 2F EF F0 13 1F E1 22  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C2F: 8A 00 13 1F DD F0 13 42 FD  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C38: 8A E1 0F E1 1E AD 14 1E CE  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C41: 8A 12 EB D1 21 0F FC CF 32  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C4A: 8A 1F DB CE 00 FE F0 11 1E  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C53: 8A BB E1 20 EC E1 0E E0 0E  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C5C: 8A DD EC C0 21 F0 11 01 0E  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C65: 8A DE F3 FE 04 3F F0 1F F0  [Range: 08, Filer: 02, Loop: Yes, End: No]
+00/4C6E: 9A 01 10 02 1F F0 1F F0 43  [Range: 09, Filer: 02, Loop: Yes, End: No]
+00/4C77: 8B FC F2 23 31 DE F1 FF 15  [Range: 08, Filer: 02, Loop: Yes, End: Yes]
+
+[12: ]
+00/4C80: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/4C89: B6 BC 10 B2 60 DF 22 1F 1E  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4C92: C6 C0 21 0F 33 EC F3 1F 0E  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+
+[13: ]
+00/4C9B: B6 F4 FE 75 AA 31 BE 42 D1  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4CA4: C2 44 DC 20 C1 53 ED FE 17  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4CAD: C2 60 DE EE E0 31 EF FD F4  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4CB6: C2 3D C0 1F F2 41 CE 0E 04  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4CBF: B2 4B BF 01 41 E3 3B B1 30  [Range: 0B, Filer: 00, Loop: Yes, End: No]
+00/4CC8: C2 00 FF 13 2E D1 3F E3 30  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4CD1: B2 EE F1 1B C7 7F DD 04 1C  [Range: 0B, Filer: 00, Loop: Yes, End: No]
+00/4CDA: C6 23 EB F5 3D E1 2F D1 2F  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4CE3: C6 01 0F F1 20 E1 2D C0 32  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4CEC: C2 02 41 DC F3 42 0F DD 14  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4CF5: C2 1F 34 FC E1 10 0F EE F1  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4CFE: C6 20 FE E1 0F 33 EE 00 24  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4D07: C2 50 DD EF 02 44 31 DB E1  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4D10: CA DF 1F E3 4F FD C3 5D F3  [Range: 0C, Filer: 02, Loop: Yes, End: No]
+00/4D19: B6 5C A2 5D E7 4C AC D3 63  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4D22: B2 41 F0 01 3F 9C 0C D4 32  [Range: 0B, Filer: 00, Loop: Yes, End: No]
+00/4D2B: BA 4B D5 1D 04 1C 13 DE E1  [Range: 0B, Filer: 02, Loop: Yes, End: No]
+00/4D34: B6 53 D0 EE 34 10 FC D0 00  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4D3D: C6 22 F0 2F DF 43 DC 01 00  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4D46: C6 23 1E DF 2F D2 40 D1 30  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4D4F: B6 CC 00 B2 71 DF 22 0F 1E  [Range: 0B, Filer: 01, Loop: Yes, End: No]
+00/4D58: C7 C0 21 0F 33 EC F3 1F 0E  [Range: 0C, Filer: 01, Loop: Yes, End: Yes]
+
+[14: ]
+00/4D61: 02 00 00 00 00 00 00 00 00  [Range: 00, Filer: 00, Loop: Yes, End: No]
+00/4D6A: C2 53 63 AF 1A 36 3E B2 23  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4D73: C6 5A B4 EC 35 EE 0D 33 90  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+
+[15: ]
+00/4D7C: C6 A0 E3 10 9D 4C C2 45 E0  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4D85: C2 6F C6 2E 53 ED BB 11 9E  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4D8E: DA FC 22 2E D3 F4 C2 3C 33  [Range: 0D, Filer: 02, Loop: Yes, End: No]
+00/4D97: C2 1B F3 27 4B E0 BC 22 EE  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4DA0: C6 E1 6B AA 3D 21 2B B4 EB  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4DA9: C2 AE 32 05 2B 36 F3 5F DC  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4DB2: C2 BF 3C B1 CB E3 73 37 0B  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4DBB: C2 2D D6 62 BE 43 66 DC 1D  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4DC4: D2 D0 20 FF F1 0C F3 12 33  [Range: 0D, Filer: 00, Loop: Yes, End: No]
+00/4DCD: C2 4B DF 99 C2 40 34 BF 60  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4DD6: C6 14 CD FE 26 CB 5F B2 45  [Range: 0C, Filer: 01, Loop: Yes, End: No]
+00/4DDF: C2 42 63 AF 1A 36 2D B3 34  [Range: 0C, Filer: 00, Loop: Yes, End: No]
+00/4DE8: C7 59 B4 EB 35 EE 0E 33 90  [Range: 0C, Filer: 01, Loop: Yes, End: Yes]
+
+00/4DF1: 
