@@ -18,5 +18,5 @@ bld/
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-ManaMagic/ManaMagic.Core/Documentation/Disassembly/
-ManaMagic/SoMBossAIPatcher/
+ManaMagic.Core/Documentation/Disassembly/
+SoMBossAIPatcher/
