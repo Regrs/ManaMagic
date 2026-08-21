@@ -7,8 +7,8 @@ namespace ManaMagic.Core
 {
     internal sealed class ByteBitCounter
     {
-        private string name = string.Empty;
-        private Dictionary<byte, byte> bitCounts = new Dictionary<byte, byte>(8)
+        private readonly string name = string.Empty;
+        private readonly Dictionary<byte, byte> bitCounts = new Dictionary<byte, byte>(8)
         {
             { 0B_0000_0000, 0 },
             { 0B_0000_0001, 0 },
