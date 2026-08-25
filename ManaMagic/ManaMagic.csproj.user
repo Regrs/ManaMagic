@@ -19,19 +19,19 @@
     <Compile Update="Controls\UserControls\Character\StatsByLevelTableEditorUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\DebuggerUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\DebuggerUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\DebugMapTriggersViewUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\DebugMapTriggersViewUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\Views\DebugEnemyStatViewUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\Views\DebugEnemyStatViewUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\Views\DebugLootTableViewUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\Views\DebugLootTableViewUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\Views\DebugWeaponDefinitionViewUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\Views\DebugWeaponDefinitionViewUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Controls\UserControls\Help\HelpUserControl.cs">
@@ -61,10 +61,10 @@
     <Compile Update="Controls\UserControls\Maps\DoorEditorUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\DebugCollisionTypeViewUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\DebugCollisionTypeViewUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\DebugDrawCanvasUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\DebugDrawCanvasUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Controls\UserControls\Maps\DisplaySettingsUserControl.cs">
@@ -127,7 +127,7 @@
     <Compile Update="Controls\UserControls\Boss\BossTilesetFrameViewerUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="Controls\UserControls\Debug\DisassemblyUtilUserControl.cs">
+    <Compile Update="Controls\UserControls\Debugging\DisassemblyUtilUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Controls\UserControls\StringTableEditorUserControl.cs">
