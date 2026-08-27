@@ -139,7 +139,7 @@ namespace ZwellTech.SuperNintendo.Drawing
         /// <param name="tileset">The <see cref="Tileset"/> whose tiles should be merged into the current instance.</param>
         public void Merge(Tileset tileset)
         {
-            tiles.AddRange(tileset.tiles);
+            this.tiles.AddRange(tileset.tiles);
         }
 
         /// <summary>
@@ -175,6 +175,11 @@ namespace ZwellTech.SuperNintendo.Drawing
         public virtual object Clone()
         {
             return new Tileset(this.Index, this.Tiles, this.TileType);
+        }
+
+        protected void Add(GraphicTile tile)
+        {
+            this.tiles.Add(tile);
         }
     }
 

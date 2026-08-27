@@ -35,18 +35,19 @@ namespace ManaMagic.Core.RomReaders
         {
             this.Seek((int)Constants.Bank10.SpriteGraphicsTableAddress);
             List<SpriteGraphicsData> dataList = new List<SpriteGraphicsData>((int)Constants.Bank10.SpriteGraphicsTableSize);
-            for (int i = 0; i <= Constants.Bank10.SpriteGraphicsTableSize; i++)
+            for (int i = 0; i < Constants.Bank10.SpriteGraphicsTableSize; i++)
             {
                 ushort encodedGfxOffset = this.ReadUInt16(); // 0001
                 ushort frameIndexOffset = this.ReadUInt16(); // 0203
-                ushort unknown2 = this.ReadUInt16();         // 0405
-                ushort unknown3 = this.ReadUInt16();         // 0607
-                ushort unknown4 = this.ReadUInt16();         // 0809
-                ushort unknown5 = this.ReadUInt16();         // 0A0B
-                ushort unknown6 = this.ReadUInt16();         // 0C0D
-                ushort unknown7 = this.ReadUInt16();         // 0E0F
+                byte unknown1 = this.Read();                 // 04
+                ushort unknown2 = this.ReadUInt16();         // 0506
+                ushort unknown3 = this.ReadUInt16();         // 0708
+                ushort aiOffset = this.ReadUInt16();         // 090A
+                ushort unknown5 = this.ReadUInt16();         // 0B0C
+                ushort unknown6 = this.ReadUInt16();         // 0D0E
+                byte unknown7 = this.Read();                 // 0F
 
-                dataList.Add(new SpriteGraphicsData(encodedGfxOffset, frameIndexOffset, unknown2, unknown3, unknown4, unknown5, unknown6, unknown7));
+                dataList.Add(new SpriteGraphicsData(encodedGfxOffset, frameIndexOffset, unknown1, unknown2, unknown3, aiOffset, unknown5, unknown6, unknown7));
             }
             return new DataTable<SpriteGraphicsData>(dataList);
         }

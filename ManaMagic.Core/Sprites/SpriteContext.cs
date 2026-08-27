@@ -18,6 +18,8 @@ namespace ManaMagic.Core.Sprites
         public DataTable<EnemyLootEntry> LootTable { get; private set; } = DataTable<EnemyLootEntry>.Empty;
 
         public DataTable<ManaEnemy> Enemies { get; private set; } = DataTable<ManaEnemy>.Empty;
+        public DataTable<SpriteTileset> SpriteTilesets { get; private set; } = DataTable<SpriteTileset>.Empty;
+
 
         /// <summary>
         /// Initializes the context by reading sprite data from the ROM file.
@@ -31,8 +33,8 @@ namespace ManaMagic.Core.Sprites
             this.EnemyStatisticsTable = reader.ReadEnemyStatisticsTable();
             this.LootTable = reader.ReadEnemyLootTable();
 
-            List<ManaEnemy> enemyList = new List<ManaEnemy>(0x56);
-            for (int i = 0; i < 0x57; i++)
+            List<ManaEnemy> enemyList = new List<ManaEnemy>(Constants.FirstBossIndex);
+            for (int i = 0; i < Constants.FirstBossIndex; i++)
             {
                 ManaEvent name = textContext.EnemyNameTable[i];
                 EnemyStatEntry statistics = this.EnemyStatisticsTable[i];
@@ -44,6 +46,17 @@ namespace ManaMagic.Core.Sprites
                 enemyList.Add(enemy);
             }
             this.Enemies = new DataTable<ManaEnemy>(enemyList);
+
+            List<SpriteTileset> spriteTilesets = new List<SpriteTileset>((int)Constants.Bank10.SpriteGraphicsTableSize);
+            for (int i = 0; i < Constants.Bank10.SpriteGraphicsTableSize; i++)
+            {
+                SpriteGraphicsData graphicsData = this.GraphicsDataTable[i];
+                SpritePalette palette = this.PaletteTable[i];
+
+                SpriteTileset tileset = new SpriteTileset(i, TileType.FourBitsPerPixel, graphicsData, palette);
+                spriteTilesets.Add(tileset);
+            }
+            this.SpriteTilesets = new DataTable<SpriteTileset>(spriteTilesets);
         }
     }
 }

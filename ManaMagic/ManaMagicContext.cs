@@ -31,7 +31,7 @@ namespace ManaMagic
             Application.SetCompatibleTextRenderingDefault(false);
 
 #if DEBUG
-            //ManaMagicContext.DebugMode = true;
+            ManaMagicContext.DebugMode = true;
 #endif
             MainForm form = new MainForm();
             this.MainForm = form;

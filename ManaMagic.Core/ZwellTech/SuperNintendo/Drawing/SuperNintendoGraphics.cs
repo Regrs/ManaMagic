@@ -598,7 +598,9 @@ namespace ZwellTech.SuperNintendo.Drawing
 
         private void SetPixel(int x, int y, Rgb555Color color)
         {
-            int index = x + (y * this.Size.Width);
+            int index = Math.Abs(x + (y * this.Size.Width));
+            if (index >= this.bitmapBuffer.Length) { return; }
+            //if (this.bitmapBuffer[index] == color.ToArgb()) { return; }
             this.bitmapBuffer[index] = color.ToArgb();
             //this.bitmapBuffer[index] = color.ToRgb555();
         }

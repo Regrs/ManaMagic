@@ -78,7 +78,7 @@ namespace ManaMagic.Core.Debugger
                         {
                             if (map.IsValid)
                             {
-                                using SuperNintendoGraphics graphics = map.DrawMap(options);
+                                using SuperNintendoGraphics graphics = map.DrawMap(options, MapDebugger.Context.SpriteContext);
                                 continue;
                             }
 
