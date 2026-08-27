@@ -1,4 +1,5 @@
 ﻿using System;
+using ManaMagic.Core.Sprites;
 using ZwellTech.SuperNintendo;
 using ZwellTech.SuperNintendo.Drawing;
 
@@ -116,12 +117,12 @@ namespace ManaMagic.Core.Maps
             return graphics;
         }
 
-        public SuperNintendoGraphics DrawMap(MapDrawingOptions options)
+        public SuperNintendoGraphics DrawMap(MapDrawingOptions options, SpriteContext spriteContext)
         {
-            return this.DrawMap(options, this.PaletteSet);
+            return this.DrawMap(options, this.PaletteSet, spriteContext);
         }
 
-        public SuperNintendoGraphics DrawMap(MapDrawingOptions options, DataTable<SpritePalette> paletteSet)
+        public SuperNintendoGraphics DrawMap(MapDrawingOptions options, DataTable<SpritePalette> paletteSet, SpriteContext spriteContext)
         {
             byte maxWidth = Math.Max(this.Layer1Background.Width, this.Layer2Background.Width);
             byte maxHeight = Math.Max(this.Layer1Background.Height, this.Layer2Background.Height);
@@ -201,6 +202,12 @@ namespace ManaMagic.Core.Maps
                 if (this.DisplaySettings.ColorMath.HasFlag(CGADSUB.EnableBackground01)) { graphics.Merge(layer1BG2, this.DisplaySettings.ColorMath); }
                 else { graphics.Merge(layer1BG2); }
                 //graphics.Merge(layer1BG2);
+            }
+
+            foreach (MapSpriteObject spriteObject in this.Header.ObjectTable)
+            {
+                using SuperNintendoGraphics spriteGraphics = spriteContext.SpriteTilesets[spriteObject.SpriteIndex].DrawFrame(0);
+                graphics.Merge(spriteGraphics, spriteObject.Location.X * 16, spriteObject.Location.Y * 16);
             }
 
             return graphics;

@@ -98,9 +98,9 @@ namespace ManaMagic.Core.Analyzer
         private void RunSpriteUsageCounter(SecretOfManaContext context)
         {
             this.spriteUsageCount.Clear();
-            for (byte i = 0; i < Constants.Bank10.SpriteGraphicsTableSize; i++)
+            for (int i = 0; i < Constants.Bank10.SpriteGraphicsTableSize; i++)
             {
-                this.spriteUsageCount.Add(i, 0);
+                this.spriteUsageCount.Add((byte)i, 0);
             }
             foreach (MapHeader header in context.MapContext.MapHeaderTable)
             {

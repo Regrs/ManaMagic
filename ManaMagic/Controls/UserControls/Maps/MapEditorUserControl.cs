@@ -268,14 +268,14 @@ namespace ManaMagic.Controls.UserControls.Maps
         {
             if (map.IsValid)
             {
-                using SuperNintendoGraphics graphics = map.DrawMap(options);
+                using SuperNintendoGraphics graphics = map.DrawMap(options, ManaMagicContext.Current.Context.SpriteContext);
                 this.mapPictureBox.Image = graphics.GetBitmap(true);
                 return;
             }
             else if (this.forceDrawCheckBox.Checked)
             {
                 //ManaMap map2 = new ManaMap(map.Header, SecretOfManaContext.Default.MapContext.DisplaySettingsTable[0], map.ObjectTable, map.Layer1Background, map.Layer2Background, map.Layer1, map.Layer2, SecretOfManaContext.Default.MapContext.Map8x8TilesetTable[0], SecretOfManaContext.Default.MapContext.Map16x16TilesetTable[0], SecretOfManaContext.Default.MapContext.PaletteSetTable[0]);
-                using SuperNintendoGraphics graphics = ManaMagicContext.Current.Context.MapContext.CreateMap(mapId, true).DrawMap(options);
+                using SuperNintendoGraphics graphics = ManaMagicContext.Current.Context.MapContext.CreateMap(mapId, true).DrawMap(options, ManaMagicContext.Current.Context.SpriteContext);
                 this.mapPictureBox.Image = graphics.GetBitmap(true);
                 return;
             }

@@ -268,6 +268,9 @@ namespace ManaMagic.Core
         public const uint EventCount = 0x0800;
         public const int TextMaxLength = 55;
 
+        public const byte FirstBossIndex = 0x57;
+        public const byte LastBossIndex = 0x7F;
+
         public static class SoundEffects
         {
             public const ushort None = 0x0000;
@@ -485,8 +488,6 @@ namespace ManaMagic.Core
 
             public const uint EnemyNamesPointerTableAddress = Constants.Bank0AOffset | 0x099E;
             public const uint EnemyNamesPointerTableSize = 0x80;
-            public const byte FirstBossIndex = 0x57;
-            public const byte LastBossIndex = 0x7F;
 
             public const uint TownNameEventsPointerTableAddress = Constants.Bank0AOffset | 0x0B82;
             public const uint TownNameEventsPointerTableSize = 0x38;
@@ -619,7 +620,7 @@ namespace ManaMagic.Core
         public static class Bank10
         {
             public const uint SpriteGraphicsTableAddress = Constants.Bank10Offset | 0x0000;
-            public const uint SpriteGraphicsTableSize = 0xFF;
+            public const uint SpriteGraphicsTableSize = 0x100;
 
             public const uint WeaponDefinitionTableAddress = Constants.Bank10Offset | 0x1000;
             public const uint WeaponDefinitionTableSize = 0x100;
