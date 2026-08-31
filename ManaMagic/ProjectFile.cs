@@ -221,6 +221,7 @@ namespace ManaMagic
         private void LoadMapTables(XmlDocument document, MapContext context)
         {
             ProjectFile.LoadMapDisplaySettingsTable(document, context);
+            this.LoadMapHeaderTable(context);
             ProjectFile.LoadMapPaletteTable(document, context);
             ProjectFile.LoadFlammieFlightCoordinateTable(document, context);
         }
@@ -328,6 +329,7 @@ namespace ManaMagic
             using (writer.CreateElementtNode(XmlConstants.Maps.MapsElementName))
             {
                 ProjectFile.SaveMapDisplaySettingsTable(context, writer);
+                ProjectFile.SaveMapHeaderTable(context, writer);
                 ProjectFile.SaveMapPaletteTable(context, writer);
                 ProjectFile.SaveFlammieFlightCoordinateTable(context, writer);
             }
@@ -888,6 +890,88 @@ namespace ManaMagic
             }
         }
 
+        private void LoadMapHeaderTable(MapContext context)
+        {
+            XmlNode? rootNode = this.loadDocument.GetElementsByTagName(XmlConstants.Maps.Header.MapHeadersElementName)[0];
+            if (rootNode != null)
+            {
+                foreach (XmlNode headerNode in rootNode.ChildNodes)
+                {
+                    if (headerNode.Name == XmlConstants.Maps.Header.MapHeaderElementName)
+                    {
+                        byte headerIndex = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlHelper.IndexAttributeName), CultureInfo.InvariantCulture);
+                        byte tileset8Index = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.Tileset8x8IndexAttributeName), CultureInfo.InvariantCulture);
+                        byte paletteSetIndex = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.PaletteSetIndexAttributeName), CultureInfo.InvariantCulture);
+                        byte tileset16Index = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.Tileset16x16IndexAttributeName), CultureInfo.InvariantCulture);
+                        byte eventOptions = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.EventOptionsAttributeName), CultureInfo.InvariantCulture);
+                        byte specialItemOptions = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.SpecialItemsOptionsAttributeName), CultureInfo.InvariantCulture);
+                        byte displaySettings = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.DisplaySettingsIndexAttributeName), CultureInfo.InvariantCulture);
+                        byte unused = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.UnusedAttributeName), CultureInfo.InvariantCulture);
+                        byte npcPaletteSetIndex = Convert.ToByte(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.NpcPaletteIndexAttributeName), CultureInfo.InvariantCulture);
+                        bool isValid = Convert.ToBoolean(XmlHelper.ReadAttribute(headerNode, XmlConstants.Maps.Header.IsValidAttributeName), CultureInfo.InvariantCulture);
+
+                        List<MapSpriteObject> objects = new List<MapSpriteObject>(headerNode.ChildNodes.Count);
+                        foreach (XmlNode spriteContainerNode in headerNode.ChildNodes)
+                        {
+                            if (spriteContainerNode.Name == XmlConstants.Maps.Header.SpriteObject.MapSpriteObjectsElementName)
+                            {
+                                foreach (XmlNode spriteNode in spriteContainerNode.ChildNodes)
+                                {
+                                    if (spriteNode.Name == XmlConstants.Maps.Header.SpriteObject.MapSpriteObjectElementName)
+                                    {
+                                        byte objectIndex = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlHelper.IndexAttributeName), CultureInfo.InvariantCulture);
+                                        byte eventFlag = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.EventFlagAttributeName), CultureInfo.InvariantCulture);
+                                        byte eventFlagRange = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.EventFlagRangeAttributeName), CultureInfo.InvariantCulture);
+                                        byte xCoordinate = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.XCoordinateAttributeName), CultureInfo.InvariantCulture);
+                                        byte yCoordinate = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.YCoordinateAttributeName), CultureInfo.InvariantCulture);
+                                        byte direction = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.DirectionAttributeName), CultureInfo.InvariantCulture);
+                                        byte spriteIndex = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.SpriteIndexAttributeName), CultureInfo.InvariantCulture);
+                                        byte eventIDLow = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.EventIdLowAttributeName), CultureInfo.InvariantCulture);
+                                        byte eventIDHigh = Convert.ToByte(XmlHelper.ReadAttribute(spriteNode, XmlConstants.Maps.Header.SpriteObject.EventIdHighAttributeName), CultureInfo.InvariantCulture);
+
+                                        MapSpriteObject spriteObject = new MapSpriteObject(objectIndex,
+                                                                                           eventFlag,
+                                                                                           eventFlagRange,
+                                                                                           xCoordinate,
+                                                                                           yCoordinate,
+                                                                                           direction,
+                                                                                           spriteIndex,
+                                                                                           eventIDLow,
+                                                                                           eventIDHigh,
+                                                                                           true);
+                                        objects.Add(spriteObject);
+                                    }
+                                }
+
+                            }
+                        }
+
+
+                        MapHeader original = context.MapHeaderTable[headerIndex];
+                        MapHeader mapHeader = new MapHeader(headerIndex,
+                                                            tileset8Index,
+                                                            paletteSetIndex,
+                                                            tileset16Index,
+                                                            eventOptions,
+                                                            specialItemOptions,
+                                                            displaySettings,
+                                                            unused,
+                                                            npcPaletteSetIndex,
+                                                            original.ObjectTable,
+                                                            isValid,
+                                                            true);
+
+                        foreach (MapSpriteObject spriteObject in objects)
+                        {
+                            mapHeader.ObjectTable.Replace(spriteObject.Index, spriteObject);
+                        }
+
+                        context.MapHeaderTable.Replace(headerIndex, mapHeader);
+                    }
+                }
+            }
+        }
+
         private static void LoadWorldMapLandingLocationTable(XmlDocument document, WorldMapContext context)
         {
             XmlNode? rootNode = document.GetElementsByTagName(XmlConstants.WorldMap.LandingLocationsElementName)[0];
@@ -1372,6 +1456,58 @@ namespace ManaMagic
             }
         }
 
+        private static void SaveMapHeaderTable(MapContext context, XmlWriter writer)
+        {
+            using (writer.CreateElementtNode(XmlConstants.Maps.Header.MapHeadersElementName))
+            {
+                Span<byte> headerValues = stackalloc byte[8];
+                Span<byte> spriteValues = stackalloc byte[8];
+                foreach (MapHeader header in context.MapHeaderTable)
+                {
+                    if (header.Dirty || header.UserModified)
+                    {
+                        header.GetEncodedValues(headerValues);
+                        using (writer.CreateElementtNode(XmlConstants.Maps.Header.MapHeaderElementName))
+                        {
+                            writer.WriteAttributeString(XmlHelper.IndexAttributeName, header.Index.ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.Tileset8x8IndexAttributeName, headerValues[0].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.PaletteSetIndexAttributeName, headerValues[1].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.Tileset16x16IndexAttributeName, headerValues[2].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.EventOptionsAttributeName, headerValues[3].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpecialItemsOptionsAttributeName, headerValues[4].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.DisplaySettingsIndexAttributeName, headerValues[5].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.UnusedAttributeName, headerValues[6].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.NpcPaletteIndexAttributeName, headerValues[7].ToString());
+                            writer.WriteAttributeString(XmlConstants.Maps.Header.IsValidAttributeName, header.IsValid.ToString());
+
+                            using (writer.CreateElementtNode(XmlConstants.Maps.Header.SpriteObject.MapSpriteObjectsElementName))
+                            {
+                                foreach (MapSpriteObject spriteObject in header.ObjectTable)
+                                {
+                                    if (spriteObject.Dirty || spriteObject.UserModified)
+                                    {
+                                        spriteObject.GetEncodedValues(spriteValues);
+                                        using (writer.CreateElementtNode(XmlConstants.Maps.Header.SpriteObject.MapSpriteObjectElementName))
+                                        {
+                                            writer.WriteAttributeString(XmlHelper.IndexAttributeName, spriteObject.Index.ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.EventFlagAttributeName, spriteValues[0].ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.EventFlagRangeAttributeName, spriteValues[1].ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.XCoordinateAttributeName, spriteValues[2].ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.YCoordinateAttributeName, spriteValues[3].ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.DirectionAttributeName, spriteValues[4].ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.SpriteIndexAttributeName, spriteValues[5].ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.EventIdLowAttributeName, spriteValues[6].ToString());
+                                            writer.WriteAttributeString(XmlConstants.Maps.Header.SpriteObject.EventIdHighAttributeName, spriteValues[7].ToString());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private static void SaveFlammieFlightCoordinateTable(MapContext context, XmlWriter writer)
         {
             using (writer.CreateElementtNode(XmlConstants.Maps.Flammie.FlammieFlightCoordinatesSetsElementName))
@@ -1812,6 +1948,37 @@ namespace ManaMagic
             {
                 public const string FlammieFlightCoordinatesSetsElementName = "FlammieFlightCoordinates";
                 public const string FlammieFlightCoordinateSetElementName = "FlammieFlightCoordinate";
+            }
+
+            public static class Header
+            {
+                public const string MapHeadersElementName = "MapHeaders";
+                public const string MapHeaderElementName = "MapHeader";
+
+                public const string Tileset8x8IndexAttributeName = "tileset8x8Index";
+                public const string PaletteSetIndexAttributeName = "paletteSetIndex";
+                public const string Tileset16x16IndexAttributeName = "tileset16x16Index";
+                public const string EventOptionsAttributeName = "eventOptions";
+                public const string SpecialItemsOptionsAttributeName = "specialItemsOptions";
+                public const string DisplaySettingsIndexAttributeName = "displaySettingsIndex";
+                public const string UnusedAttributeName = "unused";
+                public const string NpcPaletteIndexAttributeName = "npcPaletteIndex";
+                public const string IsValidAttributeName = "isValid";
+
+                public static class SpriteObject
+                {
+                    public const string MapSpriteObjectsElementName = "MapSpriteObjects";
+                    public const string MapSpriteObjectElementName = "MapSpriteObject";
+
+                    public const string EventFlagAttributeName = "eventFlag";
+                    public const string EventFlagRangeAttributeName = "eventFlagRange";
+                    public const string XCoordinateAttributeName = "xCoordinate";
+                    public const string YCoordinateAttributeName = "yCoordinate";
+                    public const string DirectionAttributeName = "direction";
+                    public const string SpriteIndexAttributeName = "spriteIndex";
+                    public const string EventIdLowAttributeName = "eventIdLow";
+                    public const string EventIdHighAttributeName = "eventIdHigh";
+                }
             }
         }
 

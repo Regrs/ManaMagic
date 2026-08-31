@@ -419,6 +419,14 @@ namespace ZwellTech.SuperNintendo.Drawing
             this.DrawRectangle(this.palette[paletteIndex], rectangle);
         }
 
+        public void DrawRectangle(Rgb555Color color, int x, int y, int width, int height)
+        {
+            this.DrawLine(color, x, y, x + width, y);                   // - TOP
+            this.DrawLine(color, x, y + height, x + width, y + height); // - BOTTOM
+            this.DrawLine(color, x, y, x, y + height);                  // - LEFT
+            this.DrawLine(color, x + width, y, x + width, y + height);  // - RIGHT
+        }
+
         /// <summary>
         /// Draws 8x8 grid lines into the graphics object for the specified number of row and columns.
         /// </summary>
@@ -672,14 +680,6 @@ namespace ZwellTech.SuperNintendo.Drawing
         private void DrawRectangle(Rgb555Color color, Rectangle rectangle)
         {
             this.DrawRectangle(color, rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
-        }
-
-        internal void DrawRectangle(Rgb555Color color, int x, int y, int width, int height)
-        {
-            this.DrawLine(color, x, y, x + width, y);                   // - TOP
-            this.DrawLine(color, x, y + height, x + width, y + height); // - BOTTOM
-            this.DrawLine(color, x, y, x, y + height);                  // - LEFT
-            this.DrawLine(color, x + width, y, x + width, y + height);  // - RIGHT
         }
 
         private void DrawTile(SpritePalette palette, GraphicTile tile, int x, int y)

@@ -14,10 +14,6 @@ namespace ManaMagic.Controls.UserControls.Debug
 {
     public partial class DebugDrawCanvasUserControl : UserControl
     {
-        private SpriteTileset tileset2;
-        private SpritePalette palette;
-        private SpriteGraphicsData graphicsData;
-        private SpriteRomReader romReader;
         private int frameIndex = 0;
         private int spriteIndex = 0;
 
@@ -28,6 +24,65 @@ namespace ManaMagic.Controls.UserControls.Debug
             this.previousCanvas1Button.Enabled = false;
             this.Load += DebugDrawCanvasUserControl_Load;
         }
+
+        private void X3()
+        {
+            SpriteTileset tileset = ManaMagicContext.Current.Context.SpriteContext.SpriteTilesets[this.spriteIndex];
+            using SuperNintendoGraphics graphics = tileset.DrawFrame((ushort)this.frameIndex);
+
+            this.canvas2PictureBox.Image = new Bitmap(graphics.GetBitmap(true), graphics.Size.Width * 2, graphics.Size.Height * 2);
+        }
+
+        private void DebugDrawCanvasUserControl_Load(object sender, EventArgs e)
+        {
+            //this.romReader = RomReaderFactory.GetRomReader<SpriteRomReader>();
+            //this.SpriteTest2(0x00, 214); // Rabite
+
+            this.X3();
+        }
+
+        private void PreviousCanvas1Button_Click(object sender, EventArgs e)
+        {
+            if (this.spriteIndex >= 0)
+            {
+                this.spriteIndex--;
+                this.frameIndex = 0;
+                this.X3();
+            }
+        }
+
+        private void NextCanvas1Button_Click(object sender, EventArgs e)
+        {
+            this.spriteIndex++;
+            this.frameIndex = 0;
+            this.X3();
+        }
+
+        private void NumericUpDown1_ValueChanged(object sender, EventArgs e) { }
+
+        private void C2NextButton_Click(object sender, EventArgs e)
+        {
+            this.frameIndex++;
+            this.X3();
+        }
+
+        private void C2PrevButton_Click(object sender, EventArgs e)
+        {
+            if (this.frameIndex >= 0)
+            {
+                this.frameIndex--;
+                this.X3();
+            }
+        }
+    }
+
+
+}
+/* Code Graveyard: Sprites
+        private SpriteTileset tileset2;
+        private SpritePalette palette;
+        private SpriteGraphicsData graphicsData;
+        private SpriteRomReader romReader;
 
         private void SpriteTest2(int index, int tilesToLoad)
         {
@@ -126,61 +181,6 @@ namespace ManaMagic.Controls.UserControls.Debug
             using SuperNintendoGraphics graphics = frame.DrawFrame(this.tileset2);
             this.canvas2PictureBox.Image = new Bitmap(graphics.GetBitmap(true), graphics.Size.Width * 2, graphics.Size.Height * 2);
         }
-
-        private void X3()
-        {
-            SpriteTileset tileset = ManaMagicContext.Current.Context.SpriteContext.SpriteTilesets[this.spriteIndex];
-            using SuperNintendoGraphics graphics = tileset.DrawFrame((ushort)this.frameIndex);
-
-            this.canvas2PictureBox.Image = new Bitmap(graphics.GetBitmap(true), graphics.Size.Width * 2, graphics.Size.Height * 2);
-        }
-
-        private void DebugDrawCanvasUserControl_Load(object sender, EventArgs e)
-        {
-            //this.romReader = RomReaderFactory.GetRomReader<SpriteRomReader>();
-            //this.SpriteTest2(0x00, 214); // Rabite
-
-            this.X3();
-        }
-
-        private void PreviousCanvas1Button_Click(object sender, EventArgs e)
-        {
-            if (this.spriteIndex >= 0)
-            {
-                this.spriteIndex--;
-                this.frameIndex = 0;
-                this.X3();
-            }
-        }
-
-        private void NextCanvas1Button_Click(object sender, EventArgs e)
-        {
-            this.spriteIndex++;
-            this.frameIndex = 0;
-            this.X3();
-        }
-
-        private void NumericUpDown1_ValueChanged(object sender, EventArgs e) { }
-
-        private void C2NextButton_Click(object sender, EventArgs e)
-        {
-            this.frameIndex++;
-            this.X3();
-        }
-
-        private void C2PrevButton_Click(object sender, EventArgs e)
-        {
-            if (this.frameIndex >= 0)
-            {
-                this.frameIndex--;
-                this.X3();
-            }
-        }
-    }
-
-
-}
-/* Code Graveyard: Sprites
 
         public sealed class SpriteTilesetOld : Tileset
         {

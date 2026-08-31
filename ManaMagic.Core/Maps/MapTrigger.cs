@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
+using ZwellTech;
 
 #nullable enable
 
 namespace ManaMagic.Core.Maps
 {
-    public sealed class MapTrigger
+    public sealed record MapTrigger : NotifyRecordPropertyChanged
     {
         public MapTriggerType TriggerType { get; }
         public ushort Value { get; }
@@ -12,7 +13,7 @@ namespace ManaMagic.Core.Maps
         public bool IsEvent { get { return this.TriggerType == MapTriggerType.Event; } }
         public bool IsDoor { get { return this.TriggerType == MapTriggerType.Door; } }
 
-        public MapTrigger(ushort value)
+        public MapTrigger(byte index, ushort value, bool userModified = false) : base(index, userModified)
         {
             // Trigger values are passed unmodified to the event sub-system.
             // Because of this it is possible to set a map trigger to fly on Flammie or get shot out of a cannon.

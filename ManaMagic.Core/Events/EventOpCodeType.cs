@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-// SetMapReturnPoint, ClearMapReturnPoint, and ActivateMapReturnPoint are probably used internally by the map system.
+// SetMapRopePoint, ClearMapRopePoint, and ActivateMapRopePoint are unused but can be control the Magic Rope.
 // SetMapBackgroundColor and SetAnimationOverride might also be used internally somewhere, but it is unlikely.
 // I'm reasonably certain the others marked as unused but have functionality are not used by anything.
 
@@ -29,9 +29,9 @@ namespace ManaMagic.Core.Events
         WaitForAnimations = 0x08,
         RefreshNpcState = 0x09,
         RefreshMapState = 0x0A,
-        //SetMapReturnPoint = 0x0B,                      // Unused (?). Sets $0108 to the value contained in $010E, which is the 16-bit door index used to enter the current map.
-        //ClearMapReturnPoint = 0x0C,                    // Unused (?). Clears $0108.
-        //ActivateMapReturnPoint = 0x0D,                 // Unused (?). Uses the door at the index stored at $0108.
+        //SetMapRopePoint = 0x0B,                        // Unused. Sets $0108 (Rope Door Index) to the value contained in $010E, which is the 16-bit door index used to enter the current map.
+        //ClearMapRopePoint = 0x0C,                      // Unused. Sets  $0108 to zero.
+        //ActivateMapRopePoint = 0x0D,                   // Unused. Uses the door at the index stored at $0108.
         OpenSellItemRing = 0x0E,
         OpenWeaponUpgradeRing = 0x0F,
         [FieldDisplayName("Jump To Event")]

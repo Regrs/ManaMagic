@@ -267,6 +267,7 @@ namespace ManaMagic.Core
 
         public const uint EventCount = 0x0800;
         public const int TextMaxLength = 55;
+        public const byte CombatMapMarker = 0xFF;
 
         public const byte FirstBossIndex = 0x57;
         public const byte LastBossIndex = 0x7F;

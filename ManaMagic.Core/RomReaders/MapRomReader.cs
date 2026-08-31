@@ -225,7 +225,7 @@ namespace ManaMagic.Core.RomReaders
                     int length = (nextPointer - pointer) / 2;
                     for (int triggerIndex = 0; triggerIndex < length; triggerIndex++)
                     {
-                        mapTriggers.Add(new MapTrigger(this.ReadUInt16()));
+                        mapTriggers.Add(new MapTrigger((byte)triggerIndex, this.ReadUInt16()));
                     }
                 }
                 mapTriggerList.Add(new DataTable<MapTrigger>(mapTriggers));
@@ -468,9 +468,10 @@ namespace ManaMagic.Core.RomReaders
                     // After the header comes the sprite listing for the map. There can be as few as zero entries and the maximum is uncapped.
                     // Each row of sprite data is 8 bytes long. As usual, most of these bytes have compression and/or encoding.
                     List<MapSpriteObject> spriteObjects = new List<MapSpriteObject>();
+                    byte index = 0;
                     while (this.Position < nextPointer)
                     {
-                        EventFlag flag = (EventFlag)this.Read();
+                        byte flag = this.Read();
                         byte range = this.Read();
                         byte xCoord = this.Read();
                         byte yCoord = this.Read();
@@ -479,14 +480,15 @@ namespace ManaMagic.Core.RomReaders
                         byte eventIdLow = this.Read();
                         byte eventIdHigh = this.Read();
 
-                        MapSpriteObject mapSpriteObject = new MapSpriteObject(flag, range, xCoord, yCoord, direction, spriteId, eventIdLow, eventIdHigh);
+                        MapSpriteObject mapSpriteObject = new MapSpriteObject(index, flag, range, xCoord, yCoord, direction, spriteId, eventIdLow, eventIdHigh);
                         spriteObjects.Add(mapSpriteObject);
+                        index++;
                     }
 
                     // Table read completed.
                     mapEventCounter.RecordBits(settings);
                     mapSpecialCounter.RecordBits(itemsAllowed);
-                    MapHeader header = new MapHeader(tileset8Id, paletteId, tileset16Id, settings, itemsAllowed, displaySettingsIndex, unknownValue, npcPaletteId, new DataTable<MapSpriteObject>(spriteObjects), true);
+                    MapHeader header = new MapHeader((byte)i, tileset8Id, paletteId, tileset16Id, settings, itemsAllowed, displaySettingsIndex, unknownValue, npcPaletteId, new DataTable<MapSpriteObject>(spriteObjects), true);
                     headers.Add(header);
                 }
 

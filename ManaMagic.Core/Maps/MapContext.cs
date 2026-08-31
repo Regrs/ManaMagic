@@ -125,7 +125,9 @@ namespace ManaMagic.Core.Maps
                     layer2 = GetLayerPieces(objectTable.Layer2);
                 }
 
-                return new ManaMap(header, displaySettings, objectTable, background, foreground, layer1, layer2, tileset8x8, tileset16x16, collisionSet, triggerTable, paletteSet);
+                ManaMap map = new ManaMap(header, displaySettings, objectTable, background, foreground, layer1, layer2, tileset8x8, tileset16x16, collisionSet, triggerTable, paletteSet);
+                map.SetListeners(this.MapHeaderTable);
+                return map;
             }
 
             return new ManaMap(header, objectTable);

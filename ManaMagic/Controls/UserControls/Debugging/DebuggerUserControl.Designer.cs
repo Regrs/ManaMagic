@@ -41,13 +41,15 @@ namespace ManaMagic.Controls.UserControls.Debug
             this.debugPrintSpecialItem40Button = new System.Windows.Forms.Button();
             this.debugPrintSpecialItem20Button = new System.Windows.Forms.Button();
             this.debugPrintAnimationScriptCommandCountButton = new System.Windows.Forms.Button();
+            this.debugScanForDisplaySettingsByteBitsButton = new System.Windows.Forms.Button();
+            this.debugPrintMaxSpriteCountButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // debugScanForF8FFCommandsButton
             // 
             this.debugScanForF8FFCommandsButton.Location = new System.Drawing.Point(20, 193);
             this.debugScanForF8FFCommandsButton.Name = "debugScanForF8FFCommandsButton";
-            this.debugScanForF8FFCommandsButton.Size = new System.Drawing.Size(125, 23);
+            this.debugScanForF8FFCommandsButton.Size = new System.Drawing.Size(187, 23);
             this.debugScanForF8FFCommandsButton.TabIndex = 51;
             this.debugScanForF8FFCommandsButton.Text = "Scan For F8-FF";
             this.debugScanForF8FFCommandsButton.UseVisualStyleBackColor = true;
@@ -57,7 +59,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugMapUnknownByteButton.Location = new System.Drawing.Point(20, 164);
             this.debugMapUnknownByteButton.Name = "debugMapUnknownByteButton";
-            this.debugMapUnknownByteButton.Size = new System.Drawing.Size(125, 23);
+            this.debugMapUnknownByteButton.Size = new System.Drawing.Size(187, 23);
             this.debugMapUnknownByteButton.TabIndex = 50;
             this.debugMapUnknownByteButton.Text = "Map Unknown Byte";
             this.debugMapUnknownByteButton.UseVisualStyleBackColor = true;
@@ -67,7 +69,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugSpriteUnknownBitsButton.Location = new System.Drawing.Point(20, 135);
             this.debugSpriteUnknownBitsButton.Name = "debugSpriteUnknownBitsButton";
-            this.debugSpriteUnknownBitsButton.Size = new System.Drawing.Size(125, 23);
+            this.debugSpriteUnknownBitsButton.Size = new System.Drawing.Size(187, 23);
             this.debugSpriteUnknownBitsButton.TabIndex = 49;
             this.debugSpriteUnknownBitsButton.Text = "Sprite Unknown Bits";
             this.debugSpriteUnknownBitsButton.UseVisualStyleBackColor = true;
@@ -77,7 +79,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugLayerSettingsCountButton.Location = new System.Drawing.Point(20, 106);
             this.debugLayerSettingsCountButton.Name = "debugLayerSettingsCountButton";
-            this.debugLayerSettingsCountButton.Size = new System.Drawing.Size(125, 23);
+            this.debugLayerSettingsCountButton.Size = new System.Drawing.Size(187, 23);
             this.debugLayerSettingsCountButton.TabIndex = 48;
             this.debugLayerSettingsCountButton.Text = "Layer Settings Count";
             this.debugLayerSettingsCountButton.UseVisualStyleBackColor = true;
@@ -87,7 +89,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugPrintSpiteActionsButton.Location = new System.Drawing.Point(20, 77);
             this.debugPrintSpiteActionsButton.Name = "debugPrintSpiteActionsButton";
-            this.debugPrintSpiteActionsButton.Size = new System.Drawing.Size(125, 23);
+            this.debugPrintSpiteActionsButton.Size = new System.Drawing.Size(187, 23);
             this.debugPrintSpiteActionsButton.TabIndex = 47;
             this.debugPrintSpiteActionsButton.Text = "Print Sprite Actions";
             this.debugPrintSpiteActionsButton.UseVisualStyleBackColor = true;
@@ -97,7 +99,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugScanForTileIDButton.Location = new System.Drawing.Point(20, 48);
             this.debugScanForTileIDButton.Name = "debugScanForTileIDButton";
-            this.debugScanForTileIDButton.Size = new System.Drawing.Size(125, 23);
+            this.debugScanForTileIDButton.Size = new System.Drawing.Size(187, 23);
             this.debugScanForTileIDButton.TabIndex = 46;
             this.debugScanForTileIDButton.Text = "Scan For Tile ID";
             this.debugScanForTileIDButton.UseVisualStyleBackColor = true;
@@ -107,7 +109,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugDrawAllButton.Location = new System.Drawing.Point(20, 19);
             this.debugDrawAllButton.Name = "debugDrawAllButton";
-            this.debugDrawAllButton.Size = new System.Drawing.Size(125, 23);
+            this.debugDrawAllButton.Size = new System.Drawing.Size(187, 23);
             this.debugDrawAllButton.TabIndex = 45;
             this.debugDrawAllButton.Text = "Debug Draw All";
             this.debugDrawAllButton.UseVisualStyleBackColor = true;
@@ -137,7 +139,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugPrintSpecialItem40Button.Location = new System.Drawing.Point(20, 250);
             this.debugPrintSpecialItem40Button.Name = "debugPrintSpecialItem40Button";
-            this.debugPrintSpecialItem40Button.Size = new System.Drawing.Size(125, 23);
+            this.debugPrintSpecialItem40Button.Size = new System.Drawing.Size(187, 23);
             this.debugPrintSpecialItem40Button.TabIndex = 54;
             this.debugPrintSpecialItem40Button.Text = "PrintSpecialItem40";
             this.debugPrintSpecialItem40Button.UseVisualStyleBackColor = true;
@@ -147,7 +149,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             // 
             this.debugPrintSpecialItem20Button.Location = new System.Drawing.Point(20, 221);
             this.debugPrintSpecialItem20Button.Name = "debugPrintSpecialItem20Button";
-            this.debugPrintSpecialItem20Button.Size = new System.Drawing.Size(125, 23);
+            this.debugPrintSpecialItem20Button.Size = new System.Drawing.Size(187, 23);
             this.debugPrintSpecialItem20Button.TabIndex = 55;
             this.debugPrintSpecialItem20Button.Text = "PrintSpecialItem20";
             this.debugPrintSpecialItem20Button.UseVisualStyleBackColor = true;
@@ -163,10 +165,32 @@ namespace ManaMagic.Controls.UserControls.Debug
             this.debugPrintAnimationScriptCommandCountButton.UseVisualStyleBackColor = true;
             this.debugPrintAnimationScriptCommandCountButton.Click += new System.EventHandler(this.RunMapDebuggerButton_Click);
             // 
+            // debugScanForDisplaySettingsByteBitsButton
+            // 
+            this.debugScanForDisplaySettingsByteBitsButton.Location = new System.Drawing.Point(20, 279);
+            this.debugScanForDisplaySettingsByteBitsButton.Name = "debugScanForDisplaySettingsByteBitsButton";
+            this.debugScanForDisplaySettingsByteBitsButton.Size = new System.Drawing.Size(187, 23);
+            this.debugScanForDisplaySettingsByteBitsButton.TabIndex = 57;
+            this.debugScanForDisplaySettingsByteBitsButton.Text = "ScanForDisplaySettingsByteBits";
+            this.debugScanForDisplaySettingsByteBitsButton.UseVisualStyleBackColor = true;
+            this.debugScanForDisplaySettingsByteBitsButton.Click += new System.EventHandler(this.RunMapDebuggerButton_Click);
+            // 
+            // debugPrintMaxSpriteCountButton
+            // 
+            this.debugPrintMaxSpriteCountButton.Location = new System.Drawing.Point(20, 308);
+            this.debugPrintMaxSpriteCountButton.Name = "debugPrintMaxSpriteCountButton";
+            this.debugPrintMaxSpriteCountButton.Size = new System.Drawing.Size(187, 23);
+            this.debugPrintMaxSpriteCountButton.TabIndex = 58;
+            this.debugPrintMaxSpriteCountButton.Text = "PrintMaxSpriteCount";
+            this.debugPrintMaxSpriteCountButton.UseVisualStyleBackColor = true;
+            this.debugPrintMaxSpriteCountButton.Click += new System.EventHandler(this.RunMapDebuggerButton_Click);
+            // 
             // DebuggerUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.debugPrintMaxSpriteCountButton);
+            this.Controls.Add(this.debugScanForDisplaySettingsByteBitsButton);
             this.Controls.Add(this.debugPrintAnimationScriptCommandCountButton);
             this.Controls.Add(this.debugPrintSpecialItem20Button);
             this.Controls.Add(this.debugPrintSpecialItem40Button);
@@ -199,5 +223,7 @@ namespace ManaMagic.Controls.UserControls.Debug
         private System.Windows.Forms.Button debugPrintSpecialItem40Button;
         private System.Windows.Forms.Button debugPrintSpecialItem20Button;
         private System.Windows.Forms.Button debugPrintAnimationScriptCommandCountButton;
+        private System.Windows.Forms.Button debugScanForDisplaySettingsByteBitsButton;
+        private System.Windows.Forms.Button debugPrintMaxSpriteCountButton;
     }
 }

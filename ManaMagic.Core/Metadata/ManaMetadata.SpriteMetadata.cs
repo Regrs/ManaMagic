@@ -9,7 +9,7 @@ namespace ManaMagic.Core.Metadata
     /// </summary>
     public static partial class ManaMetadata
     {
-        private static readonly IReadOnlyDictionary<byte, string> SpriteNameStrings = new Dictionary<byte, string>()
+        public static readonly IReadOnlyDictionary<byte, string> SpriteNameStrings = new Dictionary<byte, string>()
         {
             { 0x00, "Rabite" },
             { 0x01, "Buzz Bee" },

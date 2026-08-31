@@ -1,5 +1,6 @@
 ﻿using System;
 using ManaMagic.Core.Sprites;
+using ZwellTech;
 using ZwellTech.SuperNintendo;
 using ZwellTech.SuperNintendo.Drawing;
 
@@ -7,11 +8,11 @@ using ZwellTech.SuperNintendo.Drawing;
 
 namespace ManaMagic.Core.Maps
 {
-    public sealed class ManaMap
+    public sealed record ManaMap
     {
         public static ManaMap Empty { get; } = new ManaMap(MapHeader.InvalidHeader, MapObjectTable.InvalidObjectTable);
 
-        public MapHeader Header { get; }
+        public MapHeader Header { get; private set; }
         public MapObjectTable ObjectTable { get; }
         public MapDisplaySettings DisplaySettings { get; } = MapDisplaySettings.Empty;
         public DataTable<SpritePalette> PaletteSet { get; } = DataTable<SpritePalette>.Empty;
@@ -59,6 +60,11 @@ namespace ManaMagic.Core.Maps
             this.Tileset8x8 = tileset8x8;
             this.Tileset16x16 = tileset16x16;
             this.TilesetCollision = tilesetCollision;
+        }
+
+        public void SetListeners(DataTable<MapHeader> headerTable)
+        {
+            headerTable.RowReplaced += this.HeaderTable_RowReplaced;
         }
 
         public SuperNintendoGraphics DrawCompleteMap()
@@ -117,12 +123,12 @@ namespace ManaMagic.Core.Maps
             return graphics;
         }
 
-        public SuperNintendoGraphics DrawMap(MapDrawingOptions options, SpriteContext spriteContext)
+        public SuperNintendoGraphics DrawMap(MapDrawingOptions options, SpriteContext spriteContext, int spriteHighlightIndex)
         {
-            return this.DrawMap(options, this.PaletteSet, spriteContext);
+            return this.DrawMap(options, this.PaletteSet, spriteContext, spriteHighlightIndex);
         }
 
-        public SuperNintendoGraphics DrawMap(MapDrawingOptions options, DataTable<SpritePalette> paletteSet, SpriteContext spriteContext)
+        public SuperNintendoGraphics DrawMap(MapDrawingOptions options, DataTable<SpritePalette> paletteSet, SpriteContext spriteContext, int spriteHighlightIndex)
         {
             byte maxWidth = Math.Max(this.Layer1Background.Width, this.Layer2Background.Width);
             byte maxHeight = Math.Max(this.Layer1Background.Height, this.Layer2Background.Height);
@@ -207,7 +213,11 @@ namespace ManaMagic.Core.Maps
             foreach (MapSpriteObject spriteObject in this.Header.ObjectTable)
             {
                 using SuperNintendoGraphics spriteGraphics = spriteContext.SpriteTilesets[spriteObject.SpriteIndex].DrawFrame(0);
-                graphics.Merge(spriteGraphics, spriteObject.Location.X * 16, spriteObject.Location.Y * 16);
+                if (spriteObject.Index == spriteHighlightIndex)
+                {
+                    spriteGraphics.DrawRectangle(Rgb555Color.Black, 0, 0, spriteGraphics.Size.Width - 1, spriteGraphics.Size.Height - 1);
+                }
+                graphics.Merge(spriteGraphics, (spriteObject.Location.X * 16) - (spriteGraphics.Size.Width / 2), (spriteObject.Location.Y * 16) - (spriteGraphics.Size.Height / 2));
             }
 
             return graphics;
@@ -262,6 +272,14 @@ namespace ManaMagic.Core.Maps
                 }
             }
             return graphics;
+        }
+
+        private void HeaderTable_RowReplaced(object? sender, RowReplacedEventArgs<MapHeader> e)
+        {
+            if (e.Index == this.Header.Index)
+            {
+                this.Header = e.NewItem;
+            }
         }
     }
 

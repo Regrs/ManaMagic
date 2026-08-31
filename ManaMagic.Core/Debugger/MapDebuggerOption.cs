@@ -13,5 +13,7 @@ namespace ManaMagic.Core.Debugger
         ScanForF8FFCommands,
         PrintSpecialItem20,
         PrintSpecialItem40,
+        ScanForDisplaySettingsByteBits,
+        PrintMaxSpriteCount,
     }
 }
