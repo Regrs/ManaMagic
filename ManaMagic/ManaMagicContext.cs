@@ -145,7 +145,7 @@ namespace ManaMagic
         }
 
         [Conditional("DEBUG")]
-        private static void DebugCounts()
+        internal static void DebugCounts()
         {
             ManaDebugger.RunDebugger(TextDebuggerOption.PrintLongestEventTextLine);
             ManaDebugger.RunDebugger(TextDebuggerOption.PrintMaxSizeForItemStrings);

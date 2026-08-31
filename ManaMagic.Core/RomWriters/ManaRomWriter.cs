@@ -102,7 +102,8 @@ namespace ManaMagic.Core.RomWriters
 
         private void WriteMapData(MapContext context)
         {
-            this.mapRomWriter.WriteMapDisplaySettingsTable(context);
+            this.mapRomWriter.WriteDisplaySettingsTable(context);
+            this.mapRomWriter.WriteHeaderTable(context);
 
             // Have to fix the RGB1555 issue before enabling this.
             //this.mapRomWriter.WritePaletteSetTable(context);
@@ -257,7 +258,7 @@ namespace ManaMagic.Core.RomWriters
             int downPointer = this.Position;
             this.WriteBytes(downRoutine);
 
-            // A massive pointer table contains all the routines used for buttons in FCMs.
+            // A massive pointer table contains all the routines used for buttons in FSMs.
             // The indexes for Up/Down need to be updated to the new routines. 
             // These buttons currently point to a generic "do nothing" routine.
             this.Seek(NamingDialogRomWriter.UpControllerPatchLocation);

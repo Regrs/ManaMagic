@@ -32,6 +32,8 @@ namespace ManaMagic.Controls.UserControls.Debug
             this.debugScanForF8FFCommandsButton.Tag = MapDebuggerOption.ScanForF8FFCommands;
             this.debugPrintSpecialItem20Button.Tag = MapDebuggerOption.PrintSpecialItem20;
             this.debugPrintSpecialItem40Button.Tag = MapDebuggerOption.PrintSpecialItem40;
+            this.debugScanForDisplaySettingsByteBitsButton.Tag = MapDebuggerOption.ScanForDisplaySettingsByteBits;
+            this.debugPrintMaxSpriteCountButton.Tag = MapDebuggerOption.PrintMaxSpriteCount;
 
             this.debugPrintDefinitionOffsetsButton.Tag = RingMenuDebuggerOption.PrintDefinitionOffsets;
             this.debugPrintWeaponDefinitionButton.Tag = RingMenuDebuggerOption.PrintWeaponDefinitions;

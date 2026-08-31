@@ -51,6 +51,12 @@ namespace ManaMagic.Core.Debugger
                 case MapDebuggerOption.PrintSpecialItem40:
                     MapDebugger.PrintSpecialItem40();
                     break;
+                case MapDebuggerOption.ScanForDisplaySettingsByteBits:
+                    MapDebugger.ScanForDisplaySettingsByteBits();
+                    break;
+                case MapDebuggerOption.PrintMaxSpriteCount:
+                    MapDebugger.PrintMaxSpriteCount();
+                    break;
                 default:
                     ThrowHelper.ThrowArgumentException("Unknown debugger option", nameof(option));
                     break;
@@ -78,7 +84,7 @@ namespace ManaMagic.Core.Debugger
                         {
                             if (map.IsValid)
                             {
-                                using SuperNintendoGraphics graphics = map.DrawMap(options, MapDebugger.Context.SpriteContext);
+                                using SuperNintendoGraphics graphics = map.DrawMap(options, MapDebugger.Context.SpriteContext, -1);
                                 continue;
                             }
 
@@ -267,9 +273,9 @@ namespace ManaMagic.Core.Debugger
             int index = 0;
             foreach (MapHeader header in MapDebugger.Context.MapContext.MapHeaderTable)
             {
-                if (header.IsValid && header.Unknown > 0)
+                if (header.IsValid && header.Unused > 0)
                 {
-                    LoggerEngine.Logger.LogDebug(LogComponent.Debug, $"[{index:X4}]: {header.Unknown:X2}");
+                    LoggerEngine.Logger.LogDebug(LogComponent.Debug, $"[{index:X4}]: {header.Unused:X2}");
                 }
                 index++;
             }
@@ -374,15 +380,60 @@ namespace ManaMagic.Core.Debugger
             {
                 if (header.IsValid)
                 {
-                    if (!header.SpecialItemsOptions.HasFlag(MapSpecialItemsOptions.Unknown20) && 
+                    if (!header.SpecialItemsOptions.HasFlag(MapSpecialItemsOptions.Dungeon) && 
                         //!header.SpecialItemsOptions.HasFlag(MapSpecialItemsOptions.MagicRopeAllowed) && 
                         header.IsCombatMap)
                     {
-                        LoggerEngine.Logger.LogDebug(LogComponent.General, $"[{index:X4}]: Has Special Item Flag: {MapSpecialItemsOptions.Unknown20}");
+                        LoggerEngine.Logger.LogDebug(LogComponent.General, $"[{index:X4}]: Has Special Item Flag: {MapSpecialItemsOptions.Dungeon}");
                     }
                 }
                 index++;
             }
+        }
+
+        [Conditional("DEBUG")]
+        private static void ScanForDisplaySettingsByteBits()
+        {
+            if (!MapDebugger.CanDebug)
+            {
+                ThrowHelper.ThrowInvalidOperationException("Map debugger has not been initialized.");
+                return;
+            }
+
+            int index = 0;
+            foreach (MapHeader header in MapDebugger.Context.MapContext.MapHeaderTable)
+            {
+                if (header.IsValid && header.UnknownDSBits > 0)
+                {
+                    LoggerEngine.Logger.LogDebug(LogComponent.Debug, $"[{index:X4}]: {header.UnknownDSBits}");
+                }
+                index++;
+            }
+            LoggerEngine.Logger.LogDebug(LogComponent.Debug, "Unknown Byte Scan Complete");
+        }
+
+        [Conditional("DEBUG")]
+        private static void PrintMaxSpriteCount()
+        {
+            if (!MapDebugger.CanDebug)
+            {
+                ThrowHelper.ThrowInvalidOperationException("Map debugger has not been initialized.");
+                return;
+            }
+
+            int index = 0;
+            int maxSprites = 0;
+            int mapId = 0;
+            foreach (MapHeader header in MapDebugger.Context.MapContext.MapHeaderTable)
+            {
+                if (header.IsValid)
+                {
+                    maxSprites = Math.Max(maxSprites, header.ObjectTable.RowCount);
+                    if (maxSprites == header.ObjectTable.RowCount) { mapId = index; }
+                }
+                index++;
+            }
+            LoggerEngine.Logger.LogDebug(LogComponent.Debug, $"Max sprites on a single map is {maxSprites}, on map {mapId:X4}.");
         }
     }
 }

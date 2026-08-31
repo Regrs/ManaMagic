@@ -123,7 +123,7 @@ namespace ManaMagic.Core.Sprites
             {
                 index = this.offsetLookup.Count;
                 this.Add(this.ReadTile(offset));
-                this.offsetLookup.Add(offset, this.offsetLookup.Count);
+                this.offsetLookup.Add(offset, index);
             }
 
             return this.Tiles[index];

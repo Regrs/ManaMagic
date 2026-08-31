@@ -43,6 +43,21 @@
     <Description value="0x00: Non-Combat Map.,0x80: Combat Map." />
   </Address>
   <!-- SKIP -->
+  <Address name="ROPE_DOOR_INDEX" offset="0108" size="16" type="System">
+    <Description value="Using the Magic Rope will execute the door index stored here." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="LAST_DOOR_INDEX" offset="010E" size="16" type="System">
+    <Description value="The index of the door used to enter the current map." />
+  </Address>
+  <!-- SKIP -->
+  <Address name="FLAG_PREV_MAP_SPECIAL_ITEMS_ALLOWED" offset="011E" size="8" type="System">
+    <Description value="" />
+  </Address>
+  <Address name="FLAG_SPECIAL_ITEMS_ALLOWED" offset="011F" size="8" type="System">
+    <Description value="" />
+  </Address>
+  <!-- SKIP -->
   <Address name="ADD_INVENTORY_ITEM_ID" offset="1820" size="8" type="RingMenu">
     <Description value="The ID of the item to be added to the players inventory." />
   </Address>
