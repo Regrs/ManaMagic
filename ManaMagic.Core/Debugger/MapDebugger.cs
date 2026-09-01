@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using ManaMagic.Core.Maps;
+using ManaMagic.Core.Metadata;
 using ZwellTech;
 using ZwellTech.Logging;
 using ZwellTech.SuperNintendo.Drawing;
@@ -228,13 +229,23 @@ namespace ManaMagic.Core.Debugger
             {
                 counts.Add(i, 0);
             }
+            ushort index = 0;
             foreach (MapHeader header in MapDebugger.Context.MapContext.MapHeaderTable)
             {
                 counts[header.LayerScrollSettingsIndex]++;
+                if (header.LayerScrollSettingsIndex == 0x0A ||
+                    header.LayerScrollSettingsIndex == 0x0B ||
+                    header.LayerScrollSettingsIndex == 0x11 ||
+                    header.LayerScrollSettingsIndex == 0x12 ||
+                    header.LayerScrollSettingsIndex == 0x13)
+                {
+                    ManaDebugger.DebugPrint($"{header.LayerScrollSettingsIndex:X2}: {ManaMetadata.GetMapFriendlyName(index)}");
+                }
+                index++;
             }
             foreach (KeyValuePair<int, int> kvp in counts)
             {
-                LoggerEngine.Logger.LogDebug(LogComponent.Debug, $"{kvp.Key:X2}: {kvp.Value}");
+                LoggerEngine.Logger.LogDebug(LogComponent.Debug, $"{ManaMetadata.LayerScrollNameStrings[(byte)kvp.Key]}: {kvp.Value}");
             }
         }
 

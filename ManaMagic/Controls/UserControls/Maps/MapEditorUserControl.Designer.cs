@@ -29,44 +29,44 @@ namespace ManaMagic.Controls.UserControls.Maps
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode21 = new System.Windows.Forms.TreeNode("Event Flag: 00");
-            System.Windows.Forms.TreeNode treeNode22 = new System.Windows.Forms.TreeNode("Event Flag Min: 00");
-            System.Windows.Forms.TreeNode treeNode23 = new System.Windows.Forms.TreeNode("Event Flag Max: 00");
-            System.Windows.Forms.TreeNode treeNode24 = new System.Windows.Forms.TreeNode("X-Coordinate: 00");
-            System.Windows.Forms.TreeNode treeNode25 = new System.Windows.Forms.TreeNode("Y-Coordinate: 00");
-            System.Windows.Forms.TreeNode treeNode26 = new System.Windows.Forms.TreeNode("Direction: 00");
-            System.Windows.Forms.TreeNode treeNode27 = new System.Windows.Forms.TreeNode("Event: 0000");
-            System.Windows.Forms.TreeNode treeNode28 = new System.Windows.Forms.TreeNode("Sprite ID: 00", new System.Windows.Forms.TreeNode[] {
-            treeNode21,
-            treeNode22,
-            treeNode23,
-            treeNode24,
-            treeNode25,
-            treeNode26,
-            treeNode27});
+            System.Windows.Forms.TreeNode treeNode41 = new System.Windows.Forms.TreeNode("Event Flag: 00");
+            System.Windows.Forms.TreeNode treeNode42 = new System.Windows.Forms.TreeNode("Event Flag Min: 00");
+            System.Windows.Forms.TreeNode treeNode43 = new System.Windows.Forms.TreeNode("Event Flag Max: 00");
+            System.Windows.Forms.TreeNode treeNode44 = new System.Windows.Forms.TreeNode("X-Coordinate: 00");
+            System.Windows.Forms.TreeNode treeNode45 = new System.Windows.Forms.TreeNode("Y-Coordinate: 00");
+            System.Windows.Forms.TreeNode treeNode46 = new System.Windows.Forms.TreeNode("Direction: 00");
+            System.Windows.Forms.TreeNode treeNode47 = new System.Windows.Forms.TreeNode("Event: 0000");
+            System.Windows.Forms.TreeNode treeNode48 = new System.Windows.Forms.TreeNode("Sprite ID: 00", new System.Windows.Forms.TreeNode[] {
+            treeNode41,
+            treeNode42,
+            treeNode43,
+            treeNode44,
+            treeNode45,
+            treeNode46,
+            treeNode47});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapEditorUserControl));
-            System.Windows.Forms.TreeNode treeNode29 = new System.Windows.Forms.TreeNode("Event Flag: 00");
-            System.Windows.Forms.TreeNode treeNode30 = new System.Windows.Forms.TreeNode("Event Flag Min: 00");
-            System.Windows.Forms.TreeNode treeNode31 = new System.Windows.Forms.TreeNode("Event Flag Max: 00");
-            System.Windows.Forms.TreeNode treeNode32 = new System.Windows.Forms.TreeNode("X-Coordinate: 00");
-            System.Windows.Forms.TreeNode treeNode33 = new System.Windows.Forms.TreeNode("Y-Coordinate: 00");
-            System.Windows.Forms.TreeNode treeNode34 = new System.Windows.Forms.TreeNode("Background Object: 0000", new System.Windows.Forms.TreeNode[] {
-            treeNode29,
-            treeNode30,
-            treeNode31,
-            treeNode32,
-            treeNode33});
-            System.Windows.Forms.TreeNode treeNode35 = new System.Windows.Forms.TreeNode("Event Flag: 00");
-            System.Windows.Forms.TreeNode treeNode36 = new System.Windows.Forms.TreeNode("Event Flag Min: 00");
-            System.Windows.Forms.TreeNode treeNode37 = new System.Windows.Forms.TreeNode("Event Flag Max: 00");
-            System.Windows.Forms.TreeNode treeNode38 = new System.Windows.Forms.TreeNode("X-Coordinate: 00");
-            System.Windows.Forms.TreeNode treeNode39 = new System.Windows.Forms.TreeNode("Y-Coordinate: 00");
-            System.Windows.Forms.TreeNode treeNode40 = new System.Windows.Forms.TreeNode("Background Object: 0000", new System.Windows.Forms.TreeNode[] {
-            treeNode35,
-            treeNode36,
-            treeNode37,
-            treeNode38,
-            treeNode39});
+            System.Windows.Forms.TreeNode treeNode49 = new System.Windows.Forms.TreeNode("Event Flag: 00");
+            System.Windows.Forms.TreeNode treeNode50 = new System.Windows.Forms.TreeNode("Event Flag Min: 00");
+            System.Windows.Forms.TreeNode treeNode51 = new System.Windows.Forms.TreeNode("Event Flag Max: 00");
+            System.Windows.Forms.TreeNode treeNode52 = new System.Windows.Forms.TreeNode("X-Coordinate: 00");
+            System.Windows.Forms.TreeNode treeNode53 = new System.Windows.Forms.TreeNode("Y-Coordinate: 00");
+            System.Windows.Forms.TreeNode treeNode54 = new System.Windows.Forms.TreeNode("Background Object: 0000", new System.Windows.Forms.TreeNode[] {
+            treeNode49,
+            treeNode50,
+            treeNode51,
+            treeNode52,
+            treeNode53});
+            System.Windows.Forms.TreeNode treeNode55 = new System.Windows.Forms.TreeNode("Event Flag: 00");
+            System.Windows.Forms.TreeNode treeNode56 = new System.Windows.Forms.TreeNode("Event Flag Min: 00");
+            System.Windows.Forms.TreeNode treeNode57 = new System.Windows.Forms.TreeNode("Event Flag Max: 00");
+            System.Windows.Forms.TreeNode treeNode58 = new System.Windows.Forms.TreeNode("X-Coordinate: 00");
+            System.Windows.Forms.TreeNode treeNode59 = new System.Windows.Forms.TreeNode("Y-Coordinate: 00");
+            System.Windows.Forms.TreeNode treeNode60 = new System.Windows.Forms.TreeNode("Background Object: 0000", new System.Windows.Forms.TreeNode[] {
+            treeNode55,
+            treeNode56,
+            treeNode57,
+            treeNode58,
+            treeNode59});
             this.mainMapSplitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.mapNameLabel = new System.Windows.Forms.Label();
@@ -89,33 +89,35 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.mapTabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.tileset8x8NumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.viewPaletteSetButton = new System.Windows.Forms.Button();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.isDungeonCheckBox = new System.Windows.Forms.CheckBox();
+            this.layerLoadModeCheckedListBox = new System.Windows.Forms.CheckedListBox();
+            this.specialItemOptionsCheckedListBox = new System.Windows.Forms.CheckedListBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.combatMapCheckBox = new System.Windows.Forms.CheckBox();
+            this.onEnterEventCheckBox = new System.Windows.Forms.CheckBox();
+            this.layerScrollComboBox = new System.Windows.Forms.ComboBox();
+            this.tileset16x16ComboBox = new System.Windows.Forms.ComboBox();
+            this.tileset8x8ComboBox = new System.Windows.Forms.ComboBox();
             this.onEnterGroupBox = new System.Windows.Forms.GroupBox();
             this.onEnterEventNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.onEnterEventLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.layerScrollSettingsNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
-            this.tileset16x16NumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.view16x16TilesetButton = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.view8x8TilesetButton = new System.Windows.Forms.Button();
             this.paletteSetNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.viewDisplaySettingsButton = new System.Windows.Forms.Button();
             this.eventOptionsCheckedListBox = new System.Windows.Forms.CheckedListBox();
-            this.label10 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.combatMapCheckBox = new System.Windows.Forms.CheckBox();
-            this.specialItemOptionsCheckedListBox = new System.Windows.Forms.CheckedListBox();
-            this.layerLoadModeCheckedListBox = new System.Windows.Forms.CheckedListBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.npcPaletteSetNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.displaySettingsNumericUpDown = new System.Windows.Forms.NumericUpDown();
-            this.unknownNumericUpDown = new System.Windows.Forms.NumericUpDown();
-            this.label8 = new System.Windows.Forms.Label();
             this.spriteObjectTabPage = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.spriteObjectTreeView = new ZwellTech.Windows.Forms.ZwellTreeView();
@@ -180,15 +182,12 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.mapTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tileset8x8NumericUpDown)).BeginInit();
+            this.groupBox5.SuspendLayout();
             this.onEnterGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.onEnterEventNumericUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.layerScrollSettingsNumericUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tileset16x16NumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.paletteSetNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.npcPaletteSetNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.displaySettingsNumericUpDown)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.unknownNumericUpDown)).BeginInit();
             this.spriteObjectTabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
@@ -499,59 +498,179 @@ namespace ManaMagic.Controls.UserControls.Maps
             // panel1
             // 
             this.panel1.AutoScroll = true;
-            this.panel1.Controls.Add(this.tileset8x8NumericUpDown);
+            this.panel1.Controls.Add(this.viewPaletteSetButton);
+            this.panel1.Controls.Add(this.groupBox5);
+            this.panel1.Controls.Add(this.onEnterEventCheckBox);
+            this.panel1.Controls.Add(this.layerScrollComboBox);
+            this.panel1.Controls.Add(this.tileset16x16ComboBox);
+            this.panel1.Controls.Add(this.tileset8x8ComboBox);
             this.panel1.Controls.Add(this.onEnterGroupBox);
             this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.layerScrollSettingsNumericUpDown);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label11);
-            this.panel1.Controls.Add(this.tileset16x16NumericUpDown);
             this.panel1.Controls.Add(this.view16x16TilesetButton);
             this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.view8x8TilesetButton);
             this.panel1.Controls.Add(this.paletteSetNumericUpDown);
             this.panel1.Controls.Add(this.viewDisplaySettingsButton);
             this.panel1.Controls.Add(this.eventOptionsCheckedListBox);
-            this.panel1.Controls.Add(this.label10);
             this.panel1.Controls.Add(this.label5);
-            this.panel1.Controls.Add(this.combatMapCheckBox);
-            this.panel1.Controls.Add(this.specialItemOptionsCheckedListBox);
-            this.panel1.Controls.Add(this.layerLoadModeCheckedListBox);
-            this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.npcPaletteSetNumericUpDown);
             this.panel1.Controls.Add(this.label7);
             this.panel1.Controls.Add(this.label9);
             this.panel1.Controls.Add(this.displaySettingsNumericUpDown);
-            this.panel1.Controls.Add(this.unknownNumericUpDown);
-            this.panel1.Controls.Add(this.label8);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(489, 835);
             this.panel1.TabIndex = 41;
             // 
-            // tileset8x8NumericUpDown
+            // viewPaletteSetButton
             // 
-            this.tileset8x8NumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tileset8x8NumericUpDown.Hexadecimal = true;
-            this.tileset8x8NumericUpDown.Location = new System.Drawing.Point(359, 12);
-            this.tileset8x8NumericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.tileset8x8NumericUpDown.Name = "tileset8x8NumericUpDown";
-            this.tileset8x8NumericUpDown.Size = new System.Drawing.Size(76, 23);
-            this.tileset8x8NumericUpDown.TabIndex = 20;
+            this.viewPaletteSetButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.viewPaletteSetButton.Location = new System.Drawing.Point(440, 128);
+            this.viewPaletteSetButton.Name = "viewPaletteSetButton";
+            this.viewPaletteSetButton.Size = new System.Drawing.Size(42, 23);
+            this.viewPaletteSetButton.TabIndex = 124;
+            this.viewPaletteSetButton.Text = "View";
+            this.viewPaletteSetButton.UseVisualStyleBackColor = true;
+            this.viewPaletteSetButton.Click += new System.EventHandler(this.ViewPaletteSetButton_Click);
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox5.Controls.Add(this.label6);
+            this.groupBox5.Controls.Add(this.isDungeonCheckBox);
+            this.groupBox5.Controls.Add(this.layerLoadModeCheckedListBox);
+            this.groupBox5.Controls.Add(this.specialItemOptionsCheckedListBox);
+            this.groupBox5.Controls.Add(this.label10);
+            this.groupBox5.Controls.Add(this.combatMapCheckBox);
+            this.groupBox5.Location = new System.Drawing.Point(155, 186);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(280, 148);
+            this.groupBox5.TabIndex = 123;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Map Settings";
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
+            this.label6.Location = new System.Drawing.Point(11, 18);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(116, 15);
+            this.label6.TabIndex = 28;
+            this.label6.Text = "Special Item Options";
+            // 
+            // isDungeonCheckBox
+            // 
+            this.isDungeonCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.isDungeonCheckBox.AutoSize = true;
+            this.isDungeonCheckBox.Location = new System.Drawing.Point(179, 61);
+            this.isDungeonCheckBox.Name = "isDungeonCheckBox";
+            this.isDungeonCheckBox.Size = new System.Drawing.Size(75, 19);
+            this.isDungeonCheckBox.TabIndex = 122;
+            this.isDungeonCheckBox.Text = "Dungeon";
+            this.isDungeonCheckBox.UseVisualStyleBackColor = true;
+            this.isDungeonCheckBox.CheckedChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
+            // 
+            // layerLoadModeCheckedListBox
+            // 
+            this.layerLoadModeCheckedListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.layerLoadModeCheckedListBox.FormattingEnabled = true;
+            this.layerLoadModeCheckedListBox.Location = new System.Drawing.Point(11, 97);
+            this.layerLoadModeCheckedListBox.Name = "layerLoadModeCheckedListBox";
+            this.layerLoadModeCheckedListBox.Size = new System.Drawing.Size(162, 40);
+            this.layerLoadModeCheckedListBox.TabIndex = 29;
+            this.layerLoadModeCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.LayerLoadModeOptionsCheckedListBox_ItemCheck);
+            // 
+            // specialItemOptionsCheckedListBox
+            // 
+            this.specialItemOptionsCheckedListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.specialItemOptionsCheckedListBox.FormattingEnabled = true;
+            this.specialItemOptionsCheckedListBox.Location = new System.Drawing.Point(11, 36);
+            this.specialItemOptionsCheckedListBox.Name = "specialItemOptionsCheckedListBox";
+            this.specialItemOptionsCheckedListBox.Size = new System.Drawing.Size(162, 40);
+            this.specialItemOptionsCheckedListBox.TabIndex = 27;
+            this.specialItemOptionsCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.SpecialItemsOptionsCheckedListBox_ItemCheck);
+            // 
+            // label10
+            // 
+            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
+            this.label10.Location = new System.Drawing.Point(11, 79);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(98, 15);
+            this.label10.TabIndex = 30;
+            this.label10.Text = "Layer Load Mode";
+            // 
+            // combatMapCheckBox
+            // 
+            this.combatMapCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.combatMapCheckBox.AutoSize = true;
+            this.combatMapCheckBox.Location = new System.Drawing.Point(179, 36);
+            this.combatMapCheckBox.Name = "combatMapCheckBox";
+            this.combatMapCheckBox.Size = new System.Drawing.Size(96, 19);
+            this.combatMapCheckBox.TabIndex = 20;
+            this.combatMapCheckBox.Text = "Combat Map";
+            this.combatMapCheckBox.UseVisualStyleBackColor = true;
+            this.combatMapCheckBox.CheckedChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
+            // 
+            // onEnterEventCheckBox
+            // 
+            this.onEnterEventCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.onEnterEventCheckBox.AutoSize = true;
+            this.onEnterEventCheckBox.Location = new System.Drawing.Point(149, 341);
+            this.onEnterEventCheckBox.Name = "onEnterEventCheckBox";
+            this.onEnterEventCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.onEnterEventCheckBox.TabIndex = 120;
+            this.onEnterEventCheckBox.UseVisualStyleBackColor = true;
+            this.onEnterEventCheckBox.CheckedChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
+            // 
+            // layerScrollComboBox
+            // 
+            this.layerScrollComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.layerScrollComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.layerScrollComboBox.FormattingEnabled = true;
+            this.layerScrollComboBox.Location = new System.Drawing.Point(243, 70);
+            this.layerScrollComboBox.Name = "layerScrollComboBox";
+            this.layerScrollComboBox.Size = new System.Drawing.Size(192, 23);
+            this.layerScrollComboBox.TabIndex = 119;
+            this.layerScrollComboBox.SelectedIndexChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
+            // 
+            // tileset16x16ComboBox
+            // 
+            this.tileset16x16ComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tileset16x16ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tileset16x16ComboBox.FormattingEnabled = true;
+            this.tileset16x16ComboBox.Location = new System.Drawing.Point(243, 41);
+            this.tileset16x16ComboBox.Name = "tileset16x16ComboBox";
+            this.tileset16x16ComboBox.Size = new System.Drawing.Size(192, 23);
+            this.tileset16x16ComboBox.TabIndex = 118;
+            this.tileset16x16ComboBox.SelectedIndexChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
+            // 
+            // tileset8x8ComboBox
+            // 
+            this.tileset8x8ComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tileset8x8ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tileset8x8ComboBox.FormattingEnabled = true;
+            this.tileset8x8ComboBox.Location = new System.Drawing.Point(243, 12);
+            this.tileset8x8ComboBox.Name = "tileset8x8ComboBox";
+            this.tileset8x8ComboBox.Size = new System.Drawing.Size(192, 23);
+            this.tileset8x8ComboBox.TabIndex = 117;
+            this.tileset8x8ComboBox.SelectedIndexChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
             // 
             // onEnterGroupBox
             // 
             this.onEnterGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.onEnterGroupBox.Controls.Add(this.onEnterEventNumericUpDown);
             this.onEnterGroupBox.Controls.Add(this.onEnterEventLabel);
-            this.onEnterGroupBox.Location = new System.Drawing.Point(240, 240);
+            this.onEnterGroupBox.Enabled = false;
+            this.onEnterGroupBox.Location = new System.Drawing.Point(155, 340);
             this.onEnterGroupBox.Name = "onEnterGroupBox";
-            this.onEnterGroupBox.Size = new System.Drawing.Size(242, 73);
+            this.onEnterGroupBox.Size = new System.Drawing.Size(280, 73);
             this.onEnterGroupBox.TabIndex = 40;
             this.onEnterGroupBox.TabStop = false;
             this.onEnterGroupBox.Text = "On Enter Event";
@@ -559,15 +678,16 @@ namespace ManaMagic.Controls.UserControls.Maps
             // onEnterEventNumericUpDown
             // 
             this.onEnterEventNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.onEnterEventNumericUpDown.Enabled = false;
             this.onEnterEventNumericUpDown.Hexadecimal = true;
-            this.onEnterEventNumericUpDown.Location = new System.Drawing.Point(6, 39);
+            this.onEnterEventNumericUpDown.Location = new System.Drawing.Point(11, 39);
             this.onEnterEventNumericUpDown.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
             this.onEnterEventNumericUpDown.Name = "onEnterEventNumericUpDown";
-            this.onEnterEventNumericUpDown.Size = new System.Drawing.Size(230, 23);
+            this.onEnterEventNumericUpDown.Size = new System.Drawing.Size(263, 23);
             this.onEnterEventNumericUpDown.TabIndex = 34;
             // 
             // onEnterEventLabel
@@ -575,7 +695,7 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.onEnterEventLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.onEnterEventLabel.AutoSize = true;
             this.onEnterEventLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
-            this.onEnterEventLabel.Location = new System.Drawing.Point(6, 21);
+            this.onEnterEventLabel.Location = new System.Drawing.Point(12, 21);
             this.onEnterEventLabel.Name = "onEnterEventLabel";
             this.onEnterEventLabel.Size = new System.Drawing.Size(31, 15);
             this.onEnterEventLabel.TabIndex = 33;
@@ -585,31 +705,17 @@ namespace ManaMagic.Controls.UserControls.Maps
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(291, 17);
+            this.label2.Location = new System.Drawing.Point(173, 16);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(64, 15);
             this.label2.TabIndex = 19;
             this.label2.Text = "8x8 Tileset:";
             // 
-            // layerScrollSettingsNumericUpDown
-            // 
-            this.layerScrollSettingsNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.layerScrollSettingsNumericUpDown.Hexadecimal = true;
-            this.layerScrollSettingsNumericUpDown.Location = new System.Drawing.Point(359, 128);
-            this.layerScrollSettingsNumericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.layerScrollSettingsNumericUpDown.Name = "layerScrollSettingsNumericUpDown";
-            this.layerScrollSettingsNumericUpDown.Size = new System.Drawing.Size(76, 23);
-            this.layerScrollSettingsNumericUpDown.TabIndex = 39;
-            // 
             // label3
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(279, 45);
+            this.label3.Location = new System.Drawing.Point(161, 44);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(76, 15);
             this.label3.TabIndex = 21;
@@ -619,25 +725,11 @@ namespace ManaMagic.Controls.UserControls.Maps
             // 
             this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(240, 132);
+            this.label11.Location = new System.Drawing.Point(167, 73);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(115, 15);
+            this.label11.Size = new System.Drawing.Size(70, 15);
             this.label11.TabIndex = 38;
-            this.label11.Text = "Layer Scroll Settings:";
-            // 
-            // tileset16x16NumericUpDown
-            // 
-            this.tileset16x16NumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tileset16x16NumericUpDown.Hexadecimal = true;
-            this.tileset16x16NumericUpDown.Location = new System.Drawing.Point(359, 41);
-            this.tileset16x16NumericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.tileset16x16NumericUpDown.Name = "tileset16x16NumericUpDown";
-            this.tileset16x16NumericUpDown.Size = new System.Drawing.Size(76, 23);
-            this.tileset16x16NumericUpDown.TabIndex = 22;
+            this.label11.Text = "Layer Scroll:";
             // 
             // view16x16TilesetButton
             // 
@@ -654,7 +746,7 @@ namespace ManaMagic.Controls.UserControls.Maps
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(290, 74);
+            this.label4.Location = new System.Drawing.Point(290, 132);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(65, 15);
             this.label4.TabIndex = 23;
@@ -675,7 +767,7 @@ namespace ManaMagic.Controls.UserControls.Maps
             // 
             this.paletteSetNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.paletteSetNumericUpDown.Hexadecimal = true;
-            this.paletteSetNumericUpDown.Location = new System.Drawing.Point(359, 70);
+            this.paletteSetNumericUpDown.Location = new System.Drawing.Point(359, 128);
             this.paletteSetNumericUpDown.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -684,6 +776,7 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.paletteSetNumericUpDown.Name = "paletteSetNumericUpDown";
             this.paletteSetNumericUpDown.Size = new System.Drawing.Size(76, 23);
             this.paletteSetNumericUpDown.TabIndex = 24;
+            this.paletteSetNumericUpDown.ValueChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
             // 
             // viewDisplaySettingsButton
             // 
@@ -700,79 +793,29 @@ namespace ManaMagic.Controls.UserControls.Maps
             // 
             this.eventOptionsCheckedListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.eventOptionsCheckedListBox.FormattingEnabled = true;
-            this.eventOptionsCheckedListBox.Location = new System.Drawing.Point(240, 343);
+            this.eventOptionsCheckedListBox.Location = new System.Drawing.Point(155, 434);
             this.eventOptionsCheckedListBox.Name = "eventOptionsCheckedListBox";
-            this.eventOptionsCheckedListBox.Size = new System.Drawing.Size(242, 148);
+            this.eventOptionsCheckedListBox.Size = new System.Drawing.Size(280, 130);
             this.eventOptionsCheckedListBox.TabIndex = 25;
-            // 
-            // label10
-            // 
-            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
-            this.label10.Location = new System.Drawing.Point(240, 579);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(98, 15);
-            this.label10.TabIndex = 30;
-            this.label10.Text = "Layer Load Mode";
+            this.eventOptionsCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.EventOptionsCheckedListBox_ItemCheck);
             // 
             // label5
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
-            this.label5.Location = new System.Drawing.Point(240, 325);
+            this.label5.Location = new System.Drawing.Point(155, 416);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(81, 15);
             this.label5.TabIndex = 26;
             this.label5.Text = "Event Options";
             // 
-            // combatMapCheckBox
-            // 
-            this.combatMapCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.combatMapCheckBox.AutoSize = true;
-            this.combatMapCheckBox.Enabled = false;
-            this.combatMapCheckBox.Location = new System.Drawing.Point(339, 215);
-            this.combatMapCheckBox.Name = "combatMapCheckBox";
-            this.combatMapCheckBox.Size = new System.Drawing.Size(96, 19);
-            this.combatMapCheckBox.TabIndex = 20;
-            this.combatMapCheckBox.Text = "Combat Map";
-            this.combatMapCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // specialItemOptionsCheckedListBox
-            // 
-            this.specialItemOptionsCheckedListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.specialItemOptionsCheckedListBox.FormattingEnabled = true;
-            this.specialItemOptionsCheckedListBox.Location = new System.Drawing.Point(240, 513);
-            this.specialItemOptionsCheckedListBox.Name = "specialItemOptionsCheckedListBox";
-            this.specialItemOptionsCheckedListBox.Size = new System.Drawing.Size(242, 58);
-            this.specialItemOptionsCheckedListBox.TabIndex = 27;
-            // 
-            // layerLoadModeCheckedListBox
-            // 
-            this.layerLoadModeCheckedListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.layerLoadModeCheckedListBox.FormattingEnabled = true;
-            this.layerLoadModeCheckedListBox.Location = new System.Drawing.Point(240, 597);
-            this.layerLoadModeCheckedListBox.Name = "layerLoadModeCheckedListBox";
-            this.layerLoadModeCheckedListBox.Size = new System.Drawing.Size(242, 40);
-            this.layerLoadModeCheckedListBox.TabIndex = 29;
-            // 
-            // label6
-            // 
-            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point);
-            this.label6.Location = new System.Drawing.Point(240, 495);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(116, 15);
-            this.label6.TabIndex = 28;
-            this.label6.Text = "Special Item Options";
-            // 
             // npcPaletteSetNumericUpDown
             // 
             this.npcPaletteSetNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.npcPaletteSetNumericUpDown.Enabled = false;
             this.npcPaletteSetNumericUpDown.Hexadecimal = true;
-            this.npcPaletteSetNumericUpDown.Location = new System.Drawing.Point(359, 186);
+            this.npcPaletteSetNumericUpDown.Location = new System.Drawing.Point(359, 157);
             this.npcPaletteSetNumericUpDown.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -781,6 +824,7 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.npcPaletteSetNumericUpDown.Name = "npcPaletteSetNumericUpDown";
             this.npcPaletteSetNumericUpDown.Size = new System.Drawing.Size(76, 23);
             this.npcPaletteSetNumericUpDown.TabIndex = 34;
+            this.npcPaletteSetNumericUpDown.ValueChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
             // 
             // label7
             // 
@@ -796,7 +840,7 @@ namespace ManaMagic.Controls.UserControls.Maps
             // 
             this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(263, 190);
+            this.label9.Location = new System.Drawing.Point(263, 161);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(92, 15);
             this.label9.TabIndex = 33;
@@ -815,30 +859,7 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.displaySettingsNumericUpDown.Name = "displaySettingsNumericUpDown";
             this.displaySettingsNumericUpDown.Size = new System.Drawing.Size(76, 23);
             this.displaySettingsNumericUpDown.TabIndex = 30;
-            // 
-            // unknownNumericUpDown
-            // 
-            this.unknownNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.unknownNumericUpDown.Hexadecimal = true;
-            this.unknownNumericUpDown.Location = new System.Drawing.Point(359, 157);
-            this.unknownNumericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.unknownNumericUpDown.Name = "unknownNumericUpDown";
-            this.unknownNumericUpDown.Size = new System.Drawing.Size(76, 23);
-            this.unknownNumericUpDown.TabIndex = 32;
-            // 
-            // label8
-            // 
-            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(294, 161);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(61, 15);
-            this.label8.TabIndex = 31;
-            this.label8.Text = "Unknown:";
+            this.displaySettingsNumericUpDown.ValueChanged += new System.EventHandler(this.MapHeaderControl_ValueChanged);
             // 
             // spriteObjectTabPage
             // 
@@ -877,24 +898,24 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.spriteObjectTreeView.FadeEffects = false;
             this.spriteObjectTreeView.Location = new System.Drawing.Point(0, 0);
             this.spriteObjectTreeView.Name = "spriteObjectTreeView";
-            treeNode21.Name = "Node1";
-            treeNode21.Text = "Event Flag: 00";
-            treeNode22.Name = "Node2";
-            treeNode22.Text = "Event Flag Min: 00";
-            treeNode23.Name = "Node3";
-            treeNode23.Text = "Event Flag Max: 00";
-            treeNode24.Name = "Node4";
-            treeNode24.Text = "X-Coordinate: 00";
-            treeNode25.Name = "Node5";
-            treeNode25.Text = "Y-Coordinate: 00";
-            treeNode26.Name = "Node6";
-            treeNode26.Text = "Direction: 00";
-            treeNode27.Name = "Node7";
-            treeNode27.Text = "Event: 0000";
-            treeNode28.Name = "Node0";
-            treeNode28.Text = "Sprite ID: 00";
+            treeNode41.Name = "Node1";
+            treeNode41.Text = "Event Flag: 00";
+            treeNode42.Name = "Node2";
+            treeNode42.Text = "Event Flag Min: 00";
+            treeNode43.Name = "Node3";
+            treeNode43.Text = "Event Flag Max: 00";
+            treeNode44.Name = "Node4";
+            treeNode44.Text = "X-Coordinate: 00";
+            treeNode45.Name = "Node5";
+            treeNode45.Text = "Y-Coordinate: 00";
+            treeNode46.Name = "Node6";
+            treeNode46.Text = "Direction: 00";
+            treeNode47.Name = "Node7";
+            treeNode47.Text = "Event: 0000";
+            treeNode48.Name = "Node0";
+            treeNode48.Text = "Sprite ID: 00";
             this.spriteObjectTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode28});
+            treeNode48});
             this.spriteObjectTreeView.Size = new System.Drawing.Size(489, 345);
             this.spriteObjectTreeView.TabIndex = 0;
             this.spriteObjectTreeView.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.TreeView_BeforeLabelEdit);
@@ -1272,20 +1293,20 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.layer1ObjectsTreeView.FadeEffects = false;
             this.layer1ObjectsTreeView.Location = new System.Drawing.Point(3, 3);
             this.layer1ObjectsTreeView.Name = "layer1ObjectsTreeView";
-            treeNode29.Name = "Node1";
-            treeNode29.Text = "Event Flag: 00";
-            treeNode30.Name = "Node2";
-            treeNode30.Text = "Event Flag Min: 00";
-            treeNode31.Name = "Node3";
-            treeNode31.Text = "Event Flag Max: 00";
-            treeNode32.Name = "Node4";
-            treeNode32.Text = "X-Coordinate: 00";
-            treeNode33.Name = "Node5";
-            treeNode33.Text = "Y-Coordinate: 00";
-            treeNode34.Name = "Node0";
-            treeNode34.Text = "Background Object: 0000";
+            treeNode49.Name = "Node1";
+            treeNode49.Text = "Event Flag: 00";
+            treeNode50.Name = "Node2";
+            treeNode50.Text = "Event Flag Min: 00";
+            treeNode51.Name = "Node3";
+            treeNode51.Text = "Event Flag Max: 00";
+            treeNode52.Name = "Node4";
+            treeNode52.Text = "X-Coordinate: 00";
+            treeNode53.Name = "Node5";
+            treeNode53.Text = "Y-Coordinate: 00";
+            treeNode54.Name = "Node0";
+            treeNode54.Text = "Background Object: 0000";
             this.layer1ObjectsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode34});
+            treeNode54});
             this.layer1ObjectsTreeView.Size = new System.Drawing.Size(489, 835);
             this.layer1ObjectsTreeView.TabIndex = 1;
             // 
@@ -1308,20 +1329,20 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.layer2ObjectsTreeView.FadeEffects = false;
             this.layer2ObjectsTreeView.Location = new System.Drawing.Point(3, 3);
             this.layer2ObjectsTreeView.Name = "layer2ObjectsTreeView";
-            treeNode35.Name = "Node1";
-            treeNode35.Text = "Event Flag: 00";
-            treeNode36.Name = "Node2";
-            treeNode36.Text = "Event Flag Min: 00";
-            treeNode37.Name = "Node3";
-            treeNode37.Text = "Event Flag Max: 00";
-            treeNode38.Name = "Node4";
-            treeNode38.Text = "X-Coordinate: 00";
-            treeNode39.Name = "Node5";
-            treeNode39.Text = "Y-Coordinate: 00";
-            treeNode40.Name = "Node0";
-            treeNode40.Text = "Background Object: 0000";
+            treeNode55.Name = "Node1";
+            treeNode55.Text = "Event Flag: 00";
+            treeNode56.Name = "Node2";
+            treeNode56.Text = "Event Flag Min: 00";
+            treeNode57.Name = "Node3";
+            treeNode57.Text = "Event Flag Max: 00";
+            treeNode58.Name = "Node4";
+            treeNode58.Text = "X-Coordinate: 00";
+            treeNode59.Name = "Node5";
+            treeNode59.Text = "Y-Coordinate: 00";
+            treeNode60.Name = "Node0";
+            treeNode60.Text = "Background Object: 0000";
             this.layer2ObjectsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode40});
+            treeNode60});
             this.layer2ObjectsTreeView.Size = new System.Drawing.Size(489, 835);
             this.layer2ObjectsTreeView.TabIndex = 2;
             // 
@@ -1481,16 +1502,14 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.tabPage1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tileset8x8NumericUpDown)).EndInit();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.onEnterGroupBox.ResumeLayout(false);
             this.onEnterGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.onEnterEventNumericUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.layerScrollSettingsNumericUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tileset16x16NumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.paletteSetNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.npcPaletteSetNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.displaySettingsNumericUpDown)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.unknownNumericUpDown)).EndInit();
             this.spriteObjectTabPage.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
@@ -1529,9 +1548,7 @@ namespace ManaMagic.Controls.UserControls.Maps
         private System.Windows.Forms.TabControl mapTabControl;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage spriteObjectTabPage;
-        private System.Windows.Forms.NumericUpDown tileset16x16NumericUpDown;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown tileset8x8NumericUpDown;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox forceDrawCheckBox;
         private System.Windows.Forms.NumericUpDown paletteSetNumericUpDown;
@@ -1542,8 +1559,6 @@ namespace ManaMagic.Controls.UserControls.Maps
         private System.Windows.Forms.CheckedListBox specialItemOptionsCheckedListBox;
         private System.Windows.Forms.NumericUpDown displaySettingsNumericUpDown;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.NumericUpDown unknownNumericUpDown;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.NumericUpDown npcPaletteSetNumericUpDown;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.CheckBox combatMapCheckBox;
@@ -1577,7 +1592,6 @@ namespace ManaMagic.Controls.UserControls.Maps
         private System.Windows.Forms.ColumnHeader TriggerTypeColumn;
         private System.Windows.Forms.ColumnHeader TriggerTypeIndexColumn;
         private System.Windows.Forms.Label mapNameLabel;
-        private System.Windows.Forms.NumericUpDown layerScrollSettingsNumericUpDown;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button debugPrintSpiteActionsButton;
         private System.Windows.Forms.Button debugLayerSettingsCountButton;
@@ -1620,5 +1634,12 @@ namespace ManaMagic.Controls.UserControls.Maps
         private System.Windows.Forms.Button spriteMoveDownButton;
         private System.Windows.Forms.Button spriteMoveUpButton;
         private System.Windows.Forms.ComboBox spriteIndexComboBox;
+        private System.Windows.Forms.ComboBox tileset8x8ComboBox;
+        private System.Windows.Forms.ComboBox tileset16x16ComboBox;
+        private System.Windows.Forms.ComboBox layerScrollComboBox;
+        private System.Windows.Forms.CheckBox onEnterEventCheckBox;
+        private System.Windows.Forms.CheckBox isDungeonCheckBox;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.Button viewPaletteSetButton;
     }
 }

@@ -9,7 +9,7 @@ using ZwellTech.Windows.Forms;
 
 namespace ManaMagic.Controls.UserControls.Maps
 {
-    public partial class MapPaletteEditorUserControl : UserControl
+    public partial class MapPaletteEditorUserControl : UserControl, IManaControl
     {
         private DataTable<SpritePalette>? paletteSet;
         private bool ignoreEvents = false;
@@ -32,6 +32,11 @@ namespace ManaMagic.Controls.UserControls.Maps
             // Can't edit these until the RGB1555 issue is resolved.
             this.DisablePaletteEditing();
             this.ignoreEvents = false;
+        }
+
+        public void SetIndex(int index)
+        {
+            this.indexNumericUpDown.Value = index;
         }
 
         protected override CreateParams CreateParams
