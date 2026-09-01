@@ -10,7 +10,7 @@ namespace ManaMagic.Core.Metadata
         /// <summary>
         /// Gets the index of the tileset.
         /// </summary>
-        public int Index { get; init; }
+        public byte Index { get; init; }
 
         /// <summary>
         /// Gets the name of the tileset.
@@ -45,7 +45,7 @@ namespace ManaMagic.Core.Metadata
         /// <param name="defaultPaletteIndex">The default palette index of the tileset.</param>
         /// <param name="defaultPaletteSet">The default palette set of the tileset.</param>
         /// <param name="flags">The metadata flags for the tileset.</param>
-        public MapTilesetMetadata(int index, string name, byte defaultPaletteSet, byte defaultPaletteIndex, MapTilesetMetadataFlags flags)
+        public MapTilesetMetadata(byte index, string name, byte defaultPaletteSet, byte defaultPaletteIndex, MapTilesetMetadataFlags flags)
         {
             this.Index = index;
             this.Name = name;

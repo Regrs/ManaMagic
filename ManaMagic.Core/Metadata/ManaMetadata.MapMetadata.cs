@@ -672,5 +672,83 @@ namespace ManaMagic.Core.Metadata
             new MapTilesetMetadata(0x3F, "Invalid (Dummied Out)",      0x00, 0x00, MapTilesetMetadataFlags.DummiedOut),
             new MapTilesetMetadata(0x40, "Invalid (Dummied Out)",      0x00, 0x00, MapTilesetMetadataFlags.DummiedOut),
         });
+
+        public static IReadOnlyDictionary<byte, string> Map16x16TilesetNameStrings { get; } = new Dictionary<byte, string>()
+        {
+            { 0x00, "Town Exterior" },
+            { 0x01, "Plains Exterior" },
+            { 0x02, "Forest Exterior" },
+            { 0x03, "Desert Exterior" },
+            { 0x04, "House Interior" },
+            { 0x05, "Sprite Village Exterior" },
+            { 0x06, "Grassy Interior" },
+            { 0x07, "Haunted Forest" },
+            { 0x08, "Ruins Exterior" },
+            { 0x09, "Ruins Interior" },
+            { 0x0A, "Cave Interior" },
+            { 0x0B, "Pure Land Overlook" },
+            { 0x0C, "Mountain Exterior" },
+            { 0x0D, "Snowy Plains Exterior" },
+            { 0x0E, "Snowy Palace Exterior" },
+            { 0x0F, "Castle Interior" },
+            { 0x10, "Matango Exterior" },
+            { 0x11, "Pure Land Arch Exterior" },
+            { 0x12, "Ship Exterior" },
+            { 0x13, "Ship Interior" },
+            { 0x14, "Mana Fortress Exterior" },
+            { 0x15, "Mana Fortress Interior" },
+            { 0x16, "Seed Palace Exterior 1" },
+            { 0x17, "Seed Palace Interior" },
+            { 0x18, "Upscale Town Exterior" },
+            { 0x19, "Snow Village Exterior" },
+            { 0x1A, "Grand Palace Interior" },
+            { 0x1B, "Grand Palace Sand Interior" },
+            { 0x1C, "Upscale Town Interior" },
+            //{ 0x1D, "Invalid (Dummied Out)" },
+            { 0x1E, "Pure Land Exterior" },
+            { 0x1F, "Seed Palace Exterior 2" },
+            //{ 0x20, "Invalid (Dummied Out)" },
+        };
+
+        public static IReadOnlyDictionary<byte, string> LayerScrollNameStrings { get; } = new Dictionary<byte, string>()
+        {
+            { 0x00, "(00) No Scroll" },
+            { 0x12, "(12) No Scroll" },                // (00B2) Pure Land (Intro Cutscene Version)
+            
+            { 0x08, "(08) Layer 1: South-East" },
+            { 0x09, "(09) Layer 1: Swirl" },
+
+            { 0x04, "(04) Layer 2: North" },
+            { 0x03, "(03) Layer 2: South" },
+            { 0x02, "(02) Layer 2: East" },
+            { 0x0D, "(0D) Layer 2: East" },
+            { 0x10, "(10) Layer 2: East (Slow)" },
+            { 0x0C, "(0C) Layer 2: West" },
+            { 0x0F, "(0F) Layer 2: West (Slow)" },
+            { 0x07, "(07) Layer 2: South-East" },
+            { 0x01, "(01) Layer 2: South-West" },
+            { 0x05, "(05) Layer 2: Swirl" },
+
+            { 0x06, "(06) Layer 2: Follows Player" },
+            { 0x0B, "(0B) Layer 2: Follows Player" },  // (0100) Potos Fields - Waterfall Log Bridge
+            { 0x0E, "(0E) Layer 2: Follows Player" },
+            { 0x11, "(11) Layer 2: Follows Player" },  // (00B1) Mana Fortress - Boss Arena - Mech Rider III (Intro Cutscene Version)
+            { 0x13, "(13) Layer 2: Follows Player" },  // (00B3) Pure Land - Mana Tree (Intro Cutscene Version)
+
+            { 0x0A, "(0A) Layer 2: Opposite Player" }, // (00EC) Pure Land - Mana Tree Outlook
+
+            //{ 0x14, "(14) Invalid (Dummied Out)" },
+            //{ 0x15, "(15) Invalid (Dummied Out)" },
+            //{ 0x16, "(16) Invalid (Dummied Out)" },
+            //{ 0x17, "(17) Invalid (Dummied Out)" },
+            //{ 0x18, "(18) Invalid (Dummied Out)" },
+            //{ 0x19, "(19) Invalid (Dummied Out)" },
+            //{ 0x1A, "(1A) Invalid (Dummied Out)" },
+            //{ 0x1B, "(1B) Invalid (Dummied Out)" },
+            //{ 0x1C, "(1C) Invalid (Dummied Out)" },
+            //{ 0x1D, "(1D) Invalid (Dummied Out)" },
+            //{ 0x1E, "(1E) Invalid (Dummied Out)" },
+            //{ 0x1F, "(1F) Invalid (Dummied Out)" },
+        };
     }
 }

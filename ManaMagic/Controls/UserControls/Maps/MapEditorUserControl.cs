@@ -17,6 +17,7 @@ namespace ManaMagic.Controls.UserControls.Maps
 {
     public partial class MapEditorUserControl : UserControl, IManaControl
     {
+        private readonly IReadOnlyDictionary<string, Action<MapHeader>> MapHeaderEventHandlers;
         private readonly IReadOnlyDictionary<string, Action<MapSpriteObject>> MapSpriteObjectEventHandlers;
 
         private ManaMap activeMap = ManaMap.Empty;
@@ -30,8 +31,8 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.DebugEnableOptions();
             this.Initialize();
             this.onEnterEventNumericUpDown.Maximum = Constants.Bank0A.EventIdMaximum;
-            this.SetEnabledState(false);
 
+            this.MapHeaderEventHandlers = this.LoadMapHeaderEventHandlers();
             this.MapSpriteObjectEventHandlers = this.LoadMapSpriteObjectEventHandlers();
         }
 
@@ -46,25 +47,23 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.ignoreEvents = true;
             foreach (MapEventOptions option in Enum.GetValues<MapEventOptions>())
             {
-                if (option != MapEventOptions.None)
+                if (option != MapEventOptions.None && option != MapEventOptions.OnEnter)
                 {
                     this.eventOptionsCheckedListBox.Items.Add(option);
                 }
             }
 
-            foreach (MapSpecialItemsOptions option in Enum.GetValues<MapSpecialItemsOptions>())
-            {
-                if (option != MapSpecialItemsOptions.None)
-                {
-                    this.specialItemOptionsCheckedListBox.Items.Add(option);
-                }
-            }
+            this.specialItemOptionsCheckedListBox.Items.Add(MapSpecialItemsOptions.MagicRopeAllowed);
+            this.specialItemOptionsCheckedListBox.Items.Add(MapSpecialItemsOptions.FlammieDrumAllowed);
 
             foreach (LayerLoadMode option in Enum.GetValues<LayerLoadMode>())
             {
                 this.layerLoadModeCheckedListBox.Items.Add(option);
             }
 
+            ManaUtil.BindMap8x8TilesetComboBox(this.tileset8x8ComboBox);
+            ManaUtil.BindComboBox(this.tileset16x16ComboBox, ManaMetadata.Map16x16TilesetNameStrings);
+            ManaUtil.BindComboBox(this.layerScrollComboBox, ManaMetadata.LayerScrollNameStrings);
             ManaUtil.BindComboBox(this.spriteIndexComboBox, ManaMetadata.SpriteNameStrings);
 
             this.spriteEventFlagComboBox.DataSource = Enum.GetValues<EventFlag>();
@@ -80,6 +79,7 @@ namespace ManaMagic.Controls.UserControls.Maps
         private void SetMap(bool changeForceState = true)
         {
             this.SuspendLayout();
+            this.ignoreEvents = true;
             this.mapIdNumericUpDown.Enabled = false;
             this.mapSpiteObjectIndex = -1;
             ushort mapId = (ushort)this.mapIdNumericUpDown.Value;
@@ -104,26 +104,9 @@ namespace ManaMagic.Controls.UserControls.Maps
             {
                 this.mapIdNumericUpDown.Enabled = true;
                 this.mapIdNumericUpDown.Focus();
+                this.ignoreEvents = false;
                 this.ResumeLayout();
             }
-        }
-
-        private void SetEnabledState(bool enabled)
-        {
-            this.SuspendLayout();
-            this.tileset8x8NumericUpDown.Enabled = enabled;
-            this.tileset16x16NumericUpDown.Enabled = enabled;
-            this.paletteSetNumericUpDown.Enabled = enabled;
-            this.displaySettingsNumericUpDown.Enabled = enabled;
-            this.layerScrollSettingsNumericUpDown.Enabled = enabled;
-            this.unknownNumericUpDown.Enabled = enabled;
-            this.npcPaletteSetNumericUpDown.Enabled = enabled;
-            this.combatMapCheckBox.Enabled = enabled;
-            this.eventOptionsCheckedListBox.Enabled = enabled;
-            this.specialItemOptionsCheckedListBox.Enabled = enabled;
-            this.layerLoadModeCheckedListBox.Enabled = enabled;
-            this.onEnterGroupBox.Enabled = enabled;
-            this.ResumeLayout();
         }
 
         [Conditional("DEBUG")]
@@ -151,34 +134,28 @@ namespace ManaMagic.Controls.UserControls.Maps
 
         private void SetHeader()
         {
-            this.tileset8x8NumericUpDown.Value = this.activeMap.Header.Tileset8x8Index;
-            this.tileset16x16NumericUpDown.Value = this.activeMap.Header.Tileset16x16Index;
+            this.tileset8x8ComboBox.SelectedValue = this.activeMap.Header.Tileset8x8Index;
+            this.tileset16x16ComboBox.SelectedValue = this.activeMap.Header.Tileset16x16Index;
             this.paletteSetNumericUpDown.Value = this.activeMap.Header.PaletteSetIndex;
             this.displaySettingsNumericUpDown.Value = this.activeMap.Header.DisplaySettingsIndex;
-            this.layerScrollSettingsNumericUpDown.Value = this.activeMap.Header.LayerScrollSettingsIndex;
-            this.unknownNumericUpDown.Value = this.activeMap.Header.Unused;
+            this.layerScrollComboBox.SelectedValue = this.activeMap.Header.LayerScrollSettingsIndex;
             this.npcPaletteSetNumericUpDown.Value = this.activeMap.Header.NpcPaletteIndex;
+            this.npcPaletteSetNumericUpDown.Enabled = !this.activeMap.Header.IsCombatMap;
             this.combatMapCheckBox.Checked = this.activeMap.Header.IsCombatMap;
+            this.isDungeonCheckBox.Checked = this.activeMap.Header.SpecialItemsOptions.HasFlag(MapSpecialItemsOptions.Dungeon);
 
             int index = 0;
             foreach (MapEventOptions option in Enum.GetValues<MapEventOptions>())
             {
-                if (option != MapEventOptions.None)
+                if (option != MapEventOptions.None && option != MapEventOptions.OnEnter)
                 {
                     this.eventOptionsCheckedListBox.SetItemChecked(index, this.activeMap.Header.EventOptions.HasFlag(option));
                     index++;
                 }
             }
 
-            index = 0;
-            foreach (MapSpecialItemsOptions option in Enum.GetValues<MapSpecialItemsOptions>())
-            {
-                if (option != MapSpecialItemsOptions.None)
-                {
-                    this.specialItemOptionsCheckedListBox.SetItemChecked(index, this.activeMap.Header.SpecialItemsOptions.HasFlag(option));
-                    index++;
-                }
-            }
+            this.specialItemOptionsCheckedListBox.SetItemChecked(0, this.activeMap.Header.SpecialItemsOptions.HasFlag(MapSpecialItemsOptions.MagicRopeAllowed));
+            this.specialItemOptionsCheckedListBox.SetItemChecked(1, this.activeMap.Header.SpecialItemsOptions.HasFlag(MapSpecialItemsOptions.FlammieDrumAllowed));
 
             index = 0;
             foreach (LayerLoadMode option in Enum.GetValues<LayerLoadMode>())
@@ -189,13 +166,18 @@ namespace ManaMagic.Controls.UserControls.Maps
 
             string onEnterText = "0000";
             ushort onEnterValue = 0;
+            bool enabled = false;
             if (this.activeMap.Header.EventOptions.HasFlag(MapEventOptions.OnEnter))
             {
                 onEnterText = ManaMetadata.GetEventFriendlyName(this.activeMap.Triggers[0].Value);
                 onEnterValue = this.activeMap.Triggers[0].Value;
+                enabled = true;
+
             }
             this.onEnterEventLabel.Text = onEnterText;
             this.onEnterEventNumericUpDown.Value = onEnterValue;
+            this.onEnterEventCheckBox.Checked = enabled;
+            this.onEnterGroupBox.Enabled = enabled;
 
             this.spriteObjectTreeView.Nodes.Clear();
             this.spriteEditorPanel.Visible = false;
@@ -325,6 +307,61 @@ namespace ManaMagic.Controls.UserControls.Maps
                                          this.layer02Background02ToolStripMenuItem.Checked);
         }
 
+        private IReadOnlyDictionary<string, Action<MapSpriteObject>> LoadMapSpriteObjectEventHandlers()
+        {
+            return new Dictionary<string, Action<MapSpriteObject>>()
+            {
+                { this.spriteIndexComboBox.Name, (MapSpriteObject spriteObject) =>
+                    {
+                        spriteObject.SpriteIndex = (byte)this.spriteIndexComboBox.SelectedIndex;
+                        this.spriteObjectTreeView.SelectedNode.Text = $"Sprite: {ManaMetadata.GetSpriteFriendlyName(spriteObject.SpriteIndex)}";
+                        this.RefreshMap();
+                    }
+                },
+
+                { this.spriteEventFlagComboBox.Name, (MapSpriteObject spriteObject) => { spriteObject.EventFlag = (EventFlag)this.spriteEventFlagComboBox.SelectedItem; } },
+                { this.spriteFlagMinNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.EventFlagMinimum = (byte)this.spriteFlagMinNumericUpDown.Value; } },
+                { this.spriteFlagMaxNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.EventFlagMaximum = (byte)this.spriteFlagMaxNumericUpDown.Value; } },
+                { this.spriteXCoordinateNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.Location.X = (byte)this.spriteXCoordinateNumericUpDown.Value; } },
+                { this.spriteYCoordinateNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.Location.Y = (byte)this.spriteYCoordinateNumericUpDown.Value; } },
+                { this.spriteDirectionComboBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Direction = (SpriteDirection)this.spriteDirectionComboBox.SelectedItem; } },
+                { this.spritePaletteIndexNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.PaletteIndex = (byte)this.spritePaletteIndexNumericUpDown.Value; } },
+                { this.spriteEventNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.EventIndex = (byte)this.spriteEventNumericUpDown.Value; } },
+
+                { this.spriteEventInRadiusCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.EventInRadius, this.spriteEventInRadiusCheckBox.Checked); } },
+                { this.spriteDoNotFaceOnInteractCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.DoNotFaceOnInteract, this.spriteDoNotFaceOnInteractCheckBox.Checked); } },
+                { this.spriteEventOnInteractCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.EventOnInteract, this.spriteEventOnInteractCheckBox.Checked); } },
+                { this.spritePushableCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.Pushable, this.spritePushableCheckBox.Checked); } },
+
+                { this.spriteAlwaysLoadedCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.AlwaysLoaded = this.spriteAlwaysLoadedCheckBox.Checked; } },
+                { this.spriteStationaryCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Stationary = this.spriteStationaryCheckBox.Checked; } },
+            };
+        }
+
+        private IReadOnlyDictionary<string, Action<MapHeader>> LoadMapHeaderEventHandlers()
+        {
+            return new Dictionary<string, Action<MapHeader>>()
+            {
+                { this.tileset8x8ComboBox.Name, (MapHeader header) => { header.Tileset8x8Index = (byte)this.tileset8x8ComboBox.SelectedValue; } },
+                { this.tileset16x16ComboBox.Name, (MapHeader header) => { header.Tileset16x16Index = (byte)this.tileset16x16ComboBox.SelectedValue; } },
+                { this.paletteSetNumericUpDown.Name, (MapHeader header) => { header.PaletteSetIndex = (byte)this.paletteSetNumericUpDown.Value; } },
+                { this.displaySettingsNumericUpDown.Name, (MapHeader header) => { header.DisplaySettingsIndex = (byte)this.displaySettingsNumericUpDown.Value; } },
+                { this.layerScrollComboBox.Name, (MapHeader header) => { header.LayerScrollSettingsIndex = (byte)this.layerScrollComboBox.SelectedValue; } },
+                { this.npcPaletteSetNumericUpDown.Name, (MapHeader header) => { header.DisplaySettingsIndex = (byte)this.npcPaletteSetNumericUpDown.Value; } },
+                { this.isDungeonCheckBox.Name, (MapHeader header) => { header.SpecialItemsOptions = (MapSpecialItemsOptions)ManaUtil.SetFlagState((byte)header.SpecialItemsOptions, (byte)MapSpecialItemsOptions.Dungeon, this.isDungeonCheckBox.Checked); } },
+
+                { this.combatMapCheckBox.Name, (MapHeader header) => {
+                    this.npcPaletteSetNumericUpDown.Enabled = !this.combatMapCheckBox.Checked;
+                    this.npcPaletteSetNumericUpDown.Value = this.combatMapCheckBox.Checked ? Constants.CombatMapMarker : 0x00;
+                }},
+
+                { this.onEnterEventCheckBox.Name, (MapHeader header) => {
+                    header.EventOptions = (MapEventOptions)ManaUtil.SetFlagState((byte)header.EventOptions, (byte)MapEventOptions.OnEnter, this.onEnterEventCheckBox.Checked);
+                    this.onEnterGroupBox.Enabled = this.onEnterEventCheckBox.Checked;
+                }},
+            };
+        }
+
         private void MapEditorUserControl_Load(object sender, EventArgs e)
         {
             this.SetIndex(0x0010); // Color Math map.
@@ -354,12 +391,17 @@ namespace ManaMagic.Controls.UserControls.Maps
 
         private void View8x8TilesetButton_Click(object sender, EventArgs e)
         {
-            ManaMagicContext.Current.SwitchToSection(TreeViewSection.Map8x8TilesetViewer, (int)this.tileset8x8NumericUpDown.Value);
+            ManaMagicContext.Current.SwitchToSection(TreeViewSection.Map8x8TilesetViewer, (byte)this.tileset8x8ComboBox.SelectedValue);
         }
 
         private void View16x16TilesetButton_Click(object sender, EventArgs e)
         {
-            ManaMagicContext.Current.SwitchToSection(TreeViewSection.Map16x16TilesetViewer, (int)this.tileset16x16NumericUpDown.Value);
+            ManaMagicContext.Current.SwitchToSection(TreeViewSection.Map16x16TilesetViewer, (byte)this.tileset16x16ComboBox.SelectedValue);
+        }
+
+        private void ViewPaletteSetButton_Click(object sender, EventArgs e)
+        {
+            ManaMagicContext.Current.SwitchToSection(TreeViewSection.MapPaletteEditor, (byte)this.paletteSetNumericUpDown.Value);
         }
 
         private void RunMapDebuggerButton_Click(object sender, EventArgs e)
@@ -404,35 +446,57 @@ namespace ManaMagic.Controls.UserControls.Maps
             this.mapSpiteObjectIndex = -1;
         }
 
-        private IReadOnlyDictionary<string, Action<MapSpriteObject>> LoadMapSpriteObjectEventHandlers()
+        private void MapHeaderControl_ValueChanged(object sender, EventArgs args)
         {
-            return new Dictionary<string, Action<MapSpriteObject>>()
+            if (!this.ignoreEvents && this.activeMap != null && sender is Control control)
             {
-                { this.spriteIndexComboBox.Name, (MapSpriteObject spriteObject) =>
-                    {
-                        spriteObject.SpriteIndex = (byte)this.spriteIndexComboBox.SelectedIndex;
-                        this.spriteObjectTreeView.SelectedNode.Text = $"Sprite: {ManaMetadata.GetSpriteFriendlyName(spriteObject.SpriteIndex)}";
-                        this.RefreshMap();
-                    }
-                },
+                if (this.MapHeaderEventHandlers.TryGetValue(control.Name, out Action<MapHeader>? eventHandler))
+                {
+                    eventHandler(this.activeMap.Header);
+                }
+            }
+        }
 
-                { this.spriteEventFlagComboBox.Name, (MapSpriteObject spriteObject) => { spriteObject.EventFlag = (EventFlag)this.spriteEventFlagComboBox.SelectedItem; } },
-                { this.spriteFlagMinNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.EventFlagMinimum = (byte)this.spriteFlagMinNumericUpDown.Value; } },
-                { this.spriteFlagMaxNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.EventFlagMaximum = (byte)this.spriteFlagMaxNumericUpDown.Value; } },
-                { this.spriteXCoordinateNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.Location.X = (byte)this.spriteXCoordinateNumericUpDown.Value; } },
-                { this.spriteYCoordinateNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.Location.Y = (byte)this.spriteYCoordinateNumericUpDown.Value; } },
-                { this.spriteDirectionComboBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Direction = (SpriteDirection)this.spriteDirectionComboBox.SelectedItem; } },
-                { this.spritePaletteIndexNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.PaletteIndex = (byte)this.spritePaletteIndexNumericUpDown.Value; } },
-                { this.spriteEventNumericUpDown.Name, (MapSpriteObject spriteObject) => { spriteObject.EventIndex = (byte)this.spriteEventNumericUpDown.Value; } },
+        private void EventOptionsCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (!this.ignoreEvents && this.activeMap != null)
+            {
+                MapEventOptions value = (MapEventOptions)this.eventOptionsCheckedListBox.Items[e.Index];
+                if (e.NewValue == CheckState.Checked)
+                {
+                    this.activeMap.Header.EventOptions |= value;
+                    return;
+                }
+                this.activeMap.Header.EventOptions &= ~value;
+            }
+        }
 
-                { this.spriteEventInRadiusCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.EventInRadius, this.spriteEventInRadiusCheckBox.Checked); } },
-                { this.spriteDoNotFaceOnInteractCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.DoNotFaceOnInteract, this.spriteDoNotFaceOnInteractCheckBox.Checked); } },
-                { this.spriteEventOnInteractCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.EventOnInteract, this.spriteEventOnInteractCheckBox.Checked); } },
-                { this.spritePushableCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Interactions = (SpriteInteractTypes)ManaUtil.SetFlagState((byte)spriteObject.Interactions, (byte)SpriteInteractTypes.Pushable, this.spritePushableCheckBox.Checked); } },
+        private void SpecialItemsOptionsCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (!this.ignoreEvents && this.activeMap != null)
+            {
+                MapSpecialItemsOptions value = (MapSpecialItemsOptions)this.specialItemOptionsCheckedListBox.Items[e.Index];
+                if (e.NewValue == CheckState.Checked)
+                {
+                    this.activeMap.Header.SpecialItemsOptions |= value;
+                    return;
+                }
+                this.activeMap.Header.SpecialItemsOptions &= ~value;
+            }
+        }
 
-                { this.spriteAlwaysLoadedCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.AlwaysLoaded = this.spriteAlwaysLoadedCheckBox.Checked; } },
-                { this.spriteStationaryCheckBox.Name, (MapSpriteObject spriteObject) => { spriteObject.Stationary = this.spriteStationaryCheckBox.Checked; } },
-            };
+        private void LayerLoadModeOptionsCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (!this.ignoreEvents && this.activeMap != null)
+            {
+                LayerLoadMode value = (LayerLoadMode)this.layerLoadModeCheckedListBox.Items[e.Index];
+                if (e.NewValue == CheckState.Checked)
+                {
+                    this.activeMap.Header.LayerLoadMode |= value;
+                    return;
+                }
+                this.activeMap.Header.LayerLoadMode &= ~value;
+            }
         }
 
         private void MapSpriteObjectControl_ValueChanged(object sender, EventArgs args)

@@ -48,6 +48,19 @@ namespace ManaMagic
             comboBox.SelectedIndex = 0;
         }
 
+        public static void BindMap8x8TilesetComboBox(ComboBox comboBox, bool removeInvalidEntries = true)
+        {
+            List<MapTilesetMetadata> list = ManaMetadata.Map8x8TilesetMetadata.ToList();
+            if (removeInvalidEntries)
+            {
+                list.RemoveAll(p => p.IsDummiedOut);
+            }
+            comboBox.DataSource = list;
+            comboBox.ValueMember = "Index";
+            comboBox.DisplayMember = "Name";
+            comboBox.SelectedIndex = 0;
+        }
+
         public static void SetDoubleBuffered(this DataGridView dataGridView, bool doubleBuffered)
         {
             typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, dataGridView, new object[] { doubleBuffered });

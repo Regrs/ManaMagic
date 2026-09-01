@@ -429,6 +429,9 @@ namespace ManaMagic.Core.Metadata
             { 0x06AE, "Dummied Out" },
             { 0x06AF, "Dummied Out" },
 
+            { 0x06D7, "Whip Post: Perform Jump" },
+            { 0x06D8, "Whip Post: Weapon Check" },
+
             { 0x06EB, "Close And Lock All Generic Palace Doors" },
             { 0x06EC, "Close Generic Palace Door 01" },
             { 0x06ED, "Close Generic Palace Door 02" },
@@ -443,7 +446,7 @@ namespace ManaMagic.Core.Metadata
             { 0x06F5, "Close All Generic Palace Doors And Refresh Map" },
             { 0x06F6, "Close All Generic Palace Doors" },
 
-            { 0x06F8, "Whip Post: Start Jump" },
+            { 0x06F8, "Whip Post Collision: Start Jump" },
 
             { 0x0700, "Play Track: 'Secret of the Arid Sands' (E)" }, // Not Returnable
             { 0x0701, "Play Track: 'Flight into the Unknown' (E) (Dummied Out)" }, // Not Returnable
