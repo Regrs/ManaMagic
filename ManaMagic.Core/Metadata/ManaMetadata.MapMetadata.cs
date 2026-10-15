@@ -5,6 +5,7 @@ using ZwellTech.SuperNintendo;
 
 namespace ManaMagic.Core.Metadata
 {
+    //https://docs.google.com/spreadsheets/u/0/d/1930AfZklHp_VXNlPLac67S2DLQobetB7pjnjojZNzOg/htmlview?pli=1#gid=0
     public static partial class ManaMetadata
     {
         private static readonly IReadOnlyDictionary<ushort, string> DoorNameStrings = new Dictionary<ushort, string>()

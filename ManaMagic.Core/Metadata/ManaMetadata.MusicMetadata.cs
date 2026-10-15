@@ -111,6 +111,26 @@ namespace ManaMagic.Core.Metadata
                 new MusicMetadata(0x3E, "'A Conclusion'", MusicMetadataFlags.DummiedOut),
                 new MusicMetadata(0x3F, "'A Conclusion'", MusicMetadataFlags.DummiedOut),
         };
+
+        public static IReadOnlyList<string> NoteNames { get; } = new List<string>() { "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A# (2)" };
+        public static IReadOnlyList<string> DurationNames { get; } = new List<string>()
+        { 
+            "Whole Note",
+            "Dotted Half Note",
+            "Half Note",
+            "Half Note Triplet",
+            "Dotted Quarter Note",
+            "Quarter Note",
+            "Quarter Note Triplet",
+            "Dotted Eighth Note",
+            "Eighth Note",
+            "Triplet",
+            "Sixteenth Note",
+            "Sixteenth Note Triplet",
+            "Thirty-Second Note",
+            "Thirty-Second Note Tripet",
+            "Sixty-Fourth Note"
+        };
     }
 }
 /*

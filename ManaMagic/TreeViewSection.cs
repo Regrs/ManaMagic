@@ -93,6 +93,7 @@ namespace ManaMagic
         // Debug
         DebugDisassembly,
         DebugDebugger,
+        DebugAudioDebugger,
         DebugDrawCanvas,
 
         // Debug -> Views

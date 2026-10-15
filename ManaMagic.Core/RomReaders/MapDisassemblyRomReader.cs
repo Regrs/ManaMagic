@@ -6,6 +6,8 @@ using ZwellTech.Logging;
 using ZwellTech.SuperNintendo;
 
 #nullable enable
+#pragma warning disable CA1834 // Consider using 'StringBuilder.Append(char)' when applicable
+#pragma warning disable IDE0051 // Remove unused private members
 
 namespace ManaMagic.Core.RomReaders
 {
@@ -627,7 +629,7 @@ namespace ManaMagic.Core.RomReaders
 
     internal sealed class DisassemblyUtil
     {
-        private SecretOfManaContext context = null!;
+        private readonly SecretOfManaContext context = null!;
 
         private void LoadBank03_Stuff()
         {
@@ -935,3 +937,6 @@ namespace ManaMagic.Core.RomReaders
         }
     }
 }
+
+#pragma warning restore CA1834 // Consider using 'StringBuilder.Append(char)' when applicable
+#pragma warning restore IDE0051 // Remove unused private members

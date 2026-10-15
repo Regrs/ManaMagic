@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
+using ManaMagic.Core;
 using ManaMagic.Core.Items;
 using ZwellTech.SuperNintendo;
 using ZwellTech.Windows.Forms;
@@ -79,7 +80,6 @@ namespace ManaMagic.Controls.UserControls.Items.Shops
             if (e.RowIndex > -1 && !this.ignoreEvents)
             {
                 this.ignoreEvents = true;
-                DataGridView? dataGridView = sender as DataGridView;
                 DataTable<UShortValue>? dataTable = null;
                 bool sellable = true;
 
@@ -89,7 +89,7 @@ namespace ManaMagic.Controls.UserControls.Items.Shops
                 else if (sender == this.accessoriesDataGridView) { dataTable = ManaMagicContext.Current.Context.ItemContext.AccessoryPriceTable; }
                 else if (sender == this.weaponUpgradesDataGridView) { dataTable = ManaMagicContext.Current.Context.ItemContext.WeaponUpgradePriceTable; sellable = false; }
 
-                if (dataGridView != null && dataTable != null)
+                if (sender is DataGridView dataGridView && dataTable != null)
                 {
                     ushort value = Convert.ToUInt16(dataGridView[ShopPriceEditorUserControl.ValueColumnIndex, e.RowIndex].Value);
                     if (!sellable)
