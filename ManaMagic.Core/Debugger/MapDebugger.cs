@@ -58,6 +58,9 @@ namespace ManaMagic.Core.Debugger
                 case MapDebuggerOption.PrintMaxSpriteCount:
                     MapDebugger.PrintMaxSpriteCount();
                     break;
+                case MapDebuggerOption.PrintMapsUsingEventOption08:
+                    MapDebugger.PrintMapsUsingEventOption08();
+                    break;
                 default:
                     ThrowHelper.ThrowArgumentException("Unknown debugger option", nameof(option));
                     break;
@@ -445,6 +448,26 @@ namespace ManaMagic.Core.Debugger
                 index++;
             }
             LoggerEngine.Logger.LogDebug(LogComponent.Debug, $"Max sprites on a single map is {maxSprites}, on map {mapId:X4}.");
+        }
+
+        [Conditional("DEBUG")]
+        private static void PrintMapsUsingEventOption08()
+        {
+            if (!MapDebugger.CanDebug)
+            {
+                ThrowHelper.ThrowInvalidOperationException("Map debugger has not been initialized.");
+                return;
+            }
+
+            ushort mapId = 0;
+            foreach (MapHeader header in MapDebugger.Context.MapContext.MapHeaderTable)
+            {
+                if (header.IsValid && header.EventOptions.HasFlag(MapEventOptions.Unknown08))
+                {
+                    ManaDebugger.DebugPrint(ManaMetadata.GetMapFriendlyName(mapId));
+                }
+                mapId++;
+            }
         }
     }
 }

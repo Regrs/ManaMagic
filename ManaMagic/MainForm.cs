@@ -6,6 +6,7 @@ using ManaMagic.Controls.UserControls.Boss;
 using ManaMagic.Controls.UserControls.Character;
 using ManaMagic.Controls.UserControls.Debug;
 using ManaMagic.Controls.UserControls.Debug.Views;
+using ManaMagic.Controls.UserControls.Debugging;
 using ManaMagic.Controls.UserControls.Events;
 using ManaMagic.Controls.UserControls.Help;
 using ManaMagic.Controls.UserControls.Items;
@@ -115,6 +116,7 @@ namespace ManaMagic
             // Debug
             { TreeViewSection.DebugDisassembly, new DisassemblyUtilUserControl() { Dock = DockStyle.Fill } },
             { TreeViewSection.DebugDebugger, new DebuggerUserControl() { Dock = DockStyle.Fill } },
+            { TreeViewSection.DebugAudioDebugger, new AudioDebuggerUserControl() { Dock = DockStyle.Fill } },
             { TreeViewSection.DebugDrawCanvas, new DebugDrawCanvasUserControl() { Dock = DockStyle.Fill } },
 
             // Debug -> Views
@@ -318,6 +320,7 @@ namespace ManaMagic
                 TreeNode debugNode = new TreeNode("Debug");
                 debugNode.Nodes.Add(new ManaTreeNode("Disassembly", TreeViewSection.DebugDisassembly));
                 debugNode.Nodes.Add(new ManaTreeNode("Debugger", TreeViewSection.DebugDebugger));
+                debugNode.Nodes.Add(new ManaTreeNode("Audio Debugger", TreeViewSection.DebugAudioDebugger));
                 debugNode.Nodes.Add(new ManaTreeNode("Draw Canvas", TreeViewSection.DebugDrawCanvas));
 
                 // Debug -> Views

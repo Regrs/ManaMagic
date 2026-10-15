@@ -1,0 +1,2 @@
+cd /d "D:\Software Development\ManaMagic\ManaMagic.Core" &msbuild "ManaMagic.Core.csproj" /t:sdvViewer /p:configuration="Debug" /p:platform="Any CPU" /p:SolutionDir="D:\Software Development\ManaMagic" 
+exit %errorlevel% 

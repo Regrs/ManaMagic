@@ -403,7 +403,36 @@ namespace ManaMagic.Core
         /// <summary>
         /// Contains addresses, offsets, and other important values in Bank 03.
         /// </summary>
-        public static class Bank03 { }
+        public static class Bank03
+        {
+            public const int EchoSettingsTableAddress = Constants.Bank03Offset | 0x0708;
+            public const uint EchoSettingsTableAddressSize = 0x10;
+
+            public const int AkaoMessageParameterCountTableAddress = Constants.Bank03Offset | 0x19CE;
+            public const uint AkaoMessageParameterCountTableSize = 0x2E;
+
+            public const int AkaoNotePitchesTableAddress = Constants.Bank03Offset | 0x1A3C;
+            public const uint AkaoNotePitchesTableSize = 0x0D;
+
+            public const int EchoFilterCoefficientTableAddress = Constants.Bank03Offset | 0x1A56;
+            public const uint EchoFilterCoefficientTableSize = 0x04;
+
+            public const int AkaoNoteDurationTableAddress = Constants.Bank03Offset | 0x1A76;
+            public const uint AkaoNoteDurationTableSize = 0x0F;
+
+            public const int AkaoSongSequencePointerTableAddress = Constants.Bank03Offset | 0x3D39;
+            public const uint AkaoSongSequencePointerTableSize = 0x40;
+
+            public const int InstrumentPointerTableAddress = Constants.Bank03Offset | 0x3DF9;
+            public const int InstrumentLoopbackTableAddress = Constants.Bank03Offset | 0x3E5C;
+            public const int InstrumentFrequencyMultiplierTableAddress = Constants.Bank03Offset | 0x3E9E;
+            public const int InstrumentAdsrTableAddress = Constants.Bank03Offset | 0x3EE0;
+            public const uint InstrumentTableSize = 0x21;
+
+            public const int TrackInstrumentTableAddress = Constants.Bank03Offset | 0x3F22;
+            public const uint TrackInstrumentTableSize = 0x40;
+            public const uint InstrumentsPerTrack = 0x10;
+        }
 
         /// <summary>
         /// Contains addresses, offsets, and other important values in Bank 06.

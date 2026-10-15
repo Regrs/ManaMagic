@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using ManaMagic.Core.Analyzer;
+using ManaMagic.Core.Audio;
 using ManaMagic.Core.Bosses;
 using ManaMagic.Core.Character;
 using ManaMagic.Core.Events;
@@ -35,6 +36,7 @@ namespace ManaMagic.Core
         public MenuContext MenuContext { get; } = new MenuContext();
         public SpriteContext SpriteContext { get; } = new SpriteContext();
         public TextContext TextContext { get; } = new TextContext();
+        public AudioContext AudioContext { get; } = new AudioContext();
 
         public SecretOfManaContext() { this.Analyzer = new ManaAnalyzer(this); }
 
@@ -55,6 +57,7 @@ namespace ManaMagic.Core
             this.EventContext.Initialize();
             this.MapContext.Initialize();
             this.WorldMapContext.Initialize();
+            this.AudioContext.Initialize();
             this.SpriteContext.Initialize(this.TextContext);
             this.ItemContext.Initialize(this.TextContext, this.MenuContext);
             this.BossContext.Initialize(this.TextContext, this.SpriteContext, this.LZ77Decompressor);

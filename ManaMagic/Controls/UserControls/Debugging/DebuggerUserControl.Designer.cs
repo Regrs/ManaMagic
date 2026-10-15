@@ -43,6 +43,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             this.debugPrintAnimationScriptCommandCountButton = new System.Windows.Forms.Button();
             this.debugScanForDisplaySettingsByteBitsButton = new System.Windows.Forms.Button();
             this.debugPrintMaxSpriteCountButton = new System.Windows.Forms.Button();
+            this.debugPrintMapsUsingEventOption08Button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // debugScanForF8FFCommandsButton
@@ -185,10 +186,21 @@ namespace ManaMagic.Controls.UserControls.Debug
             this.debugPrintMaxSpriteCountButton.UseVisualStyleBackColor = true;
             this.debugPrintMaxSpriteCountButton.Click += new System.EventHandler(this.RunMapDebuggerButton_Click);
             // 
+            // debugPrintMapsUsingEventOption08Button
+            // 
+            this.debugPrintMapsUsingEventOption08Button.Location = new System.Drawing.Point(20, 337);
+            this.debugPrintMapsUsingEventOption08Button.Name = "debugPrintMapsUsingEventOption08Button";
+            this.debugPrintMapsUsingEventOption08Button.Size = new System.Drawing.Size(187, 23);
+            this.debugPrintMapsUsingEventOption08Button.TabIndex = 59;
+            this.debugPrintMapsUsingEventOption08Button.Text = "PrintMapsUsingEventOption08";
+            this.debugPrintMapsUsingEventOption08Button.UseVisualStyleBackColor = true;
+            this.debugPrintMapsUsingEventOption08Button.Click += new System.EventHandler(this.RunMapDebuggerButton_Click);
+            // 
             // DebuggerUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.debugPrintMapsUsingEventOption08Button);
             this.Controls.Add(this.debugPrintMaxSpriteCountButton);
             this.Controls.Add(this.debugScanForDisplaySettingsByteBitsButton);
             this.Controls.Add(this.debugPrintAnimationScriptCommandCountButton);
@@ -225,5 +237,6 @@ namespace ManaMagic.Controls.UserControls.Debug
         private System.Windows.Forms.Button debugPrintAnimationScriptCommandCountButton;
         private System.Windows.Forms.Button debugScanForDisplaySettingsByteBitsButton;
         private System.Windows.Forms.Button debugPrintMaxSpriteCountButton;
+        private System.Windows.Forms.Button debugPrintMapsUsingEventOption08Button;
     }
 }

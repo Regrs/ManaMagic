@@ -22,6 +22,8 @@ namespace ManaMagic.Core.Metadata
         /// </summary>
         public MusicMetadataFlags Flags { get; init; }
 
+        public bool IsDummiedOut { get { return this.Flags.HasFlag(MusicMetadataFlags.DummiedOut); } }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MusicMetadata"/> class with the specified index, track name and metadata flags.
         /// </summary>

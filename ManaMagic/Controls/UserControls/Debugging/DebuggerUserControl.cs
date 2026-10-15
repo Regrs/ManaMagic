@@ -34,6 +34,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             this.debugPrintSpecialItem40Button.Tag = MapDebuggerOption.PrintSpecialItem40;
             this.debugScanForDisplaySettingsByteBitsButton.Tag = MapDebuggerOption.ScanForDisplaySettingsByteBits;
             this.debugPrintMaxSpriteCountButton.Tag = MapDebuggerOption.PrintMaxSpriteCount;
+            this.debugPrintMapsUsingEventOption08Button.Tag = MapDebuggerOption.PrintMapsUsingEventOption08;
 
             this.debugPrintDefinitionOffsetsButton.Tag = RingMenuDebuggerOption.PrintDefinitionOffsets;
             this.debugPrintWeaponDefinitionButton.Tag = RingMenuDebuggerOption.PrintWeaponDefinitions;

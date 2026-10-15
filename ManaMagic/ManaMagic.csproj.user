@@ -19,6 +19,9 @@
     <Compile Update="Controls\UserControls\Character\StatsByLevelTableEditorUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Update="Controls\UserControls\Debugging\AudioDebuggerUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Update="Controls\UserControls\Debugging\DebuggerUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

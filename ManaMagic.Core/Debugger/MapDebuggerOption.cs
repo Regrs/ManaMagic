@@ -15,5 +15,6 @@ namespace ManaMagic.Core.Debugger
         PrintSpecialItem40,
         ScanForDisplaySettingsByteBits,
         PrintMaxSpriteCount,
+        PrintMapsUsingEventOption08,
     }
 }

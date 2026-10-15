@@ -6,6 +6,8 @@ using ZwellTech.SuperNintendo;
 
 #nullable enable
 #pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable CA1834 // Consider using 'StringBuilder.Append(char)' when applicable
 
 namespace ManaMagic.Controls.UserControls.Debug
 {
@@ -16,9 +18,7 @@ namespace ManaMagic.Controls.UserControls.Debug
             InitializeComponent();
         }
 
-//#pragma warning disable IDE0051 // Remove unused private members
         private void DisassembleMapData()
-//#pragma warning restore IDE0051 // Remove unused private members
         {
             StringBuilder sb = new StringBuilder();
             MapDisassemblyRomReader romReader = RomReaderFactory.GetRomReader<MapDisassemblyRomReader>();
@@ -171,3 +171,8 @@ C8/53CC:	9888		[1E6]
 C8/53CE:	A488		[1E7]
 
 */
+
+
+#pragma warning restore IDE1006 // Naming Styles
+#pragma warning restore IDE0051 // Remove unused private members
+#pragma warning restore CA1834 // Consider using 'StringBuilder.Append(char)' when applicable

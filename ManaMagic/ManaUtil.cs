@@ -61,6 +61,19 @@ namespace ManaMagic
             comboBox.SelectedIndex = 0;
         }
 
+        public static void BindMusicTrackComboBox(ComboBox comboBox, bool removeInvalidEntries = true)
+        {
+            List<MusicMetadata> list = ManaMetadata.MusicMetadata.ToList();
+            if (removeInvalidEntries)
+            {
+                list.RemoveAll(p => p.IsDummiedOut);
+            }
+            comboBox.DataSource = list;
+            comboBox.ValueMember = "Index";
+            comboBox.DisplayMember = "TrackName";
+            comboBox.SelectedIndex = 0;
+        }
+
         public static void SetDoubleBuffered(this DataGridView dataGridView, bool doubleBuffered)
         {
             typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, dataGridView, new object[] { doubleBuffered });
